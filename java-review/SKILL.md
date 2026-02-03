@@ -26,7 +26,7 @@ description: "在代码走查时，都需要执行以下流程，确保代码被
 
 ## 输出
 
-每次结果都输出到 `doc/review/java-review-{yyyymmdd}-{seq%000}.md` 中
+每次结果都以中文输出到 `doc/review/java-review-{yyyymmdd}-{seq%000}.md` 中
 
 ## 核心原则
 
