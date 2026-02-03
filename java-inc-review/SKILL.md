@@ -1,6 +1,6 @@
 ---
-name: java-review
-description: "根据输入的git区间或svn区间，获得diff patch。patch走查时，都需要执行以下流程，确保代码被合理评估"
+name: java-inc-review
+description: "根据输入的git区间或svn区间，获得diff patch。patch走查时，都需要执行以下流程，确保代码被合理评估; 没有可执行文件，请按流程执行"
 ---
 
 # 代码走查
