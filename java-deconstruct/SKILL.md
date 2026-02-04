@@ -1,6 +1,6 @@
 ---
 name: java-deconstruct
-description: "读取所有java代码，解构为设计图，设计文档"
+description: "读取所有java代码，解构为设计图，设计文档; 没有执行文件，请按流程执行"
 ---
 
 # java代码解构
