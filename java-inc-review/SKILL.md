@@ -1,6 +1,6 @@
 ---
 name: java-inc-review
-description: "根据输入的git区间或svn区间，获得diff patch。patch走查时，都需要执行以下流程，确保代码被合理评估; 没有可执行文件，请按流程执行"
+description: "该skill没有执行文件，为操作指引：根据输入的git区间或svn区间，获得diff patch。patch走查时，都需要执行以下流程，确保代码被合理评估"
 ---
 
 # 代码走查
@@ -39,4 +39,3 @@ description: "根据输入的git区间或svn区间，获得diff patch。patch走
 ## 核心原则
 
 谦逊，目的是治病救人，目的不是羞辱人
-

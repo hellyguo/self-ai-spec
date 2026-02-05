@@ -1,6 +1,6 @@
 ---
 name: java-env
-description: "java项目的环境需要"
+description: "该skill没有执行文件，为信息输入：Java开发需要的环境信息"
 ---
 
 # 环境配置
@@ -30,4 +30,3 @@ description: "java项目的环境需要"
 
 - 基于pom.xml的配置查找jdk合适版本 
 - 优先使用mvnd
-
