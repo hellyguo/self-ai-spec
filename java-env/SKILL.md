@@ -12,11 +12,11 @@ description: "该skill没有执行文件，为信息输入：Java开发需要的
 
 ## mvnd dir:
 
-/home/helly/app/maven-mvnd-1.0.2-linux-amd64
+/home/helly/app/maven-mvnd
 
 ## mvn dir:
 
-/home/helly/app/apache-maven-3.9.9
+/home/helly/app/apache-maven
 
 ## spotbug dir:
 
