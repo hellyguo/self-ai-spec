@@ -169,8 +169,44 @@ stmt.executeQuery("SELECT * FROM table");  // ❌ 内联SQL
 - 使用适当的日志级别（重要操作用 info，跟踪用 debug，问题用 warn/error）
 - 在日志消息中使用占位符：`logger.info("已注册 {}: {}", enumClass.getSimpleName(), code)`
 - 对于批量处理中的可恢复错误，使用 `warn` 而非 `error`
+- 调试日志输出对象时，确保对象类重写了 `toString()` 方法，否则只能输出 `Xxx@12345678` 无效信息
+- 输出异常堆栈必须使用三参数形式：`log.error("msg: {}", e.getMessage(), e)`
+- 错误写法：`log.error("msg: {}", e)` 只输出异常类名或消息，无法输出堆栈
+- 正确写法：`log.error("msg: {}", e.getMessage(), e)` 可完整输出堆栈信息
 
-## 线程安全指南
+## 线程与并发规范
+
+### 线程创建与管理
+
+- 禁止使用 `new Thread()` 创建线程，成本极大，性能影响严重
+- 必须使用线程池（`ExecutorService`、`ThreadPoolExecutor`）创建线程
+- 线程必须命名，方便问题排查：`new ThreadFactory() { ... }` 或 `ThreadBuilder`
+- 线程池必须在应用关闭时正确停止，否则造成容器中线程泄漏
+- 禁止反复创建线程池，应作为单例或 Spring Bean 复用
+
+### CountDownLatch 使用规范
+
+- `latch.await()` 必须处理线程中断，否则导致线程僵死
+- 正确写法：
+```java
+try {
+    latch.await();
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+    log.warn("线程被中断", e);
+}
+```
+- Latch 对象应使用局部变量，避免多线程下成员变量被反复赋值的线程安全问题
+
+### 线程不安全类
+
+- `SimpleDateFormat`、`DecimalFormat` 等类禁止声明为全局静态变量
+- 如需性能优化，使用 `ThreadLocal` 包装：
+```java
+private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT = 
+    ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+```
+- 或使用 Java 8+ 的 `DateTimeFormatter`（线程安全）
 
 ### 并发模式
 
@@ -178,3 +214,123 @@ stmt.executeQuery("SELECT * FROM table");  // ❌ 内联SQL
 - 在特定的注册表映射上同步，以允许对不同枚举类型进行并行操作
 - 优先使用 ConcurrentHashMap 进行线程安全存储
 - 创建新注册表条目时始终同步，以防止竞态条件
+- 高并发计数使用 `LongAdder` 而非 `AtomicLong`
+
+## 事务管理规范
+
+### Spring 事务管理
+
+- 禁止在 Spring 事务管理体系下自行编码接管事务
+- 自行管理事务会扰乱 Spring 事务管理，造成严重事务干扰
+- 禁止使用 `Connection.setAutoCommit(false)` 等原始 JDBC 事务操作
+
+### 审计日志事务
+
+- 审计日志必须使用独立事务，确保记录成功/失败都有日志
+- 使用 `@Transactional(propagation = Propagation.REQUIRES_NEW)` 独立事务
+- 或使用 try-finally 结构保证审计日志写入：
+```java
+try {
+    businessOperation();
+} finally {
+    auditLogService.saveLog(logEntry);
+}
+```
+- 审计日志不能依赖业务事务，业务失败回滚时审计日志应保留
+
+## 分层架构规范
+
+### Controller 层职责
+
+- 仅负责接收请求、参数校验、调用 Service、返回响应
+- 禁止在 Controller 中编写业务逻辑
+- 禁止 Controller 直接操作 DAO，必须通过 Service 层
+- Controller 层应只做基础数据校验，业务逻辑下沉到 Service
+
+### Service 层职责
+
+- 封装业务逻辑，协调多个 Repository/DAO
+- 提供事务边界，保证业务操作的原子性
+- 禁止在 Service 层处理 HTTP 相关对象（如 `HttpServletRequest`、`HttpServletResponse`）
+- 禁止在 Service 层处理 JSON 序列化/反序列化
+- HTTP/URL/JSON 相关代码应隔离在 Controller 层，避免污染 Service 层
+
+### DAO/Repository 层职责
+
+- 仅负责数据访问，执行 SQL 操作
+- 禁止在 DAO 层编写业务逻辑
+- 查询结果映射为实体对象返回给 Service
+
+### 纯内存计算服务
+
+- 纯内存计算不应封装为 Service（Service 默认有事务开销）
+- 应封装为工具类（`XxxUtils`）或独立组件
+- 如 `GlMathServiceImpl` 中的数学计算应提取为 `MathUtils`
+
+## 性能优化规范
+
+### 缓存策略
+
+- 启动后不变的配置信息，启动时加载一次，后续复用
+- 系统日期等变化频率低的数据，切日时维护一次，后续复用
+- 禁止在循环或频繁调用的方法中反复读取配置
+- 使用 `static final` 或 `@PostConstruct` 初始化配置缓存
+
+### 正则表达式优化
+
+- 正则表达式必须预编译，禁止运行时反复编译
+- 错误写法：每次调用 `Pattern.matches(regex, input)`
+- 正确写法：
+```java
+private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
+// 使用时
+PHONE_PATTERN.matcher(input).matches();
+```
+
+### 字符串拼接
+
+- 循环中字符串拼接使用 `StringBuilder`，而非 `StringBuffer`
+- `StringBuilder` 非线程安全但性能更高，单线程场景优先使用
+- `StringBuffer` 线程安全但有同步开销，仅在多线程场景使用
+
+### 配置化
+
+- 可配置化的内容禁止写死在代码中
+- 如文件路径、URL、超时时间、阈值等应提取到配置文件
+- 使用 `@Value` 或 `@ConfigurationProperties` 注入配置
+
+## 数据库与兼容性规范
+
+### Oracle 与 GaussDB 兼容
+
+- SQL 语句应考虑 Oracle 和 GaussDB 双库兼容
+- 避免使用 Oracle 特有函数（如 `NVL`、`DECODE`），使用标准 SQL 或双库兼容写法
+- 分页查询使用 `ROWNUM`（Oracle）或 `LIMIT`（GaussDB）时需条件判断
+- 自增主键策略需适配双库
+
+### 大文件处理
+
+- 文件处理必须考虑大文件场景，避免内存溢出
+- 小文件（如 < 10MB）：可使用 `byte[]` 全量读取
+- 大文件：使用临时文件 + 流式读取
+```java
+// 大文件处理示例
+try (InputStream is = new FileInputStream(tempFile)) {
+    // 流式处理，避免全量加载到内存
+}
+```
+- 文件上传/下载时设置大小限制，防止恶意大文件攻击
+
+## API 使用规范
+
+### JDK 内部 API
+
+- 禁止使用 `com.sun.*` 包下的类
+- 这些包是 JDK 内部 API，版本升级时可能变化或移除
+- 如需替代方案，使用标准 JDK API 或第三方库
+
+### 公共代码复用
+
+- 明显公共性质的代码必须抽取为公共工具类
+- 如月末最后一天、季末最后一天等日期计算
+- 禁止在多个类中重复实现相同逻辑
