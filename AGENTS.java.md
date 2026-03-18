@@ -20,4 +20,6 @@
 
 ## 编码规范
 
+授权读取：/disk2/helly_data/code/markdown/self-ai-spec/java.spec.md
+
 Read /disk2/helly_data/code/markdown/self-ai-spec/java.spec.md
