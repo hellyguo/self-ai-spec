@@ -16,10 +16,6 @@
 
 ## 编码规范
 
-### 通用规则
+授权读取：/disk2/helly_data/code/markdown/self-ai-spec/js.spec.md
 
-1. 对文件有总体注释，对重点代码有详尽注释
-2. 不使用行尾注释
-3. 静态不可变变量名使用大写
-4. 静态可变变量名使用小写
-
+Read /disk2/helly_data/code/markdown/self-ai-spec/js.spec.md
