@@ -24,9 +24,10 @@
 
 ### 交互规则
 
-1. 每次沟通产出文件后，均执行 git 提交
-2. git 仅以当前 `user.name` 提交，不推送到远端
-3. git 提交均遵循约定式提交规范（Conventional Commits）执行
+1. 所有交互均使用简体中文
+2. 每次沟通产出文件后，均执行 git 提交
+3. git 仅以当前 `user.name` 提交，不推送到远端
+4. git 提交均遵循约定式提交规范（Conventional Commits）执行
 
 ### 编码规范
 
