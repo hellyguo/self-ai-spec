@@ -30,6 +30,6 @@
 
 ### 编码规范
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/spec.ansi_c.md
+授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.ansi_c.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/spec.ansi_c.md
+Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.ansi_c.md
