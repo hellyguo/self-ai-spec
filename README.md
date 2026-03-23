@@ -1,14 +1,14 @@
 # AI Skills
 
-AI agent skill definitions for guiding coding agents in code review, refactoring, compilation, and other tasks.
+AI 编码代理技能定义，用于指导编码代理进行代码审查、重构、编译等任务。
 
-## Overview
+## 概述
 
-This repository contains skill definitions used by various AI coding assistants. Each skill is a self-contained set of instructions that guides AI agents through specific tasks like code review, refactoring, compilation, and more.
+本仓库包含各种 AI 编码助手使用的技能定义。每个技能都是一组自包含的指令，指导 AI 代理完成特定任务，如代码审查、重构、编译等。
 
-## Symlink Setup
+## 符号链接设置
 
-This repository is symlinked to multiple AI tool directories:
+本仓库被符号链接到多个 AI 工具目录：
 
 ```
 ~/.opencode/skills   → /home/helly/code/markdown/ai-skills
@@ -16,37 +16,37 @@ This repository is symlinked to multiple AI tool directories:
 ~/.qoder/skills      → /home/helly/code/markdown/ai-skills
 ```
 
-This allows all AI tools to share the same skill definitions without duplication.
+这使得所有 AI 工具可以共享相同的技能定义，避免重复。
 
-## Available Skills
+## 可用技能
 
-### Code Review
-| Skill | Language | Description |
-|-------|----------|-------------|
-| `java-review` | Java | Full codebase review |
-| `java-inc-review` | Java | Incremental review (git/svn diff) |
-| `cpp-review` | C++ | Full review with detailed rules |
-| `ansi-c-review` | ANSI C | Full codebase review |
-| `python-review` | Python | Full codebase review |
-| `rust-review` | Rust | Full codebase review |
+### 代码审查
+| 技能 | 语言 | 描述 |
+|------|------|------|
+| `java-review` | Java | 全量代码审查 |
+| `java-inc-review` | Java | 增量审查（git/svn diff） |
+| `cpp-review` | C++ | 包含详细规则的全面审查 |
+| `ansi-c-review` | ANSI C | 全量代码审查 |
+| `python-review` | Python | 全量代码审查 |
+| `rust-review` | Rust | 全量代码审查 |
 
-### Build & Environment
-| Skill | Description |
-|-------|-------------|
-| `java-env` | Java environment (JDK, Maven) |
-| `java-compile` | Java compilation |
-| `java-g2m` | Gradle to Maven conversion |
+### 构建与环境
+| 技能 | 描述 |
+|------|------|
+| `java-env` | Java 环境（JDK、Maven） |
+| `java-compile` | Java 编译 |
+| `java-g2m` | Gradle 转 Maven |
 
-### Code Generation
-| Skill | Description |
-|-------|-------------|
-| `java-gen-unittest` | Generate unit tests |
-| `java-refactor` | Refactoring methodology |
-| `code-deconstruct` | Generate design docs |
+### 代码生成
+| 技能 | 描述 |
+|------|------|
+| `java-gen-unittest` | 生成单元测试 |
+| `java-refactor` | 重构方法论 |
+| `code-deconstruct` | 生成设计文档 |
 
-### AGENTS.md Merge
-| Skill | Source File |
-|-------|-------------|
+### AGENTS.md 合并
+| 技能 | 源文件 |
+|------|--------|
 | `java-merge-agent-md` | AGENTS.java.md |
 | `cpp-merge-agent-md` | AGENTS.cpp.md |
 | `ansi-c-merge-agent-md` | AGENTS.ansi_c.md |
@@ -54,6 +54,6 @@ This allows all AI tools to share the same skill definitions without duplication
 | `rust-merge-agent-md` | AGENTS.rust.md |
 | `js-merge-agent-md` | AGENTS.js.md |
 
-## Usage
+## 使用方法
 
-Skills are automatically loaded by AI tools when a task matches the skill's purpose. See AGENTS.md for detailed documentation.
+技能会在任务匹配其目的时被 AI 工具自动加载。详细文档请参阅 AGENTS.md。
