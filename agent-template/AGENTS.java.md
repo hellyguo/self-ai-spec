@@ -38,3 +38,9 @@
 授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.java.md
 
 Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.java.md
+
+### 构建工具
+
+授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/ci.java.md
+
+Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/ci.java.md
