@@ -28,4 +28,4 @@
 2. 每次沟通产出文件后，均执行 git 提交
 3. git 仅以当前 `user.name` 提交，不推送到远端
 4. git 提交均遵循约定式提交规范（Conventional Commits）执行
-5. 重要内容/TODO Plan，随时记录到 MEMORY.md
+5. 重要内容/TODO Plan，随时记录到 MEMORY.md，版本管理忽略该文件，不提交到 Git
