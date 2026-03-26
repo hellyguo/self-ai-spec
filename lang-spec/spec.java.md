@@ -608,3 +608,365 @@ try (InputStream is = new FileInputStream(tempFile)) {
 - 注释完善
 - 架构优化
 - 扩展性提升
+
+## SpotBugs 与 PMD 规则参考
+
+以下规则来自 SpotBugs 和 PMD 静态分析工具，用于代码审查时识别常见问题模式。
+
+### 正确性问题
+
+#### 空指针相关
+
+| 规则ID | 描述 |
+|--------|------|
+| NP_ALWAYS_NULL | 空指针解引用 |
+| NP_NULL_ON_SOME_PATH | 可能的空指针解引用 |
+| NP_NULL_PARAM_DEREF | 方法调用传递null给非空参数 |
+| NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT | equals方法未检查null参数 |
+| NP_BOOLEAN_RETURN_NULL | Boolean返回类型方法返回null |
+| NP_OPTIONAL_RETURN_NULL | Optional返回类型方法返回null |
+| RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE | 对已解引用的值进行冗余null检查 |
+| BrokenNullCheck | null检查逻辑错误 |
+
+#### 类型转换与比较
+
+| 规则ID | 描述 |
+|--------|------|
+| BC_IMPOSSIBLE_CAST | 不可能的类型转换 |
+| BC_IMPOSSIBLE_DOWNCAST | 不可能的向下转型 |
+| BC_IMPOSSIBLE_INSTANCEOF | instanceof始终返回false |
+| EC_UNRELATED_TYPES | equals比较不同类型 |
+| EC_ARRAY_AND_NONARRAY | equals比较数组和非数组 |
+| EC_NULL_ARG | 调用equals(null) |
+| INT_BAD_COMPARISON_WITH_SIGNED_BYTE | 有符号字节比较错误 |
+| CompareObjectsWithEquals | 使用equals比较对象 |
+
+#### equals/hashCode/compareTo
+
+| 规则ID | 描述 |
+|--------|------|
+| EQ_ALWAYS_TRUE | equals始终返回true |
+| EQ_ALWAYS_FALSE | equals始终返回false |
+| EQ_SELF_NO_OBJECT | 协变equals方法定义 |
+| HE_EQUALS_NO_HASHCODE | 定义equals但未定义hashCode |
+| HE_HASHCODE_NO_EQUALS | 定义hashCode但未定义equals |
+| CO_SELF_NO_OBJECT | 协变compareTo方法定义 |
+| CO_COMPARETO_RESULTS_MIN_VALUE | compareTo返回Integer.MIN_VALUE |
+| OverrideBothEqualsAndHashcode | 必须同时重写equals和hashCode |
+
+#### 其他正确性问题
+
+| 规则ID | 描述 |
+|--------|------|
+| IL_INFINITE_LOOP | 明显的无限循环 |
+| IL_INFINITE_RECURSIVE_LOOP | 明显的无限递归循环 |
+| IL_CONTAINER_ADDED_TO_ITSELF | 集合添加自身 |
+| RV_RETURN_VALUE_IGNORED | 忽略返回值 |
+| DMI_ARGUMENTS_WRONG_ORDER | 方法参数顺序错误 |
+| UR_UNINIT_READ | 构造函数中读取未初始化字段 |
+| RANGE_ARRAY_INDEX | 数组索引越界 |
+
+### 安全问题
+
+#### SQL注入与数据库安全
+
+| 规则ID | 描述 |
+|--------|------|
+| SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE | 非常量字符串传递给execute方法 |
+| SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING | 非常量字符串生成PreparedStatement |
+| DMI_CONSTANT_DB_PASSWORD | 硬编码数据库密码 |
+| DMI_EMPTY_DB_PASSWORD | 空数据库密码 |
+| SQL_BAD_RESULTSET_ACCESS | 尝试访问索引0的结果集字段 |
+
+#### XSS与Web安全
+
+| 规则ID | 描述 |
+|--------|------|
+| XSS_REQUEST_PARAMETER_TO_SEND_ERROR | Servlet错误页反射型XSS漏洞 |
+| XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER | Servlet反射型XSS漏洞 |
+| XSS_REQUEST_PARAMETER_TO_JSP_WRITER | JSP反射型XSS漏洞 |
+| HRS_REQUEST_PARAMETER_TO_HTTP_HEADER | HTTP响应分割漏洞 |
+| PT_ABSOLUTE_PATH_TRAVERSAL | Servlet绝对路径遍历 |
+| PT_RELATIVE_PATH_TRAVERSAL | Servlet相对路径遍历 |
+
+#### 加密与密钥安全
+
+| 规则ID | 描述 |
+|--------|------|
+| HardCodedCryptoKey | 硬编码加密密钥 |
+| InsecureCryptoIv | 不安全的加密初始化向量 |
+| UNS_UNSAFE_CALL | 调用Unsafe类 |
+
+### 性能问题
+
+#### 资源泄漏
+
+| 规则ID | 描述 |
+|--------|------|
+| OS_OPEN_STREAM | 方法可能未关闭流 |
+| OS_OPEN_STREAM_EXCEPTION_PATH | 异常路径可能未关闭流 |
+| ODR_OPEN_DATABASE_RESOURCE | 方法可能未关闭数据库资源 |
+| CloseResource | 确保资源关闭 |
+| UseTryWithResources | 使用try-with-resources |
+| AvoidFileStream | 避免使用FileInputStream/FileOutputStream |
+
+#### 低效操作
+
+| 规则ID | 描述 |
+|--------|------|
+| DM_STRING_CTOR | 低效的String构造 |
+| DM_BOOLEAN_CTOR | 低效的Boolean构造 |
+| SBSC_USE_STRINGBUFFER_CONCATENATION | 循环中使用+拼接字符串 |
+| WMI_WRONG_MAP_ITERATOR | 低效使用keySet迭代器 |
+| StringInstantiation | 避免不必要的String实例化 |
+| InefficientStringBuffering | 低效的StringBuffer使用 |
+| UseArrayListInsteadOfVector | 使用ArrayList替代Vector |
+
+#### 内存与对象创建
+
+| 规则ID | 描述 |
+|--------|------|
+| DMI_RANDOM_USED_ONLY_ONCE | Random对象仅使用一次 |
+| DM_NEW_FOR_GETCLASS | 仅为了获取class而创建对象 |
+| ISC_INSTANTIATE_STATIC_CLASS | 不必要的静态类实例化 |
+| SIC_INNER_SHOULD_BE_STATIC | 应该是静态内部类 |
+| AvoidInstantiatingObjectsInLoops | 避免循环中创建对象 |
+
+### 并发问题
+
+#### 线程安全
+
+| 规则ID | 描述 |
+|--------|------|
+| IS2_INCONSISTENT_SYNC | 不一致的同步 |
+| IS_FIELD_NOT_GUARDED | 字段未防护并发访问 |
+| VO_VOLATILE_REFERENCE_TO_ARRAY | volatile数组引用元素非volatile |
+| VO_VOLATILE_INCREMENT | volatile字段自增非原子操作 |
+| NonThreadSafeSingleton | 非线程安全单例 |
+| UseConcurrentHashMap | 使用ConcurrentHashMap |
+| DoubleCheckedLocking | 双重检查锁定问题 |
+
+#### 同步问题
+
+| 规则ID | 描述 |
+|--------|------|
+| DL_SYNCHRONIZATION_ON_SHARED_CONSTANT | 字符串字面量同步 |
+| DL_SYNCHRONIZATION_ON_BOOLEAN | Boolean同步 |
+| ESYNC_EMPTY_SYNC | 空同步块 |
+| UL_UNRELEASED_LOCK | 方法未在所有路径释放锁 |
+| AvoidSynchronizedAtMethodLevel | 避免方法级同步 |
+
+#### 线程操作
+
+| 规则ID | 描述 |
+|--------|------|
+| RU_INVOKE_RUN | 调用run而非start |
+| SC_START_IN_CTOR | 构造函数调用Thread.start() |
+| WA_NOT_IN_LOOP | wait不在循环中 |
+| NO_NOTIFY_NOT_NOTIFYALL | 使用notify而非notifyAll |
+| DontCallThreadRun | 不要直接调用Thread.run() |
+
+#### 死锁风险
+
+| 规则ID | 描述 |
+|--------|------|
+| TLW_TWO_LOCK_WAIT | 持有两个锁时wait |
+| SWL_SLEEP_WITH_LOCK_HELD | 持有锁时调用sleep |
+
+### 代码风格
+
+#### 命名规范
+
+| 规则ID | 描述 |
+|--------|------|
+| NM_CLASS_NAMING_CONVENTION | 类名应以大写字母开头 |
+| NM_METHOD_NAMING_CONVENTION | 方法名应以小写字母开头 |
+| NM_LCASE_HASHCODE | hashcode应为hashCode |
+| NM_LCASE_TOSTRING | tostring应为toString |
+| NM_BAD_EQUAL | equal应为equals |
+| LongVariable | 变量名过长 |
+| ShortVariable | 变量名过短 |
+| AvoidDollarSigns | 避免使用$符号 |
+
+#### 导入与修饰符
+
+| 规则ID | 描述 |
+|--------|------|
+| UnnecessaryImport | 不必要的导入 |
+| UnnecessaryModifier | 不必要的修饰符 |
+| ModifierOrder | 修饰符顺序 |
+| NoPackage | 缺少包声明 |
+
+#### 代码结构
+
+| 规则ID | 描述 |
+|--------|------|
+| OnlyOneReturn | 方法应只有一个返回点 |
+| ControlStatementBraces | 控制语句大括号 |
+| EmptyControlStatement | 空控制语句 |
+| UnnecessaryReturn | 不必要的return |
+| UnnecessarySemicolon | 不必要的分号 |
+| UselessParentheses | 无用的括号 |
+
+### 最佳实践
+
+#### 序列化
+
+| 规则ID | 描述 |
+|--------|------|
+| SE_NO_SERIALVERSIONID | 可序列化类未定义serialVersionUID |
+| SE_NONFINAL_SERIALVERSIONID | serialVersionUID非final |
+| SE_NONSTATIC_SERIALVERSIONID | serialVersionUID非static |
+| SE_NONLONG_SERIALVERSIONID | serialVersionUID非long |
+| SE_BAD_FIELD | 非瞬态非可序列化字段 |
+| MissingSerialVersionUID | 缺少serialVersionUID |
+
+#### Clone实现
+
+| 规则ID | 描述 |
+|--------|------|
+| CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE | 定义clone但未实现Cloneable |
+| CN_IDIOM_NO_SUPER_CALL | clone方法未调用super.clone() |
+| CloneMethodMustImplementCloneable | clone方法必须实现Cloneable |
+| CloneMethodMustBePublic | clone方法必须为public |
+
+#### 异常处理
+
+| 规则ID | 描述 |
+|--------|------|
+| DE_MIGHT_DROP | 方法可能丢弃异常 |
+| DE_MIGHT_IGNORE | 方法可能忽略异常 |
+| AvoidCatchingGenericException | 避免捕获泛型异常 |
+| PreserveStackTrace | 保留堆栈跟踪 |
+| ReturnFromFinallyBlock | finally块中返回 |
+| EmptyCatchBlock | 空catch块 |
+
+#### 资源与环境
+
+| 规则ID | 描述 |
+|--------|------|
+| DM_EXIT | 方法调用System.exit() |
+| DM_GC | 显式垃圾回收 |
+| AvoidPrintStackTrace | 避免printStackTrace |
+| SystemPrintln | 使用System.out.println |
+| DoNotCallGarbageCollectionExplicitly | 不要显式调用GC |
+
+#### 集合与数组
+
+| 规则ID | 描述 |
+|--------|------|
+| DMI_USING_REMOVEALL_TO_CLEAR_COLLECTION | 不要用removeAll清空集合 |
+| UseCollectionIsEmpty | 使用isEmpty检查集合 |
+| UseEnumCollections | 使用EnumSet/EnumMap |
+| ReturnEmptyCollectionRatherThanNull | 返回空集合而非null |
+| MethodReturnsInternalArray | 方法返回内部数组 |
+
+### 设计问题
+
+#### 复杂度
+
+| 规则ID | 描述 |
+|--------|------|
+| CyclomaticComplexity | 圈复杂度过高 |
+| CognitiveComplexity | 认知复杂度过高 |
+| NPathComplexity | NPath复杂度过高 |
+| TooManyMethods | 方法过多 |
+| TooManyFields | 字段过多 |
+| ExcessiveParameterList | 参数列表过长 |
+| ExcessivePublicCount | 公共成员过多 |
+
+#### 耦合与内聚
+
+| 规则ID | 描述 |
+|--------|------|
+| CouplingBetweenObjects | 对象间耦合度过高 |
+| LawOfDemeter | 违反迪米特法则 |
+| LooseCoupling | 应使用松耦合类型 |
+| GodClass | 上帝类 |
+| DataClass | 数据类 |
+
+#### 类设计
+
+| 规则ID | 描述 |
+|--------|------|
+| AbstractClassWithoutAbstractMethod | 抽象类无抽象方法 |
+| UseUtilityClass | 应使用工具类 |
+| SingularField | 单例字段 |
+| AvoidDeeplyNestedIfStmts | 避免深度嵌套if语句 |
+
+### 易错代码
+
+#### 常见错误模式
+
+| 规则ID | 描述 |
+|--------|------|
+| DMI_BIGDECIMAL_CONSTRUCTED_FROM_DOUBLE | BigDecimal从double构造精度问题 |
+| DMI_BAD_MONTH | 错误的月份常量值 |
+| DMI_CALLING_NEXT_FROM_HASNEXT | hasNext调用next |
+| RV_ABSOLUTE_VALUE_OF_RANDOM_INT | 随机整数绝对值计算错误 |
+| FE_TEST_IF_EQUAL_TO_NOT_A_NUMBER | 与NaN比较永假 |
+| AvoidDecimalLiteralsInBigDecimalConstructor | 避免BigDecimal使用double字面量 |
+| ComparisonWithNaN | 与NaN比较 |
+
+#### Switch与循环
+
+| 规则ID | 描述 |
+|--------|------|
+| SF_SWITCH_FALLTHROUGH | switch穿透 |
+| SF_DEAD_STORE_DUE_TO_SWITCH_FALLTHROUGH | switch穿透导致死存储 |
+| ImplicitSwitchFallThrough | 隐式switch穿透 |
+| JumbledIncrementer | 混乱的循环增量 |
+
+#### 赋值与比较
+
+| 规则ID | 描述 |
+|--------|------|
+| SA_FIELD_SELF_ASSIGNMENT | 字段自赋值 |
+| SA_LOCAL_SELF_ASSIGNMENT | 局部变量自赋值 |
+| SA_FIELD_SELF_COMPARISON | 字段自比较 |
+| DLS_DEAD_LOCAL_STORE | 局部变量死存储 |
+| DLS_OVERWRITTEN_INCREMENT | 被覆盖的自增 |
+| AssignmentInOperand | 操作数中的赋值 |
+
+#### Finalize问题
+
+| 规则ID | 描述 |
+|--------|------|
+| FI_EMPTY | 空finalizer应删除 |
+| FI_MISSING_SUPER_CALL | finalizer未调用父类finalizer |
+| FI_EXPLICIT_INVOCATION | 显式调用finalizer |
+| EmptyFinalizer | 空finalizer |
+| FinalizeDoesNotCallSuperFinalize | finalizer未调用super.finalize |
+
+### 静态分析工具集成
+
+#### 推荐配置
+
+```xml
+<!-- Maven pom.xml 配置示例 -->
+<plugin>
+    <groupId>com.github.spotbugs</groupId>
+    <artifactId>spotbugs-maven-plugin</artifactId>
+    <version>4.8.0</version>
+    <configuration>
+        <effort>Max</effort>
+        <threshold>Medium</threshold>
+    </configuration>
+</plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-pmd-plugin</artifactId>
+    <version>3.21.0</version>
+    <configuration>
+        <rulesets>
+            <ruleset>/rulesets/java/quickstart.xml</ruleset>
+        </rulesets>
+    </configuration>
+</plugin>
+```
+
+#### CI 流程集成
+
+- 在 CI 流水线中集成 SpotBugs 和 PMD 检查
+- 设置质量门禁，阻止新增问题合并
+- 定期分析技术债务，优先处理高危问题
