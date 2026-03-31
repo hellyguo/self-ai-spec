@@ -1,5 +1,5 @@
 ---
-name: java-jmh-benchmark
+name: jmh-bench
 description: "运行JMH基准测试的标准流程"
 ---
 
