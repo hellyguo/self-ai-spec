@@ -1,6 +1,6 @@
 ---
 name: jmh-bench
-description: "运行JMH基准测试的标准流程"
+description: "该skill没有执行文件，为操作指引：运行JMH基准测试的标准流程"
 ---
 
 # JMH 基准测试执行指南
