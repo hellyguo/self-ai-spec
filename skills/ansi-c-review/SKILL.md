@@ -35,7 +35,7 @@ Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.ansi_c.md
 
 ## 输出
 
-每次结果都以中文输出到 `doc/review/ansi-c-review-{yyyymmdd}-{seq%000}.md` 中
+每次结果都以中文输出到 `docs/review/ansi-c-review-{yyyymmdd}-{seq%000}.md` 中
 
 输出文件末尾必须添加署名，格式：`Reviewed by <coding util>+<model name>`，例如：`Reviewed by opencode+GLM5`
 
