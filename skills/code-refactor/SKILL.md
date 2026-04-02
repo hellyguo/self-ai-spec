@@ -1,6 +1,6 @@
 ---
-name: java-refactor
-description: "该skill没有执行文件，为操作指引： 如何重构"
+name: code-refactor
+description: "该skill没有执行文件，为操作指引：如何重构"
 ---
 
 # 代码重构方法论
