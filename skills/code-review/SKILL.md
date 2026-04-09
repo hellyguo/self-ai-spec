@@ -126,7 +126,7 @@ Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.{lang}.md
 
 生成 ER 图，双格式输出：
 
-- **Mermaid 格式**：写入 `docs/review/code-review-{yyyymmdd}-{seq%000}-er-diagram.mmd`
+- **Markdown+Mermaid 格式**：写入 `docs/review/code-review-{yyyymmdd}-{seq%000}-er-diagram.md`
 - **PlantUML 格式**：写入 `docs/review/code-review-{yyyymmdd}-{seq%000}-er-diagram.puml`
 
 其中 `{seq%000}` 保持和主文件相同，保证文件顺序。并将文件连接进主文件。

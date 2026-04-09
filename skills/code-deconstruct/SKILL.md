@@ -51,7 +51,7 @@ docs/deconstruct/database/
 
 生成实体关系图，双格式输出：
 - PlantUML 格式：`docs/deconstruct/database/er_diagram.puml`
-- Mermaid 格式：`docs/deconstruct/database/er_diagram.md`
+- Markdown+Mermaid 格式：`docs/deconstruct/database/er_diagram.md`
 
 ER 图要求：
 - 展示所有表及其字段
