@@ -1,6 +1,6 @@
 ---
 name: merge-agents-md
-description: "通用 AGENTS.md 合并技能，支持多种编程语言模板"
+description: "该skill没有执行文件，为操作指引：通用 AGENTS.md 合并技能，支持多种编程语言模板"
 ---
 
 # 合并 AGENTS.md

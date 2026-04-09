@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "通用代码审查技能，支持多种编程语言，包含代码结构、性能、安全、数据库等多维度审查"
+description: "该skill没有执行文件，为操作指引：通用代码审查技能，支持多种编程语言，包含代码结构、性能、安全、数据库等多维度审查"
 ---
 
 # 代码审查
@@ -126,8 +126,10 @@ Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.{lang}.md
 
 生成 ER 图，双格式输出：
 
-- **Mermaid 格式**：写入 `docs/review/er-diagram.mmd`
-- **PlantUML 格式**：写入 `docs/review/er-diagram.puml`
+- **Mermaid 格式**：写入 `docs/review/code-review-{yyyymmdd}-{seq%000}-er-diagram.mmd`
+- **PlantUML 格式**：写入 `docs/review/code-review-{yyyymmdd}-{seq%000}-er-diagram.puml`
+
+其中 `{seq%000}` 保持和主文件相同，保证文件顺序。并将文件连接进主文件。
 
 ```mermaid
 erDiagram
