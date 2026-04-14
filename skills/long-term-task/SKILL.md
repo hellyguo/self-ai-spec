@@ -1,5 +1,5 @@
 ---
-name: non-stop-task
+name: long-term-task
 description: "该skill没有执行文件，为操作指引：不中断长任务执行技能，理解问题、澄清需求、制定计划、连续执行直至完成"
 ---
 
