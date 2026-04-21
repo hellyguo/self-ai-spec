@@ -39,7 +39,8 @@
 3. 每次沟通产出文件后，均执行 git 提交
 4. git 仅以当前 `user.name` 提交，不推送到远端
 5. git 提交均遵循约定式提交规范（Conventional Commits）执行
-6. 重要内容/TODO Plan，随时记录到 MEMORY.md，版本管理忽略该文件，写入 .gitignore，不提交到 Git
+6. 编排计划时，如过长(>3000行)，拆分为多份计划
+7. 重要内容/TODO Plan，随时记录到 MEMORY.md，版本管理忽略该文件，写入 .gitignore，不提交到 Git
 
 ### 编码规范
 
