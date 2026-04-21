@@ -11,9 +11,10 @@ description: "该skill没有执行文件，为操作指引：生成Java单元测
 
 ## 过程
 
-1. 遍历所有的java，确保对代码之间联系有清晰认识
-1. 对java文件解析，进行构建单元测试
+1. 遍历所有的java，确保对代码之间联系有清晰认识，必要时，可通过 skill /code-deconstruct 先行进行解构分析
+1. 对java文件解析，进行构建单元测试。主要目标为 public 方法。
 1. 对可能需要外部数据的外部依赖的，进行mock，保证代码可执行，可使用库：mockito/powermock
+1. 如果需要数据库，可选择在 maven test scope 引入使用 h2 数据库模拟；也可以选择通过 mockito/powermock 模拟数据库
 1. 最终生成一个suite，包裹所有单元测试，可一次性执行所有测试(如已存在suite，将生成的单元测试补入其中)
 
 ## 输出
