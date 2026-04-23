@@ -1,0 +1,3 @@
+display_name: MemRec
+short_description: AI记忆持久化系统，存储关键决策、知识、项目上下文
+default_prompt: 使用memrec记录重要决策或检索历史记忆
