@@ -40,7 +40,7 @@ fn process_data(data: String) -> usize {
 
 ## 错误处理
 
-- 禁止 `unwrap()` 和 `expect()` 在生产代码中使用
+- 禁止 `unwrap()` 、`panic()` 和 `expect()` 在生产代码中使用
 - 使用 `Result<T, E>` 处理可恢复错误
 - 使用 `?` 运算符传播错误
 - 使用 `thiserror` 或 `anyhow` 库简化错误定义
