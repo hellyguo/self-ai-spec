@@ -12,6 +12,6 @@ java -jar ~/app/simian/simian-4.2.1.jar -language=java -threshold=20 $(fd -H -I 
 
 1. 其中，threshold应根据实际情况调整
 2. 其中，language=java应根据实际情况调整
-3. 其中的 fd0/grep0 可通过bash/zsh 的 alias 查看其原始命令
-4. seq应从001开始，按日重置，dup-{yyyy-mm-dd}-{seq}.txt 最终应 git 留档
+3. 其中的 fd0/grep0, fd0='fd -H -I -s -c never', grep0='grep --color=never'
+4. seq 应从 001 开始，按日重置，dup-{yyyy-mm-dd}-{seq}.txt 最终应 git 留档
 
