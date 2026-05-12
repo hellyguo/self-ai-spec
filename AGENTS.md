@@ -33,7 +33,8 @@ description: "技能简介"
 | 技能 | 用途 |
 |------|------|
 | `code-review` | 多语言代码审查（Java/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
-| `code-deconstruct` | 源代码解构为设计文档、ER图 |
+| `code-deconstruct` | 源代码解构为设计文档、ER图（设计层面） |
+| `requirement-collect` | 源代码解构为需求文档（需求层面） |
 | `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
 | `code-detect-dup` | 代码重复度检测 |
 | `code-refactor` | 重构方法论 |

@@ -1,21 +1,19 @@
 ---
 name: code-deconstruct
-description: "读取所有源代码，解构为设计图，设计文档; 没有执行文件，请按流程执行"
+description: "读取所有源代码，解构为设计图、设计文档、数据库设计; 没有执行文件，请按流程执行"
 ---
 
-# 源代码解构
+# 源代码解构（设计）
 
 ## 代码解构流程
 
-**核心原则**，完整解构，过大的文档，可进行进一步拆解
+**核心原则**：完整解构设计，过大的文档可进行进一步拆解
 
 1. 读取所有源代码，感知项目目的/意图/结构，以及代码之间关系
 2. 定位若干核心类，生成主干类图，格式: `plantuml`，写入 `docs/deconstruct/classes_graph.puml`
 3. 定位核心数据流，生成数据流图，格式: `plantuml` 和 `markdown+mermaid` 双格式，写入 `docs/deconstruct/core_data_flow.puml(md)`
 4. 将代码结构分模块编写设计细节文档，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/design_{package}/design.md`
 5. 汇总所有模块的设计细节后，写出全项目设计细节文档，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/global_design.md`
-6. 将代码结构分模块编写需求文档，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/requirements_{package}/requirements.md`
-7. 将源码实现的意图，提炼为需求`requirements`，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/global_requirements.md`
 
 ## 数据库解构流程
 
@@ -55,7 +53,7 @@ docs/deconstruct/database/
 - PlantUML 格式：`docs/deconstruct/database/er_diagram.puml`
 - Markdown+Mermaid 格式：`docs/deconstruct/database/er_diagram.md`
 
-必要时，可调度 skill /plantuml-skill 和 /creating-mermaid-diagrams 生成图片，嵌入 markdown 文档中
+必要时，可调度 skill `/plantuml-skill` 和 `/creating-mermaid-diagrams` 生成图片，嵌入 markdown 文档中
 
 ER 图要求：
 - 展示所有表及其字段
@@ -97,7 +95,6 @@ docs/deconstruct/
 ├── core_data_flow.puml          # 数据流图
 ├── core_data_flow.md            # 数据流图
 ├── global_design.md             # 全局设计文档
-├── global_requirements.md       # 全局需求文档
 ├── database/                    # 数据库解构输出
 │   ├── database_inventory.md    # 数据库清单
 │   ├── er_diagram.puml          # ER图
@@ -106,9 +103,11 @@ docs/deconstruct/
 │   ├── tables/                  # 表结构详情
 │   ├── indexes/                 # 索引清单
 │   └── constraints/             # 约束清单
-├── design_{package}/            # 分模块设计文档
-│   └── design.md
-└── requirements_{package}/      # 分模块需求文档
-    └── requirements.md
+└── design_{package}/            # 分模块设计文档
+    └── design.md
 ```
+
+## 关联技能
+
+需求收集请使用技能：`requirement-collect`
 
