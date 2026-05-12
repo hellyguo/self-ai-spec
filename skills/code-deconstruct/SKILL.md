@@ -23,6 +23,7 @@ description: "读取所有源代码，解构为设计图、设计文档、数据
 - SQL 文件：`*.sql`
 - iBATIS 映射文件：`**/sqlmap*.xml`、`**/*SqlMap.xml`
 - MyBatis 映射文件：`**/*Mapper.xml`、`**/*map.xml`
+- 代码内部内嵌的 SQL 语句，可能存在拼接
 
 ### 2. 构建数据库详细清单
 
