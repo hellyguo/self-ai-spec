@@ -602,21 +602,26 @@ def extract_annotation_sql(java_file):
 ### SQL 提取正则模式
 
 ```regex
-# SQL关键字匹配
-(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s+
+# SQL关键字匹配（大小写无关）
+(?i)(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s+
 
 # MyBatis SQL标签
 <sql[^>]*id="([^"]+)"[^>]*>(.*?)</sql>
 <select[^>]*>(.*?)</select>
 
-# Java字符串SQL
-"(SELECT|INSERT|UPDATE|DELETE)[^"]*"
-String\s+\w+\s*=\s*"([^"]*(?:SELECT|INSERT|UPDATE|DELETE)[^"]*)"
+# Java字符串SQL（大小写无关）
+(?i)"(SELECT|INSERT|UPDATE|DELETE)[^"]*"
+(?i)String\s+\w+\s*=\s*"([^"]*(?:SELECT|INSERT|UPDATE|DELETE)[^"]*)"
 
-# Python字符串SQL
-""".*(?:SELECT|INSERT|UPDATE|DELETE).*"""
-'.*(?:SELECT|INSERT|UPDATE|DELETE).*'
+# Python字符串SQL（大小写无关）
+(?i)""".*(?:SELECT|INSERT|UPDATE|DELETE).*"""
+(?i)'.*(?:SELECT|INSERT|UPDATE|DELETE).*'
+
+# 多语言通用SQL匹配（大小写无关）
+(?i)(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP)\s+[\w\s\*,\.\(\)]+(FROM|INTO|TABLE|SET|VALUES|WHERE|JOIN|ORDER|GROUP|HAVING)
 ```
+
+**注意**：`(?i)` 标记表示大小写无关（case-insensitive）匹配
 
 ---
 
