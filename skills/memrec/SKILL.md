@@ -83,15 +83,42 @@ memrec delete <memory-id>
 
 ## 项目隔离
 
-| 类型 | 用途 |
-|------|------|
-| 公共记忆（--global） | 跨项目共享知识和用户偏好 |
-| 项目记忆 | 项目特定决策和上下文 |
+**自动检测机制：**
+- 优先检测git root（`git rev-parse --show-toplevel`）
+- 若非git仓库，使用当前工作目录
+- 在项目根目录创建 `.mr_pid` 文件存储project_id
+
+| 类型 | 用途 | project_id |
+|------|------|------------|
+| 公共记忆（--global） | 跨项目共享知识和用户偏好 | `Uuid::nil()`（全0） |
+| 项目记忆 | 项目特定决策和上下文 | `.mr_pid`中的UUID |
 
 **检索范围：**
 - 默认：项目记忆 + 公共记忆
-- `--project-only`：仅项目记忆
+- `--project-only`：仅当前项目记忆
 - `--global-only`：仅公共记忆
+
+**示例：**
+```bash
+# 在 /disk2/code/rust/memrec 目录
+memrec add "memrec项目决策" --mtype decision
+# → 写入 memrec/.mr_pid 的 project_id
+
+# 在 /disk2/code/java/hydrakiller 目录
+memrec add "hydrakiller项目决策" --mtype decision
+# → 写入 hydrakiller/.mr_pid 的 project_id（不同）
+
+# 搜索时自动隔离
+cd /disk2/code/rust/memrec
+memrec search "决策" --project-only  # 仅返回memrec项目
+
+cd /disk2/code/java/hydrakiller
+memrec search "决策" --project-only  # 仅返回hydrakiller项目
+```
+
+**注意：**
+- `.mr_pid` 文件不应提交到git（添加到.gitignore）
+- 移动项目目录后，project_id保持不变（`.mr_pid`随项目移动）
 
 ## 工作流集成
 
@@ -117,5 +144,18 @@ memrec stats
 4. **事实用fact** - 物理定律、数学公式用fact标签
 5. **检索优先search** - 用语义检索而非枚举
 6. **min_score默认0.75** - 过滤低相关度干扰项（可通过MEMREC_MIN_SCORE调整）
+7. **项目隔离自动** - 无需手动指定，自动检测git root
+8. **.mr_pid勿提交** - 添加到.gitignore，避免project_id冲突
+
+## 数据位置
+
+```
+~/.memrec/
+├── memrecd.sock        # Unix Socket
+├── data/               # RocksDB记忆元数据
+├── vectors/            # RocksDB向量存储
+├── models/             # ONNX embedding模型
+└── memrecd.log         # 服务日志
+```
 
 ---
