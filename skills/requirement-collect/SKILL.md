@@ -544,14 +544,79 @@ graph LR
 
 ## 源代码类型
 
-- java: `*.java`
-- ansi c: `*.c/*.h`
-- cpp: `*.cpp/*.hpp/*.c/*.h`
-- javascript: `*.js/*.ts`
-- python: `*.py`
-- rust: `*.rs`
-- sql: `*.sql`
-- script: `*.sh/*.bat/*.cmd`
+### 直接源码文件
+
+| 类型 | 文件扩展名 | 说明 |
+|------|------------|------|
+| Java | `*.java` | Java源码 |
+| Python | `*.py` | Python源码 |
+| C++ | `*.cpp *.hpp *.cxx *.hxx` | C++源码和头文件 |
+| ANSI C | `*.c *.h` | C源码和头文件 |
+| JavaScript | `*.js *.mjs *.cjs` | JavaScript源码 |
+| TypeScript | `*.ts *.tsx *.mts *.cts` | TypeScript源码 |
+| Rust | `*.rs` | Rust源码 |
+| Go | `*.go` | Go源码 |
+| Kotlin | `*.kt *.kts` | Kotlin源码 |
+| Scala | `*.scala *.sc` | Scala源码 |
+| Shell | `*.sh *.bash *.zsh` | Shell脚本 |
+| Batch | `*.bat *.cmd *.ps1` | Windows脚本 |
+
+### SQL 来源（需拼接提取）
+
+| 来源类型 | 文件/位置 | 提取方法 |
+|----------|-----------|----------|
+| SQL文件 | `*.sql` | 直接读取 |
+| MyBatis Mapper | `**/*Mapper.xml **/*mapper.xml` | 从 `<sql>` `<select>` `<insert>` `<update>` `<delete>` 标签提取 |
+| iBATIS SqlMap | `**/*SqlMap.xml **/sqlmap*.xml` | 从 SQL 标签提取 |
+| Hibernate HQL | `*.java` | 从 `@NamedQuery` 注解、HQL字符串提取 |
+| JPA SQL | `*.java` | 从 `@Query` 注解提取 |
+| Java字符串SQL | `*.java` | 从字符串常量、方法内SQL拼接提取 |
+| Python SQL | `*.py` | 从字符串、SQLAlchemy语句提取 |
+| 内嵌SQL | 各种源码 | 正则匹配SQL关键字模式 |
+
+### SQL 拼接提取规则
+
+```python
+# 伪代码示例：提取散落的SQL
+
+# 1. MyBatis Mapper 提取
+def extract_mybatis_sql(xml_file):
+    # 提取 <sql id="xxx"> 内容
+    # 提取 <select/insert/update/delete> 内容
+    # 合并 <include refid="xxx"> 引用
+    # 替换 ${param} 和 #{param} 参数占位符
+
+# 2. Java字符串SQL提取
+def extract_java_sql(java_file):
+    # 匹配模式："SELECT ..." 或 "INSERT ..." 
+    # 匹配模式：String sql = "..."; 
+    # 拼接多行字符串：sql += "..."
+    # 提取 StringBuilder.append("...") 拼接
+
+# 3. 注解SQL提取
+def extract_annotation_sql(java_file):
+    # @Query("SELECT ...")
+    # @NamedQuery(name="xxx", query="SELECT ...")
+```
+
+### SQL 提取正则模式
+
+```regex
+# SQL关键字匹配
+(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\s+
+
+# MyBatis SQL标签
+<sql[^>]*id="([^"]+)"[^>]*>(.*?)</sql>
+<select[^>]*>(.*?)</select>
+
+# Java字符串SQL
+"(SELECT|INSERT|UPDATE|DELETE)[^"]*"
+String\s+\w+\s*=\s*"([^"]*(?:SELECT|INSERT|UPDATE|DELETE)[^"]*)"
+
+# Python字符串SQL
+""".*(?:SELECT|INSERT|UPDATE|DELETE).*"""
+'.*(?:SELECT|INSERT|UPDATE|DELETE).*'
+```
 
 ---
 
