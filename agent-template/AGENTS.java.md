@@ -41,8 +41,9 @@
 5. git 仅以当前 `user.name` 提交，不推送到远端
 6. git 提交均遵循约定式提交规范（Conventional Commits）执行
 7. 编排计划或设计时，如过长(>3000行)，拆分为多份文档
-8. 重要内容(plan、design等)，随时记录到 MEMORY.md 和 memrec
-9. 版本管理忽略 MEMORY.md，写入 .gitignore，不提交到 Git
+8. 计划或设计中，不要穿插代码，代码不能成为设计或计划的主要内容，仅需要部分伪代码将逻辑讲清楚
+9. 重要内容(plan、design等)，随时记录到 MEMORY.md 和 memrec
+10. 版本管理忽略 MEMORY.md，写入 .gitignore，不提交到 Git
 
 ### 编码规范
 
