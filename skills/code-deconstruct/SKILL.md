@@ -21,6 +21,13 @@ description: "读取所有源代码，解构为设计图、设计文档、数据
 6. 对核心算法、数据结构、算法实现，生成算法文档，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/algorithm_{package}/algorithm.md`
 7. 对重要的架构设计，总结归纳，写入 `docs/deconstruct/arch_design_summary.md`
 8. 汇总所有模块的设计细节后，写出全项目设计细节文档，格式: `markdown`，可辅以 `mermaid`，写入 `docs/deconstruct/global_design.md`
+9. 对模块的定义：
+
+    1. Java: `package`，如有 `maven` `module`，需识别为 `{module}-{package}`
+    2. Python: `package`/`module`
+    3. Ansi C/C++: `Makefile` `target`/`CMakeLists.txt` `target`，以 `target` 为目标
+    4. JS: `module`
+    5. Rust: `mod`，如有 `cargo` `workspace`，需识别为 `{member}-{mod}`
 
 ## 数据库解构流程
 
