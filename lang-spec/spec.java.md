@@ -265,6 +265,9 @@ public enum CurrFlag {
 - 输出异常堆栈必须使用三参数形式：`log.error("msg: {}", e.getMessage(), e)`
 - 错误写法：`log.error("msg: {}", e)` 只输出异常类名或消息，无法输出堆栈
 - 正确写法：`log.error("msg: {}", e.getMessage(), e)` 可完整输出堆栈信息
+- **禁止异常吞没**：catch 块中必须有日志或重新抛出，禁止空 catch 块
+- **异常必须处理**：捕获异常后必须有后续处理（重试、通知、降级等），不能只打日志
+- **禁止 catch Exception**：应捕获具体异常类型，避免捕获 RuntimeException 等泛型异常
 
 ## 线程与并发规范
 
@@ -276,6 +279,14 @@ public enum CurrFlag {
 - 线程池必须在应用关闭时正确停止，否则造成容器中线程泄漏
 - 禁止反复创建线程池，应作为单例或 Spring Bean 复用
 - 使用线程池减少线程创建开销
+- **禁止使用 `Executors.newCachedThreadPool()`**：创建无界线程池，高并发下可能OOM崩溃
+  - 核心线程数为0，最大线程数为Integer.MAX_VALUE
+  - 任务队列是SynchronousQueue，不缓存任务
+  - 应使用 `ThreadPoolExecutor` 配合有界队列
+- **`parallelStream()` 必须指定独立线程池**：
+  - 默认共用 `ForkJoinPool.commonPool()`，所有并行流相互影响
+  - 阻塞任务会拖慢整个系统的并行处理能力
+  - 应使用 `submit(()->list.parallelStream())` 或独立 ForkJoinPool
 
 ### 线程停止
 
@@ -334,6 +345,16 @@ private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
     ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 ```
 - 或使用 Java 8+ 的 `DateTimeFormatter`（线程安全）
+- **ThreadLocal 必须清理**：ThreadLocal 未清理会导致内存泄漏，尤其在线程池场景
+```java
+// 推荐：使用 try-finally 确保 ThreadLocal 清理
+try {
+    threadLocalVar.set(value);
+    // 使用 threadLocalVar
+} finally {
+    threadLocalVar.remove();
+}
+```
 
 ### 并发模式
 
@@ -356,6 +377,17 @@ private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
 - 自行管理事务会扰乱 Spring 事务管理，造成严重事务干扰
 - 禁止使用 `Connection.setAutoCommit(false)` 等原始 JDBC 事务操作
 - 新启线程不继承事务上下文，需单独处理
+- **事务方法必须正确回滚**：默认只回滚 RuntimeException，checked exception 需显式配置
+```java
+// 回滚所有异常
+@Transactional(rollbackFor = Exception.class)
+
+// 回滚指定异常
+@Transactional(rollbackFor = {SQLException.class, IOException.class})
+```
+- **禁止事务中执行 DDL**：DDL 会隐式提交事务，破坏事务完整性
+  - TRUNCATE、CREATE、ALTER、DROP 等 DDL 语句会自动提交
+  - 事务中途执行 DDL 会导致前面的事务无法回滚
 
 ### 审计日志事务
 
@@ -415,6 +447,37 @@ try {
 - 禁止在循环或频繁调用的方法中反复读取配置
 - 使用 `static final` 或 `@PostConstruct` 初始化配置缓存
 - 高成本对象（如反射结果）应缓存复用
+- **Pattern 必须预编译**：`Pattern.compile()` 成本极高，禁止在循环或高频方法中调用
+```java
+// 正确写法
+private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3-9]\\d{9}$");
+
+// 错误写法：每次调用都编译
+public boolean isValid(String phone) {
+    return Pattern.matches("^1[3-9]\\d{9}$", phone);  // ❌
+}
+```
+- **BeanCopier 必须缓存**：`BeanCopier.create()` 涉及字节码生成，禁止重复创建
+```java
+// 正确写法：使用 ConcurrentHashMap 缓存
+private static final ConcurrentHashMap<String, BeanCopier> COPIER_CACHE = new ConcurrentHashMap<>();
+
+public static BeanCopier getCopier(Class<?> src, Class<?> dest) {
+    String key = src.getName() + "_" + dest.getName();
+    return COPIER_CACHE.computeIfAbsent(key, k -> BeanCopier.create(src, dest, false));
+}
+```
+- **枚举查找必须缓存**：`Enum.values()` 每次调用都会创建新数组，禁止在循环中调用
+```java
+// 错误写法
+for (int i = 0; i < MyEnum.values().length; i++) { }  // ❌ 每次循环都创建数组
+
+// 正确写法
+private static final MyEnum[] VALUES = MyEnum.values();  // 缓存
+for (MyEnum e : VALUES) { }
+```
+- **网络接口信息必须缓存**：`NetworkInterface.getNetworkInterfaces()` 耗时秒级，禁止频繁调用
+- **拼音转换必须缓存**：汉字转拼音耗时，应使用 LRU 缓存热门词汇
 
 ### Redis 缓存优化
 
@@ -459,6 +522,15 @@ PHONE_PATTERN.matcher(input).matches();
 - 选择合适的查找算法，避免循环遍历代替查找
 - 避免对同一集合多次循环
 - 禁止三重循环，复杂度极高
+- **集合初始化必须指定容量**：避免频繁扩容
+```java
+// 错误写法：频繁扩容
+List<String> list = new ArrayList<>();  // 初始容量10，频繁扩容
+
+// 正确写法：预估容量
+List<String> list = new ArrayList<>(expectedSize);
+Map<String, String> map = new HashMap<>(expectedSize);
+```
 
 ### 配置化
 
@@ -504,6 +576,22 @@ PHONE_PATTERN.matcher(input).matches();
 - iBatis/MyBatis 中避免使用 `$` 符号拼接 SQL
 - 使用 `#` 符号进行参数绑定
 - 对用户输入进行校验
+- **禁止拼接动态表名、列名**：必须使用白名单校验，禁止直接拼接用户输入
+```java
+// 错误写法：直接拼接用户输入
+String sql = "SELECT * FROM " + tableName;  // ❌ SQL注入风险
+
+// 正确写法：白名单校验
+private static final Set<String> ALLOWED_TABLES = Set.of("user", "order", "product");
+public void query(String tableName) {
+    if (!ALLOWED_TABLES.contains(tableName)) {
+        throw new IllegalArgumentException("非法表名");
+    }
+    String sql = "SELECT * FROM " + tableName;
+}
+```
+- **动态排序字段必须白名单**：ORDER BY 后的字段名禁止直接拼接
+- **WHERE 条件拼接必须校验**：禁止将用户输入直接拼接到 WHERE 子句
 
 ### 大文件处理
 
@@ -559,6 +647,10 @@ try (InputStream is = new FileInputStream(tempFile)) {
 - 反射操作应缓存 `Method`/`Field` 对象
 - 使用 Spring 或 CGLib 的 `BeanUtils` 替代手动反射
 - 可构建 LRU 缓存加速反射调用
+- **String.intern() 慎用**：会占用 JVM 字符串常量池（PermGen/Metaspace），大量调用可能导致内存泄漏
+  - 仅用于有限、收敛的枚举值（如业务类型、状态码）
+  - 禁止用于用户输入、动态生成的字符串
+  - intern() 的字符串会一直占用内存直到 JVM 退出
 
 ## 安全规范
 
