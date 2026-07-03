@@ -39,6 +39,7 @@ description: "技能简介"
 | `code-detect-dup` | 代码重复度检测 |
 | `code-refactor` | 重构方法论 |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
+| `lets-loop` | 循环代码坏味道检测：性能问题、复杂度热点、N+1查询 |
 | `long-task` | 长任务执行：理解、澄清、计划、连续执行 |
 | `java-compile` | Java 编译指引 |
 | `java-env` | Java 环境信息 |
