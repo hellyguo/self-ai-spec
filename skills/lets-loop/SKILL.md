@@ -1,458 +1,559 @@
 ---
 name: lets-loop
-description: "持续循环调度框架：循环调度组合技能的通用框架，支持动态任务编排、技能组合、状态保持和自动恢复"
+description: "Loop Engineering 循环调度框架：企业Agent落地的第四层工程进化，支持20种循环设计模式、四层工程治理、自主持续改进"
 ---
 
-# Let's Loop - 持续循环调度框架
+# Let's Loop - Loop Engineering 循环调度框架
 
-> 循环调度组合技能的通用框架，支持动态任务编排、技能组合、状态保持和自动恢复
+> **企业Agent落地的第四层工程进化：从提示词工程到循环工程，构建部署后每天都变得更好的系统**
 
-## 概述
+**核心洞察**：AI工程的范式已从单次提示词，演进到持续循环调度。2026年，生产环境中最强大的AI系统不再是单次模型调用，而是循环：
+生成 → 评估 → 学习 → 改进 → 一遍又一遍 → 直到输出真正足够好
 
-`lets-loop` 是一个持续循环调度框架，灵感来源于文章中的循环检测概念，但扩展为一个通用的技能调度器。它能够：
+## 四层工程进化论
 
-1. **循环调度**：持续循环执行技能组合，直到完成目标
-2. **动态编排**：根据任务状态动态调整技能组合和执行顺序
-3. **状态保持**：在循环之间保持状态，支持中断恢复
-4. **技能组合**：将多个技能组合成任务流水线
-5. **进度监控**：实时监控任务进度和执行状态
+`lets-loop` 代表了 **Loop Engineering（第四层工程）**，以下是完整的四层进化路径：
 
-## 核心概念
+### L1: Prompt Engineering（提示词工程）
 
-### 循环单元 (Loop Unit)
+**核心**：怎么说清楚任务
 
-单个技能执行的最小单元，包含：
+- 优化提示词措辞、角色设定、输出格式
+- 技术：Chain-of-Thought、Few-shot、结构化模板
+- **局限性**：信息孤岛、无记忆、人肉触发
 
-- 技能名称
-- 输入参数
-- 执行条件
-- 输出处理规则
-- 超时设置
-- 重试策略
+### L2: Context Engineering（上下文工程）
 
-### 循环计划 (Loop Plan)
+**核心**：提供什么背景信息
 
-由多个循环单元组成的执行计划：
+- 设计最优token集的信息策略
+- 技术：RAG、MCP协议、Message History管理
+- **局限性**：模型的手不受控、错误不会自愈
 
-- 顺序执行：一个接一个执行
-- 并行执行：同时执行多个单元
-- 条件执行：基于条件选择执行路径
-- 循环执行：重复执行直到条件满足
+### L3: Harness Engineering（约束工程）
 
-### 循环状态 (Loop State)
+**核心**：如何验证正确性
 
-在整个循环过程中保持的状态：
+- 构建让错误结构性不可重犯的执行环境
+- 技术：AGENTS.md规则、Sensors感知、Enforcement约束、Observability
+- **局限性**：仍然依赖人触发和收尾、无跨session记忆
 
-- 执行进度
-- 中间结果
-- 错误信息
-- 执行历史
+### L4: Loop Engineering（循环工程） ⭐ **本技能**
 
-## 工作流程
+**核心**：如何持续迭代改进
 
-### 1. 计划制定阶段
+- 设计让Agent自己发现工作、自己推进、自己改进的循环
+- 技术：Automations、Worktrees、Skills、Sub-agents、State、Plugins
+- **价值**：无人值守运行、跨session连续性、知识复利
 
-```yaml
-loop_plan:
-  name: "代码质量改进循环"
-  description: "持续改进代码质量的循环计划"
-  steps:
-    - step: "code-review"
-      condition: "always"
-      params:
-        scope: "changed_files"
-        language: "auto"
-    
-    - step: "lets-loop"  # 循环中的循环
-      condition: "review_score < 80"
-      params:
-        sub_plan: "性能优化循环"
-    
-    - step: "code-refactor"
-      condition: "issues_found > 0"
-      params:
-        priority: "high"
-    
-    - step: "git-commit"
-      condition: "changes_made"
-      params:
-        message: "chore: 代码质量改进循环"
-```
+**嵌套关系**：Loop Engineering 包含 Harness Engineering，Harness Engineering 包含
+Context Engineering，Context Engineering 包含 Prompt Engineering。
 
-### 2. 循环执行阶段
+## Loop 的六个构成要素
 
-```text
-启动循环 → 执行技能 → 检查结果 → 更新状态 → 决策下一步 → [继续/终止]
-```
+基于Google Chrome团队Addy Osmani和Anthropic Claude Code负责人Boris Cherny的分析，每个生产级Loop需要六个原语：
 
-### 3. 状态管理阶段
-
-- 保存当前状态到 `.loop-state.json`
-- 支持中断后从断点恢复
-- 记录执行历史和性能指标
-
-## 内置循环模式
-
-### 1. 质量保障循环
-
-```yaml
-name: "质量保障循环"
-trigger: "git_push"
-steps:
-  - code-review
-  - code-detect-problem
-  - java-gen-unittest  # 如果测试覆盖不足
-  - merge-agents-md    # 如果配置变更
-```
-
-### 2. 性能优化循环
-
-```yaml
-name: "性能优化循环"
-trigger: "review_found_performance_issue"
-steps:
-  - lets-loop --mode "复杂度检测"
-  - java-asprof        # Java 性能分析
-  - jmh-bench         # 基准测试
-  - code-refactor     # 重构优化
-  - jmh-bench         # 验证优化效果
-```
-
-### 3. 重构循环
-
-```yaml
-name: "重构循环"
-trigger: "code_detected_dup > 50%"
-steps:
-  - code-detect-dup
-  - code-deconstruct
-  - requirement-collect
-  - code-refactor
-  - code-review       # 验证重构结果
-```
-
-## 使用方式
-
-### 命令行调用
+### 1. Automations（自动化心跳）
 
 ```bash
-# 启动一个循环
-/lets-loop --plan quality_assurance
+# 定时触发
+/lets-loop --cron "0 9 * * *" --plan daily_quality_check
 
-# 执行特定技能组合
-/lets-loop --steps "code-review,code-refactor,git-commit"
-
-# 恢复中断的循环
-/lets-loop --resume --state-file .loop-state.json
-
-# 监控循环状态
-/lets-loop --monitor --interval 30
-
-# 生成循环报告
-/lets-loop --report --format html
+# 事件触发  
+/lets-loop --trigger "git_push" --branch main --plan ci_gate
 ```
 
-### 自然语言触发
-
-```text
-"启动一个持续改进循环"
-"循环执行代码审查和重构"
-"创建一个性能优化工作流"
-"恢复上次中断的任务循环"
-"监控当前的循环执行状态"
-```
-
-## 技能集成
-
-### 现有技能适配
-
-所有现有技能都可以作为循环单元：
-
-| 技能 | 循环角色 | 触发条件 |
-| ------ | ---------- | ---------- |
-| `code-review` | 质量检查 | 代码变更、定期执行 |
-| `code-refactor` | 改进执行 | 发现问题、计划执行 |
-| `code-detect-problem` | 问题诊断 | 质量下降、性能问题 |
-| `java-gen-unittest` | 测试增强 | 覆盖不足、新增功能 |
-| `long-term-task` | 长任务包装 | 复杂多步骤任务 |
-
-### 新技能组合示例
+### 2. Worktrees（工作树隔离）
 
 ```yaml
-# 完整的开发周期循环
-name: "开发周期循环"
-steps:
-  - step: "requirement-collect"
-    when: "new_feature"
-  
-  - step: "code-deconstruct"
-    when: "design_needed"
-  
-  - step: "long-term-task"
-    params:
-      task: "实现新功能"
-    
-  - step: "java-gen-unittest"
-    when: "java_project"
-    
-  - step: "code-review"
-    always: true
-    
-  - step: "merge-agents-md"
-    when: "agents_updated"
+loop_config:
+  concurrency: 3
+  isolation: git_worktree
+  branches:
+    - feature/loop-1
+    - feature/loop-2  
+    - feature/loop-3
 ```
 
-## 状态管理
+### 3. Skills（技能编码）
 
-### 状态文件格式
+```markdown
+---
+name: java-performance-patterns
+description: "Java性能优化模式，基于历史错误提炼"
+---
+# 不这样做
+- 避免循环内查询（N+1问题）
+- 禁止O(n²)嵌套循环
+- 不要在线性查找中使用ArrayList
+
+# 要这样做  
+- 使用批量查询 + 预加载
+- 改用Set/Map提高查找效率
+- 使用stream并行处理
+```
+
+### 4. Plugins / Connectors（插件连接器）
+
+```yaml
+plugins:
+  - name: jira-integration
+    mcp_server: "jira-mcp"
+    capabilities: ["read_issues", "update_status", "create_ticket"]
+  
+  - name: slack-notify
+    mcp_server: "slack-mcp"  
+    capabilities: ["send_message", "create_channel"]
+```
+
+### 5. Sub-agents（子Agent制衡）
+
+```yaml
+# Maker-Checker分离：写的人和查的人分开
+sub_agents:
+  - role: "builder"
+    skill: "code-refactor"
+    model: "gpt-4"
+  
+  - role: "reviewer"  
+    skill: "code-review"
+    model: "claude-3.5"
+    authority: "approval_required"
+```
+
+### 6. State（外部状态存储）
 
 ```json
 {
-  "loop_id": "quality_loop_20250703",
-  "status": "running",
-  "current_step": 3,
-  "start_time": "2025-07-03T10:00:00Z",
-  "elapsed_time": 120,
-  "results": [
-    {"step": 1, "skill": "code-review", "status": "completed", "score": 85},
-    {"step": 2, "skill": "code-detect-problem", "status": "completed", 
-  "issues": 3},
-    {"step": 3, "skill": "code-refactor", "status": "in_progress"}
-  ],
-  "next_steps": [4, 5],
-  "metrics": {
-    "total_steps": 5,
-    "completed": 2,
-    "failed": 0,
-    "success_rate": 100
+  "loop_type": "reflexion",
+  "iteration": 15,
+  "memory": {
+    "errors": ["循环内查询导致性能下降", "缺少边界检查"],
+    "successes": ["批量查询提升性能300%", "缓存策略减少DB调用80%"],
+    "patterns": ["N+1问题 → 批量查询", "重复线性扫描 → Set查找"]
   }
 }
 ```
 
-### 恢复机制
+## 20种循环设计模式
 
-```bash
-# 自动恢复上次状态
-if [ -f ".loop-state.json" ]; then
-  echo "检测到未完成循环，恢复执行..."
-  /lets-loop --resume
-else
-  echo "启动新循环..."
-  /lets-loop --plan default
-fi
+基于《每位AI工程师都应该了解的20种循环设计模式》的分类实现：
+
+### 类别1：质量改进循环
+
+#### 1. 生成 → 批判 → 重写
+
+```yaml
+pattern: "generate_critique_rewrite"
+steps:
+  - agent: "generator"
+    skill: "code-refactor"
+    output_as: "draft"
+  
+  - agent: "critic"  
+    skill: "code-review"
+    critique: "draft"
+    output_as: "feedback"
+  
+  - agent: "generator"
+    skill: "code-refactor"  
+    input: "draft + feedback"
+    until: "feedback.score >= 85"
 ```
 
-## 监控和报告
+#### 2. 打分并重试循环
 
-### 实时监控
-
-```bash
-# 监控循环执行
-/lets-loop --monitor
-
-# 输出示例
-[10:00] 🔄 循环启动: 质量保障循环
-[10:01] ✅ Step 1: code-review 完成 (评分: 85/100)
-[10:03] ⚠️  Step 2: code-detect-problem 发现问题: 3个
-[10:05] 🔄 Step 3: code-refactor 执行中...
-[10:07] 📊 进度: 60% | 成功: 2/5 | 预计完成: 10:15
+```yaml
+pattern: "score_retry"
+max_retries: 5
+quality_threshold: 80
+steps:
+  - generate_output
+  - evaluate:
+      criteria: ["correctness", "performance", "security"]
+  - if score < threshold:
+      - retry_with: "improved_prompt"
 ```
 
-### 报告生成
+#### 3. 多批判者循环
+
+```yaml
+pattern: "multi_critic"
+critics:
+  - role: "security_expert"
+    skill: "security-review"
+  - role: "performance_expert"
+    skill: "code-detect-problem"  
+  - role: "architecture_expert"
+    skill: "code-deconstruct"
+consensus_required: 2/3
+```
+
+### 类别2：记忆循环
+
+#### 4. Reflexion循环（最重要的自我改进）
+
+```yaml
+pattern: "reflexion"
+memory_store: ".loop-memory.json"
+steps:
+  - attempt_task
+  - if failed:
+      - analyze_failure:
+          questions: ["我假设了什么？", "假设为什么错？", "下次有什么不同？"]
+      - store_lesson: "lesson.md"
+      - retry_with: "lesson.md"
+```
+
+#### 5. 错误库循环
+
+```bash
+# 错误驱动的知识库
+/lets-loop --pattern error_library --scope "java_n+1_queries"
+
+# 处理新任务前先检查错误库
+/lets-loop --task "optimize_query" --precheck "error_library"
+```
+
+#### 6. 成功模式循环
+
+```yaml
+pattern: "success_patterns"
+capture_when: "quality_score > 90 AND execution_time < threshold"
+store_as: "success_patterns/{{date}}/{{task_type}}.md"
+```
+
+### 类别3：规划循环
+
+#### 7. 计划 → 执行 → 重新规划
+
+```yaml
+pattern: "plan_execute_replan"
+adaptive: true
+steps:
+  - plan: "decompose_goal"
+  - execute_step: 1
+  - observe_results
+  - if results_unexpected:
+      - replan: "adjust_strategy"
+  - continue_until: "goal_achieved"
+```
+
+#### 8. 动态工作流循环
+
+```yaml
+pattern: "dynamic_workflow"
+decision_points:
+  - after: "code-review"
+    if: "security_issues > 0"
+    then: "run security_audit"
+    else: "continue_to_refactor"
+```
+
+### 类别4：探索循环  
+
+#### 9. 分支探索循环
+
+```yaml
+pattern: "branch_exploration"
+parallel_branches: 3
+approaches: ["conservative", "aggressive", "creative"]
+select_best_by: "quality_score * 0.6 + performance_score * 0.4"
+```
+
+### 类别5：系统优化循环
+
+#### 10. 提示词优化循环
+
+```yaml
+pattern: "prompt_optimization"
+test_set: "validation_cases.json"
+target_score: 90
+optimization_strategy: "evolutionary"
+mutations:
+  - add_few_shot_examples
+  - rephrase_instructions
+  - adjust_temperature
+```
+
+#### 11. 工作流优化循环（元循环）
+
+```yaml
+pattern: "workflow_optimization"
+monitor_metrics: ["latency", "cost", "quality", "success_rate"]
+optimization_triggers:
+  - if: "latency > 5000ms"
+    action: "parallelize_slow_steps"
+  - if: "cost > budget"
+    action: "replace_with_cheaper_model"
+  - if: "quality < threshold"
+    action: "add_additional_reviewer"
+```
+
+## 企业级Loop实现
+
+### 代码审查自动化Loop
+
+```yaml
+name: "code_review_automation_loop"
+level: "L4"
+automation: "pr_created"
+worktrees: 2
+
+sub_agents:
+  - builder:
+      skill: "code-refactor"
+      model: "claude-code"
+    
+  - reviewer:
+      skill: "code-review"
+      model: "gpt-4o"
+      checkpoints: ["security", "performance", "maintainability"]
+    
+  - tester:
+      skill: "java-gen-unittest"
+      model: "claude-3.5"
+      coverage_target: 80
+
+state_management:
+  memory: "errors.json"
+  progress: "review_progress.md"
+  patterns: "success_patterns/"
+
+quality_gates:
+  - test_coverage >= 80
+  - security_issues == 0
+  - performance_score >= 70
+  - reviewer_consensus >= 2/3
+
+cost_control:
+  max_tokens_per_pr: 50000
+  max_iterations: 10
+  budget_alert_threshold: 0.8
+```
+
+### 技术债务管理Loop
+
+```yaml
+name: "tech_debt_management_loop"
+schedule: "weekly"
+trigger: "sunday_02:00"
+
+phases:
+  - detection:
+      skills: ["code-detect-problem", "code-detect-dup"]
+      depth: "deep"
+    
+  - prioritization:
+      criteria: ["impact", "effort", "risk", "frequency"]
+      matrix: "impact_vs_effort"
+    
+  - planning:
+      skills: ["requirement-collect", "code-deconstruct"]
+      output: "refactoring_plan.md"
+    
+  - execution:
+      concurrency: 3
+      isolation: "git_worktree"
+      skills: ["code-refactor", "java-gen-unittest"]
+    
+  - validation:
+      skills: ["code-review", "jmh-bench"]
+      gates: ["tests_pass", "performance_improved", "no_regressions"]
+
+reporting:
+  format: "executive_dashboard"
+  metrics: ["debt_reduction", "quality_improvement", "roi"]
+  recipients: ["tech_leads", "engineering_manager"]
+```
+
+## 风险管理和成本控制
+
+### Loop特有的风险
+
+```yaml
+risk_management:
+  
+  # 风险1：成本可预测性下降
+  cost_controls:
+    max_tokens_per_run: 100000
+    max_sub_agents: 5
+    budget_alerts:
+      - at: "50%" 
+        action: "notify"
+      - at: "80%"
+        action: "pause_non_critical"
+      - at: "95%"
+        action: "stop_all"
+  
+  # 风险2：可靠性的新风险面
+  reliability_guards:
+    - deadlock_detection:
+        timeout: "30m"
+        action: "kill_and_restart"
+    
+    - state_corruption:
+        detection: "checksum_validation"
+        recovery: "rollback_to_last_valid"
+    
+    - triage_errors:
+        fallback: "human_review_queue"
+        escalation: "senior_engineer"
+  
+  # 风险3：理解力负债
+  comprehension_preservation:
+    - mandatory_code_walkthroughs: "weekly"
+    - architecture_documentation: "loop_generated_code.md"
+    - knowledge_transfer: "pair_review_sessions"
+```
+
+### Token预算策略
+
+```yaml
+budget_strategies:
+  
+  # 策略1：渐进式预算（推荐新手）
+  progressive:
+    phase_1: "100k tokens/month"
+    phase_2: "500k tokens/month"  
+    phase_3: "unlimited_with_approval"
+  
+  # 策略2：按ROI分配
+  roi_based:
+    allocation_logic: "expected_savings * 0.3"
+    roi_threshold: "2.0"  # ROI必须大于2
+    tracking: "actual_vs_expected_roi"
+  
+  # 策略3：按优先级分配  
+  priority_based:
+    critical: "unlimited"
+    high: "500k/month"
+    medium: "100k/month"
+    low: "10k/month"
+```
+
+## 采纳路径：企业四步走
+
+### 阶段1：夯实L1+L2
+
+```bash
+# 验证"AI能不能做这件事"
+/lets-loop --level L2 --scenarios "code-review,doc-generation" --goal "85%_accuracy"
+```
+
+### 阶段2：建设L3
+
+```bash
+# 让Agent能被信任独立完成任务
+/lets-loop --level L3 --harness "agents.md,linter,test_gates" --goal "semi_autonomous"
+```
+
+### 阶段3：试点L4
+
+```bash
+# 验证无人值守运行的可行性和ROI
+/lets-loop --level L4 --pilot "daily_ci_triage" --budget "50k_tokens" 
+--supervision "high"
+```
+
+### 阶段4：规模化L4
+
+```bash
+# 扩展Loop到多个场景
+/lets-loop --level L4 --scale "3_scenarios" --automation "full" --budget "500k_tokens"
+```
+
+## 行业适配模板
+
+### 金融行业（合规优先）
+
+```yaml
+industry: "finance"
+constraints: ["zero_error", "audit_trail", "regulatory_compliance"]
+loop_config:
+  focus_layers: ["L3", "L4_auxiliary"]
+  critical_components:
+    - "observability_pipeline"
+    - "compliance_checker"
+    - "maker_checker_separation"
+  forbidden_patterns: ["fully_autonomous_decision", "unattended_trading"]
+```
+
+### 软件工程（原生场景）
+
+```yaml
+industry: "software_engineering"
+constraints: ["code_quality", "test_coverage", "performance"]
+loop_config:
+  focus_layers: ["L3", "L4_full"]
+  patterns: ["generate_critique_rewrite", "reflexion", "branch_exploration"]
+  integration_points:
+    - "ci_cd_pipeline"
+    - "code_review_platform"
+    - "project_management"
+```
+
+### 客户服务（体验优先）
+
+```yaml
+industry: "customer_service"
+constraints: ["brand_voice", "escalation_logic", "customer_satisfaction"]
+loop_config:
+  focus_layers: ["L2", "L3_light"]
+  patterns: ["multi_critic", "dynamic_workflow"]
+  human_in_loop: "always_available"
+```
+
+## 诊断框架：问题在哪一层？
+
+当Loop出问题时，先判断故障在哪一层：
+
+```yaml
+diagnostic_flow:
+  
+  # 症状：输出质量不稳定
+  if quality_variance > 30%:
+    check: "L1_prompt_clarity"
+    fix: "improve_prompt_template"
+  
+  # 症状：重复犯同样的错  
+  if same_error_recurring:
+    check: "L2_context_rot"
+    fix: "refresh_rag_pipeline"
+  
+  # 症状：业务规则被违反
+  if business_rules_violated:
+    check: "L3_harness_gaps"
+    fix: "add_ci_check"
+  
+  # 症状：成本失控
+  if cost_exceeds_budget:
+    check: "L4_loop_configuration"
+    fix: "add_token_limits"
+```
+
+## 核心原则：Build the Loop, Stay the Engineer
+
+**最终警告**：两个人可以搭建完全相同的Loop，得到完全相反的结果。一个人用它加速自己深刻理解的工作，另一个人用它逃避理解工作本身。Loop不知道区别，你知道。
+
+### 工程师vs逃避者检查表
 
 ```markdown
-# 循环执行报告
+✅ 工程师的使用方式：
+- 用Loop处理理解深刻的重复性工作
+- 保持定期code walkthroughs
+- 审查Loop的重大决策
+- 把Loop当作放大器，不是替代品
 
-## 循环概况
-- 循环ID: quality_loop_20250703
-- 状态: 已完成
-- 持续时间: 15分钟
-- 成功率: 100%
-
-## 执行详情
-| 步骤 | 技能 | 状态 | 耗时 | 结果 |
-|------|------|------|------|------|
-
-## 指标分析
-- 代码质量提升: 85 → 92
-- 问题解决: 3/3
-- 测试覆盖提升: 65% → 78%
-
-## 建议
-1. 继续运行质量保障循环
-2. 重点关注性能优化
-3. 计划下轮重构循环
-```
-
-## 与 long-term-task 的关系
-
-`lets-loop` 是对 `long-term-task` 的扩展和泛化：
-
-| 特性 | long-term-task | lets-loop |
-| ------ | ---------------- | ----------- |
-| **核心目标** | 完成单个复杂任务 | 持续循环执行多个任务 |
-| **执行模式** | 线性执行 | 循环调度 |
-| **状态管理** | 简单进度跟踪 | 完整状态保持和恢复 |
-| **技能组合** | 有限组合 | 灵活动态组合 |
-| **适用场景** | 一次性长任务 | 持续改进、监控、自动化 |
-
-## 扩展性
-
-### 自定义循环模式
-
-用户可以定义自己的循环模式：
-
-```yaml
-# 自定义循环定义
-name: "团队代码规范循环"
-description: "确保团队代码规范的持续检查"
-schedule: "daily"  # 每日执行
-steps:
-  - step: "code-review"
-    params:
-      language: "java"
-      strictness: "high"
-  
-  - step: "notify-team"
-    condition: "issues_found > 0"
-    params:
-      channel: "team-slack"
-      template: "代码规范问题提醒"
-```
-
-### 条件表达式系统
-
-支持复杂的条件判断：
-
-```yaml
-condition: |
-  (review_score < 80) 
-  OR (performance_issues > 3) 
-  OR (security_issues > 0)
-  OR (changed_lines > 500)
-```
-
-### 事件驱动执行
-
-```yaml
-triggers:
-  - event: "git_push"
-    branch: "main"
-    actions: ["quality_assurance_loop"]
-  
-  - event: "pr_created"
-    actions: ["code-review", "test_coverage_check"]
-  
-  - event: "deployment"
-    actions: ["smoke_test_loop"]
-```
-
-## 最佳实践
-
-### 1. 循环设计原则
-
-- **单一职责**：每个循环专注一个目标
-- **适度长度**：循环不应过长，建议5-10个步骤
-- **可中断性**：设计可安全中断的检查点
-- **结果验证**：每个循环都应验证执行效果
-
-### 2. 错误处理
-
-```yaml
-error_handling:
-  retry_policy:
-    max_retries: 3
-    backoff: "exponential"
-  
-  fallback_actions:
-    - action: "log_error"
-    - action: "notify_admin"
-    - action: "skip_to_next"
-  
-  recovery_points:
-    - after_step: 2
-    - after_step: 4
-```
-
-### 3. 性能考虑
-
-- 定期清理旧状态文件
-- 限制并行循环数量
-- 监控循环执行时间
-- 设置合理的超时值
-
-## 示例用例
-
-### 用例1：持续集成质量门禁
-
-```bash
-# GitHub Actions 集成
-name: CI Quality Gate
-on: [push]
-jobs:
-  quality-loop:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Quality Loop
-        run: |
-          /lets-loop --plan ci_quality_gate
-          if [ $? -ne 0 ]; then
-            echo "质量门禁未通过"
-            exit 1
-          fi
-```
-
-### 用例2：团队代码审查自动化
-
-```yaml
-# 团队自动化审查循环
-name: "团队代码审查自动化"
-schedule: "weekly"
-steps:
-  - step: "collect_prs"
-    params:
-      team: "backend-team"
-      timeframe: "7d"
-  
-  - step: "code-review"
-    for_each: "pr"
-    params:
-      pr: "{{current_pr}}"
-  
-  - step: "generate_report"
-    params:
-      format: "team_dashboard"
-  
-  - step: "send_summary"
-    params:
-      recipients: "team-leads"
-```
-
-### 用例3：技术债务管理
-
-```yaml
-name: "技术债务管理循环"
-trigger: "monthly"
-steps:
-  - step: "code-detect-problem"
-    params:
-      depth: "deep"
-  
-  - step: "prioritize_issues"
-    params:
-      criteria: ["impact", "effort", "risk"]
-  
-  - step: "create_tech_debt_tickets"
-    params:
-      system: "jira"
-      priority: "based_on_analysis"
-  
-  - step: "track_progress"
-    params:
-      baseline: "previous_cycle"
+❌ 逃避者的使用方式：
+- 用Loop处理不理解的新领域
+- 停止审查Loop输出
+- 盲目信任Loop决策
+- 把Loop当作外包团队
 ```
 
 ---
 
-**设计理念**：将文章中的"循环检测"概念抽象为通用的"循环调度"框架，使得各种技能能够被有序、持续、智能地组合和执行，形成一个自适应的改进系统。
+**愿景**：`lets-loop` 不只是技能调度框架，更是企业AI工程的第四层进化实现。它让Agent从"单次执行工具"进化为"持续改进系统"，从"需要人推动"进化为"自己发现工作"，从"概率性正确"进化为"可验证可靠"。
+
+**设计理念**：集成Loop Engineering思想、20种循环模式、四层工程治理，构建部署后每天都变得更好的AI系统。
