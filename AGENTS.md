@@ -31,7 +31,7 @@ description: "技能简介"
 ## 可用技能
 
 | 技能 | 用途 |
-|------|------|
+| :--- | :--- |
 | `code-review` | 多语言代码审查（Java/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
 | `code-deconstruct` | 源代码解构为设计文档、ER图（设计层面） |
 | `requirement-collect` | 源代码解构为需求文档（需求层面） |
@@ -39,8 +39,8 @@ description: "技能简介"
 | `code-detect-dup` | 代码重复度检测 |
 | `code-refactor` | 重构方法论 |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
-| `lets-loop` | 循环代码坏味道检测：性能问题、复杂度热点、N+1查询 |
-| `long-task` | 长任务执行：理解、澄清、计划、连续执行 |
+| `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 |
+| `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
 | `java-compile` | Java 编译指引 |
 | `java-env` | Java 环境信息 |
 | `java-gen-unittest` | Java 单元测试生成 |
@@ -51,7 +51,7 @@ description: "技能简介"
 ## 文件命名约定
 
 | 类型 | 模式 | 示例 |
-|------|------|------|
+| :--- | :--- | :--- |
 | 技能目录 | `kebab-case` | `code-review` |
 | 技能文件 | `SKILL.md`（大写） | `SKILL.md` |
 | 语言规范 | `spec.{lang}.md` | `spec.java.md` |

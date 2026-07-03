@@ -1,260 +1,458 @@
 ---
 name: lets-loop
-description: "循环代码坏味道检测技能：专注于检测循环结构中的性能问题、代码重复和复杂度热点"
+description: "持续循环调度框架：循环调度组合技能的通用框架，支持动态任务编排、技能组合、状态保持和自动恢复"
 ---
 
-# Let's Loop - 循环代码坏味道检测技能
+# Let's Loop - 持续循环调度框架
 
-> 检测循环代码中的性能问题、复杂度热点，提供量化分析和修复建议
+> 循环调度组合技能的通用框架，支持动态任务编排、技能组合、状态保持和自动恢复
 
 ## 概述
 
-该技能专注于检测循环结构中的代码坏味道，特别是那些在 AI 生成代码中常见的性能陷阱和复杂度问题。灵感来源于 `/smell` 技能的复杂度检测模块，专门用于识别循环中的低效模式。
+`lets-loop` 是一个持续循环调度框架，灵感来源于文章中的循环检测概念，但扩展为一个通用的技能调度器。它能够：
 
-## 检测范围
+1. **循环调度**：持续循环执行技能组合，直到完成目标
+2. **动态编排**：根据任务状态动态调整技能组合和执行顺序
+3. **状态保持**：在循环之间保持状态，支持中断恢复
+4. **技能组合**：将多个技能组合成任务流水线
+5. **进度监控**：实时监控任务进度和执行状态
 
-### 1. 循环性能问题检测
+## 核心概念
 
-| 坏味道类型 | 检测模式 | 典型症状 |
-| :---------- | :-------- | :-------- |
-| **N+1 查询** | 循环体内出现 `fetch`/`query`/`exec`/`get` | 每次迭代发起数据库查询或 API 调用 |
-| **重复线性扫描** | `for` 循环内使用 `.contains()`/`.indexOf()` 等 | O(n²) 复杂度 |
-| **循环内排序** | 循环体内调用 `sort()`/`orderBy()` | 多次排序增加开销 |
-| **循环内重复计算** | 相同计算在每次迭代中重复执行 | 可提取到循环外的计算 |
-| **数据结构误用** | 使用列表进行频繁查找操作 | 应使用 Set/Map 提高查找效率 |
+### 循环单元 (Loop Unit)
 
-### 2. 循环复杂度检测
+单个技能执行的最小单元，包含：
 
-| 检测项 | 阈值 | 说明 |
-| :------ | :---- | :---- |
-| **嵌套深度** | > 3 层嵌套 | 过深的嵌套降低可读性和可维护性 |
-| **循环体行数** | > 50 行 | 循环体过长，应提取方法 |
-| **迭代次数预估** | 无明确上限的循环 | 可能导致无限循环或性能问题 |
+- 技能名称
+- 输入参数
+- 执行条件
+- 输出处理规则
+- 超时设置
+- 重试策略
 
-### 3. 循环代码重复检测
+### 循环计划 (Loop Plan)
 
-| 模式 | 检测方法 | 建议 |
-| :---- | :-------- | :---- |
-| **相似循环结构** | 相同模式循环在多处出现 | 提取通用循环处理函数 |
-| **循环条件重复** | 相邻循环有相同遍历逻辑 | 合并循环减少迭代次数 |
+由多个循环单元组成的执行计划：
+
+- 顺序执行：一个接一个执行
+- 并行执行：同时执行多个单元
+- 条件执行：基于条件选择执行路径
+- 循环执行：重复执行直到条件满足
+
+### 循环状态 (Loop State)
+
+在整个循环过程中保持的状态：
+
+- 执行进度
+- 中间结果
+- 错误信息
+- 执行历史
 
 ## 工作流程
 
-### 1. 确定扫描范围
+### 1. 计划制定阶段
 
-- 全项目扫描或指定目录
-- 按文件类型过滤（如 `*.java`、`*.py`、`*.js` 等）
-- 可结合 git diff 进行增量分析
-
-### 2. 并行检测
-
-同时扫描以下模式：
-
-- 循环结构识别（for/while/forEach/map 等）
-- 循环体内的调用模式
-- 数据操作模式
-- 复杂度统计
-
-### 3. 启发式规则
-
-#### 检测规则
-
-```bash
-# 检测 N+1 查询模式
-grep -r "for\|while\|forEach\|map\|filter" \
-  --include="*.{java,py,js,ts,go,rs}" | \
-  grep -E "(fetch|query|get|exec|select)"
-
-# 检测重复线性扫描
-grep -r "for\|while" \
-  --include="*.{java,py,js,ts,go,rs}" | \
-  grep -E "(\.contains\(|\.indexOf\(|\.includes\()"
+```yaml
+loop_plan:
+  name: "代码质量改进循环"
+  description: "持续改进代码质量的循环计划"
+  steps:
+    - step: "code-review"
+      condition: "always"
+      params:
+        scope: "changed_files"
+        language: "auto"
+    
+    - step: "lets-loop"  # 循环中的循环
+      condition: "review_score < 80"
+      params:
+        sub_plan: "性能优化循环"
+    
+    - step: "code-refactor"
+      condition: "issues_found > 0"
+      params:
+        priority: "high"
+    
+    - step: "git-commit"
+      condition: "changes_made"
+      params:
+        message: "chore: 代码质量改进循环"
 ```
 
-#### 阈值定义
+### 2. 循环执行阶段
 
-- 单循环嵌套深度 > 3：🟡 警告
-- 循环体代码行数 > 50：🟡 警告  
-- 循环内线性查找（数据量 > 100）：🔴 严重
-- 循环内数据库查询：🔴 严重（需人工确认是否合理）
-
-### 4. 生成报告
-
-#### 报告结构
-
-```markdown
-# 循环代码检测报告
-
-## 执行摘要
-- 检测文件数：X
-- 发现循环数：Y
-- 问题循环数：Z
-
-## 严重问题（🔴）
-| 文件 | 行号 | 循环类型 | 问题描述 | 建议修复 |
-|------|------|----------|----------|----------|
-
-## 警告问题（🟡）
-| 文件 | 行号 | 循环类型 | 问题描述 | 建议修复 |
-|------|------|----------|----------|----------|
-
-## 复杂度统计
-- 平均嵌套深度：X
-- 最大嵌套深度：Y（文件：Z:行号）
-- 长循环体文件列表：...
-
-## 重构建议
-1. **立即修复**：严重性能问题
-2. **短期优化**：复杂度问题和代码重复
-3. **长期改进**：架构层面的循环优化
-
-## 健康评分
-循环代码健康度：X/100
+```text
+启动循环 → 执行技能 → 检查结果 → 更新状态 → 决策下一步 → [继续/终止]
 ```
 
-### 5. 输出位置
+### 3. 状态管理阶段
 
-报告保存到：`docs/analysis/lets-loop-report-{yyyymmdd}-{hhmmss}.md`
+- 保存当前状态到 `.loop-state.json`
+- 支持中断后从断点恢复
+- 记录执行历史和性能指标
 
-## 检测算法
+## 内置循环模式
 
-### 1. 循环识别
+### 1. 质量保障循环
 
-```python
-# 伪代码
-def detect_loops(file_content):
-    patterns = [
-        r'for\s*\(.*?\)\s*\{',      # Java/C++/C# for 循环
-        r'for\s+\w+\s+in\s+',       # Python for 循环
-        r'while\s*\(.*?\)\s*\{',    # while 循环
-        r'\.forEach\(',             # JavaScript forEach
-        r'\.map\(',                 # map 函数
-        r'\.filter\(',              # filter 函数
-    ]
-    # 识别并分析每个循环
+```yaml
+name: "质量保障循环"
+trigger: "git_push"
+steps:
+  - code-review
+  - code-detect-problem
+  - java-gen-unittest  # 如果测试覆盖不足
+  - merge-agents-md    # 如果配置变更
 ```
 
-### 2. 复杂度分析
+### 2. 性能优化循环
 
-- 计算循环嵌套深度
-- 统计循环体行数
-- 分析循环变量使用模式
+```yaml
+name: "性能优化循环"
+trigger: "review_found_performance_issue"
+steps:
+  - lets-loop --mode "复杂度检测"
+  - java-asprof        # Java 性能分析
+  - jmh-bench         # 基准测试
+  - code-refactor     # 重构优化
+  - jmh-bench         # 验证优化效果
+```
 
-### 3. 性能模式匹配
+### 3. 重构循环
 
-- 检测循环内查询/调用
-- 识别线性查找模式
-- 发现重复计算
+```yaml
+name: "重构循环"
+trigger: "code_detected_dup > 50%"
+steps:
+  - code-detect-dup
+  - code-deconstruct
+  - requirement-collect
+  - code-refactor
+  - code-review       # 验证重构结果
+```
 
-## 使用示例
+## 使用方式
 
 ### 命令行调用
 
 ```bash
-# 扫描整个项目
-/lets-loop
+# 启动一个循环
+/lets-loop --plan quality_assurance
 
-# 扫描特定目录
-/lets-loop --dir src/main/java
+# 执行特定技能组合
+/lets-loop --steps "code-review,code-refactor,git-commit"
 
-# 扫描特定文件类型
-/lets-loop --pattern "*.java"
+# 恢复中断的循环
+/lets-loop --resume --state-file .loop-state.json
 
-# 增量分析（基于 git diff）
-/lets-loop --git-diff main..feature
+# 监控循环状态
+/lets-loop --monitor --interval 30
+
+# 生成循环报告
+/lets-loop --report --format html
 ```
 
 ### 自然语言触发
 
-- "检测循环性能问题"
-- "分析代码中的循环复杂度"
-- "找出循环中的坏味道"
-- "扫描 N+1 查询问题"
-
-## 集成建议
-
-### 与 CI/CD 集成
-
-```yaml
-# GitHub Actions 示例
-name: Loop Analysis
-on: [push, pull_request]
-jobs:
-  loop-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Loop Analysis
-        run: |
-          # 调用 lets-loop 技能
-          # 生成报告
-          # 如有严重问题，标记为失败
+```text
+"启动一个持续改进循环"
+"循环执行代码审查和重构"
+"创建一个性能优化工作流"
+"恢复上次中断的任务循环"
+"监控当前的循环执行状态"
 ```
 
-### 与现有审查流程结合
+## 技能集成
 
-1. 在代码审查前运行 `/lets-loop`
-2. 将报告作为审查参考
-3. 重点关注 🔴 严重问题
+### 现有技能适配
 
-## 预期效果
+所有现有技能都可以作为循环单元：
 
-### 量化指标改进
+| 技能 | 循环角色 | 触发条件 |
+| ------ | ---------- | ---------- |
+| `code-review` | 质量检查 | 代码变更、定期执行 |
+| `code-refactor` | 改进执行 | 发现问题、计划执行 |
+| `code-detect-problem` | 问题诊断 | 质量下降、性能问题 |
+| `java-gen-unittest` | 测试增强 | 覆盖不足、新增功能 |
+| `long-term-task` | 长任务包装 | 复杂多步骤任务 |
 
-- 减少 30-50% 的循环性能问题
-- 降低 O(n²) 复杂度的出现频率
-- 提高循环代码的可读性
+### 新技能组合示例
 
-### 团队收益
+```yaml
+# 完整的开发周期循环
+name: "开发周期循环"
+steps:
+  - step: "requirement-collect"
+    when: "new_feature"
+  
+  - step: "code-deconstruct"
+    when: "design_needed"
+  
+  - step: "long-term-task"
+    params:
+      task: "实现新功能"
+    
+  - step: "java-gen-unittest"
+    when: "java_project"
+    
+  - step: "code-review"
+    always: true
+    
+  - step: "merge-agents-md"
+    when: "agents_updated"
+```
 
-- 新开发者能快速识别性能陷阱
-- 代码审查更有针对性
-- 减少生产环境的性能问题
+## 状态管理
 
-## 注意事项
+### 状态文件格式
 
-### 误报处理
+```json
+{
+  "loop_id": "quality_loop_20250703",
+  "status": "running",
+  "current_step": 3,
+  "start_time": "2025-07-03T10:00:00Z",
+  "elapsed_time": 120,
+  "results": [
+    {"step": 1, "skill": "code-review", "status": "completed", "score": 85},
+    {"step": 2, "skill": "code-detect-problem", "status": "completed", 
+  "issues": 3},
+    {"step": 3, "skill": "code-refactor", "status": "in_progress"}
+  ],
+  "next_steps": [4, 5],
+  "metrics": {
+    "total_steps": 5,
+    "completed": 2,
+    "failed": 0,
+    "success_rate": 100
+  }
+}
+```
 
-- 冷路径循环（启动时、配置加载）可忽略
-- 小数据量循环（N < 100）可视为可读性优先
-- 明确标注的测试代码可降低优先级
+### 恢复机制
 
-### 热路径重点
+```bash
+# 自动恢复上次状态
+if [ -f ".loop-state.json" ]; then
+  echo "检测到未完成循环，恢复执行..."
+  /lets-loop --resume
+else
+  echo "启动新循环..."
+  /lets-loop --plan default
+fi
+```
 
-重点关注以下场景的循环：
+## 监控和报告
 
-- 高频调用的核心业务逻辑
-- 大数据量处理
-- 实时响应要求高的代码路径
+### 实时监控
 
-## 参考实现
+```bash
+# 监控循环执行
+/lets-loop --monitor
 
-基于 `/smell` 技能检测到的模式：
+# 输出示例
+[10:00] 🔄 循环启动: 质量保障循环
+[10:01] ✅ Step 1: code-review 完成 (评分: 85/100)
+[10:03] ⚠️  Step 2: code-detect-problem 发现问题: 3个
+[10:05] 🔄 Step 3: code-refactor 执行中...
+[10:07] 📊 进度: 60% | 成功: 2/5 | 预计完成: 10:15
+```
 
-- 307 处"循环内线性查找"疑似点
-- 63 处"循环内排序"疑似点
-- N+1 查询模式的自动检测
+### 报告生成
+
+```markdown
+# 循环执行报告
+
+## 循环概况
+- 循环ID: quality_loop_20250703
+- 状态: 已完成
+- 持续时间: 15分钟
+- 成功率: 100%
+
+## 执行详情
+| 步骤 | 技能 | 状态 | 耗时 | 结果 |
+|------|------|------|------|------|
+
+## 指标分析
+- 代码质量提升: 85 → 92
+- 问题解决: 3/3
+- 测试覆盖提升: 65% → 78%
+
+## 建议
+1. 继续运行质量保障循环
+2. 重点关注性能优化
+3. 计划下轮重构循环
+```
+
+## 与 long-term-task 的关系
+
+`lets-loop` 是对 `long-term-task` 的扩展和泛化：
+
+| 特性 | long-term-task | lets-loop |
+| ------ | ---------------- | ----------- |
+| **核心目标** | 完成单个复杂任务 | 持续循环执行多个任务 |
+| **执行模式** | 线性执行 | 循环调度 |
+| **状态管理** | 简单进度跟踪 | 完整状态保持和恢复 |
+| **技能组合** | 有限组合 | 灵活动态组合 |
+| **适用场景** | 一次性长任务 | 持续改进、监控、自动化 |
 
 ## 扩展性
 
-### 支持更多语言
+### 自定义循环模式
 
-- Java: 增强 Stream API 分析
-- Python: 推导式性能分析
-- JavaScript: Promise 链中的循环问题
-- Go: goroutine 中的循环陷阱
+用户可以定义自己的循环模式：
 
-### 深度分析
+```yaml
+# 自定义循环定义
+name: "团队代码规范循环"
+description: "确保团队代码规范的持续检查"
+schedule: "daily"  # 每日执行
+steps:
+  - step: "code-review"
+    params:
+      language: "java"
+      strictness: "high"
+  
+  - step: "notify-team"
+    condition: "issues_found > 0"
+    params:
+      channel: "team-slack"
+      template: "代码规范问题提醒"
+```
 
-- 循环的 Big O 复杂度计算
-- 内存使用模式分析
-- 并行化潜力评估
+### 条件表达式系统
+
+支持复杂的条件判断：
+
+```yaml
+condition: |
+  (review_score < 80) 
+  OR (performance_issues > 3) 
+  OR (security_issues > 0)
+  OR (changed_lines > 500)
+```
+
+### 事件驱动执行
+
+```yaml
+triggers:
+  - event: "git_push"
+    branch: "main"
+    actions: ["quality_assurance_loop"]
+  
+  - event: "pr_created"
+    actions: ["code-review", "test_coverage_check"]
+  
+  - event: "deployment"
+    actions: ["smoke_test_loop"]
+```
+
+## 最佳实践
+
+### 1. 循环设计原则
+
+- **单一职责**：每个循环专注一个目标
+- **适度长度**：循环不应过长，建议5-10个步骤
+- **可中断性**：设计可安全中断的检查点
+- **结果验证**：每个循环都应验证执行效果
+
+### 2. 错误处理
+
+```yaml
+error_handling:
+  retry_policy:
+    max_retries: 3
+    backoff: "exponential"
+  
+  fallback_actions:
+    - action: "log_error"
+    - action: "notify_admin"
+    - action: "skip_to_next"
+  
+  recovery_points:
+    - after_step: 2
+    - after_step: 4
+```
+
+### 3. 性能考虑
+
+- 定期清理旧状态文件
+- 限制并行循环数量
+- 监控循环执行时间
+- 设置合理的超时值
+
+## 示例用例
+
+### 用例1：持续集成质量门禁
+
+```bash
+# GitHub Actions 集成
+name: CI Quality Gate
+on: [push]
+jobs:
+  quality-loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Quality Loop
+        run: |
+          /lets-loop --plan ci_quality_gate
+          if [ $? -ne 0 ]; then
+            echo "质量门禁未通过"
+            exit 1
+          fi
+```
+
+### 用例2：团队代码审查自动化
+
+```yaml
+# 团队自动化审查循环
+name: "团队代码审查自动化"
+schedule: "weekly"
+steps:
+  - step: "collect_prs"
+    params:
+      team: "backend-team"
+      timeframe: "7d"
+  
+  - step: "code-review"
+    for_each: "pr"
+    params:
+      pr: "{{current_pr}}"
+  
+  - step: "generate_report"
+    params:
+      format: "team_dashboard"
+  
+  - step: "send_summary"
+    params:
+      recipients: "team-leads"
+```
+
+### 用例3：技术债务管理
+
+```yaml
+name: "技术债务管理循环"
+trigger: "monthly"
+steps:
+  - step: "code-detect-problem"
+    params:
+      depth: "deep"
+  
+  - step: "prioritize_issues"
+    params:
+      criteria: ["impact", "effort", "risk"]
+  
+  - step: "create_tech_debt_tickets"
+    params:
+      system: "jira"
+      priority: "based_on_analysis"
+  
+  - step: "track_progress"
+    params:
+      baseline: "previous_cycle"
+```
 
 ---
 
-**参考资料：**
-
-- 《Refactoring: Improving the Design of Existing Code》- Martin Fowler
-- `/smell` 技能启发式规则
-- 复杂度理论：Big O Notation
-- 性能优化模式
+**设计理念**：将文章中的"循环检测"概念抽象为通用的"循环调度"框架，使得各种技能能够被有序、持续、智能地组合和执行，形成一个自适应的改进系统。
