@@ -1,0 +1,4 @@
+interface:
+  display_name: "GDB Heap Memory Analysis"
+  short_description: "Interactive glibc ptmalloc heap/arena analysis for core dump memory leak debugging"
+  default_prompt: "Analyze heap memory in this core dump. Walk arenas, find largest memory consumer, check if it's subheap chain or direct mmap mode."
