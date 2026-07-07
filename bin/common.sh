@@ -84,12 +84,15 @@ check_and_copy_template() {
         js)
             src_file="AGENTS.js.md"
             ;;
+        shell)
+            src_file="AGENTS.shell.md"
+            ;;
         blank)
             src_file="AGENTS.blank.md"
             ;;
         *)
             echo "错误: 无效的编程语言: $language"
-            echo "支持的语言: java, ansi_c, cpp, rust, python, js, blank"
+            echo "支持的语言: java, ansi_c, cpp, rust, python, js, shell, blank"
             exit 1
             ;;
     esac
@@ -272,7 +275,7 @@ show_usage() {
     echo ""
     echo "参数:"
     echo "  language  - 项目语言（可选，恢复会话时不需要）"
-    echo "             支持的语言: java, ansi_c, cpp, rust, python, js, blank"
+    echo "             支持的语言: java, ansi_c, cpp, rust, python, js, shell, blank"
     echo ""
     echo "示例:"
     echo "  $script_name java     # 启动新 Java 项目"
