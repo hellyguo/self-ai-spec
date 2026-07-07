@@ -1,27 +1,26 @@
 #!/bin/bash
 
 # 导入公共函数
-SCRIPT_DIR="$HOME/code/markdown/self-ai-spec/bin"
+SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 配置变量
-DST_FILE="AGENTS.md"
+# 配置工具变量
 TOOL_NAME="qodercli"
+TOOL_CMD="qodercli"
 
 # qodercli不支持会话恢复，始终需要语言参数
 if [ $# -eq 0 ]; then
-    echo "Error: qodercli needs language parameter (no session resume support)"
+    echo "错误: qodercli 需要语言参数（不支持会话恢复）"
     echo ""
-    echo "Usage: $(basename "$0") <language>"
-    echo "支持的语音: java, ansi_c, cpp, rust, python, js, blank"
+    show_usage "$(basename "$0")" "$TOOL_NAME"
     exit 1
 fi
 
-LANGUAGE="$1"
+LANG_ARG="$1"
 
-# 检查并复制模板
-check_and_copy_template "$DST_FILE" "$LANGUAGE"
+# 检查模板是否存在
+check_and_copy_template "$LANG_ARG" "$AGENT_TEMPLATE_DIR" "$TOOL_NAME"
 
 # 启动qodercli
-start_new_session "qodercli" "$TOOL_NAME"
+start_new_session "$TOOL_CMD" "$LANG_ARG"
 

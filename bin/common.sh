@@ -1,29 +1,75 @@
 #!/bin/bash
 
 # AI工具启动脚本公共函数库
-# 用于 oc, cdbd, clc 等脚本
+# 用于 oc, cdbd, clc, qcc, updocid, updcbid, updccid 等脚本
 
-# 配置变量
-AGENT_TEMPLATE_DIR="$HOME/code/markdown/self-ai-spec/agent-template"
+# 配置变量 - 从环境变量读取
+if [ -z "$AI_SPEC_ROOT" ]; then
+    echo "错误: 环境变量 AI_SPEC_ROOT 未设置"
+    echo "请设置: export AI_SPEC_ROOT=/path/to/self-ai-spec"
+    exit 1
+fi
+
+# 从根目录推导脚本目录
+SCRIPT_DIR="$AI_SPEC_ROOT/bin"
+AGENT_TEMPLATE_DIR="$AI_SPEC_ROOT/agent-template"
+
+# 检查必要目录是否存在
+if [ ! -d "$AGENT_TEMPLATE_DIR" ]; then
+    echo "错误: 模板目录不存在: $AGENT_TEMPLATE_DIR"
+    echo "请确保 AI_SPEC_ROOT 指向正确的 self-ai-spec 目录"
+    exit 1
+fi
+
+if [ ! -d "$SCRIPT_DIR" ]; then
+    echo "错误: 脚本目录不存在: $SCRIPT_DIR"
+    echo "请确保 AI_SPEC_ROOT/bin 目录存在"
+    exit 1
+fi
 
 # 检查是否需要复制模板文件
-# 参数: $1 - 目标文件路径, $2 - 语言参数
+# 参数: $1 - 语言参数, $2 - 模板目录, $3 - 工具名称
 check_and_copy_template() {
-    local dst_file="$1"
-    local language="$2"
+    local language="$1"
+    local template_dir="$2"
+    local tool_name="$3"
     
+    # 根据工具名称确定目标文件名
+    local dst_file
+    case "$tool_name" in
+        opencode)
+            dst_file="AGENTS.md"
+            ;;
+        codebuddy)
+            dst_file="CODEBUDDY.md"
+            ;;
+        claudecode)
+            dst_file="CLAUDE.md"
+            ;;
+        qodercli)
+            dst_file="AGENTS.md"
+            ;;
+        *)
+            echo "错误: 未知的工具名称: $tool_name"
+            exit 1
+            ;;
+    esac
+    
+    # 如果目标文件已存在，跳过
     if [ -e "$dst_file" ]; then
-        echo "exist define, skip"
+        echo "已存在定义文件，跳过复制: $dst_file"
         return 0
     fi
     
-    echo "cp from defined agent md"
+    echo "从模板复制文件..."
     
     if [ -z "$language" ]; then
-        echo "need to set program language"
+        echo "错误: 需要设置编程语言"
         exit 1
     fi
     
+    # 确定源文件名
+    local src_file
     case "$language" in
         java)
             src_file="AGENTS.java.md"
@@ -47,73 +93,87 @@ check_and_copy_template() {
             src_file="AGENTS.blank.md"
             ;;
         *)
-            echo "$language not a valid program language, please set another language"
+            echo "错误: 无效的编程语言: $language"
+            echo "支持的语言: java, ansi_c, cpp, rust, python, js, blank"
             exit 1
             ;;
     esac
     
-    cp "$AGENT_TEMPLATE_DIR/$src_file" "$dst_file"
+    # 检查模板文件是否存在
+    if [ ! -f "$template_dir/$src_file" ]; then
+        echo "错误: 模板文件不存在: $template_dir/$src_file"
+        exit 1
+    fi
+    
+    # 复制模板文件
+    cp "$template_dir/$src_file" "$dst_file"
+    echo "已复制模板: $src_file → $dst_file"
     return 0
 }
 
 # 检查会话ID并恢复会话
-# 参数: $1 - ID文件路径, $2 - 恢复命令前缀, $3 - 工具名称
+# 参数: $1 - 工具命令, $2 - ID文件名
 check_and_resume_session() {
-    local id_file="$1"
-    local resume_cmd_prefix="$2"
-    local tool_name="$3"
+    local tool_cmd="$1"
+    local id_file="$2"
     
-    if [ -e "$id_file" ]; then
-        echo "exist prev id, use the id"
-        local ID
-        ID=$(cat "$id_file")
-        
-        # 不同的工具使用不同的恢复命令格式
-        case "$tool_name" in
-            opencode)
-                opencode -s "$ID"
-                ;;
-            codebuddy)
-                codebuddy --resume "$ID"
-                ;;
-            claudecode)
-                claude --resume "$ID"
-                ;;
-            *)
-                echo "Unknown tool: $tool_name"
-                exit 1
-                ;;
-        esac
-        
-        exit 0
+    if [ ! -e "$id_file" ]; then
+        return 1  # 没有会话ID，需要继续执行新会话流程
     fi
     
-    return 1  # 没有会话ID，需要继续执行新会话流程
+    echo "发现之前的会话ID，恢复会话..."
+    local session_id
+    session_id=$(cat "$id_file")
+    
+    # 不同的工具使用不同的恢复命令格式
+    case "$tool_cmd" in
+        opencode)
+            echo "恢复 opencode 会话: $session_id"
+            opencode -s "$session_id"
+            ;;
+        codebuddy)
+            echo "恢复 codebuddy 会话: $session_id"
+            codebuddy --resume "$session_id"
+            ;;
+        claude)
+            echo "恢复 claudecode 会话: $session_id"
+            claude --resume "$session_id"
+            ;;
+        *)
+            echo "错误: 不支持的工具命令: $tool_cmd"
+            return 1
+            ;;
+    esac
+    
+    exit 0  # 成功恢复，退出脚本
 }
 
 # 启动新会话
-# 参数: $1 - 工具命令, $2 - 工具名称
+# 参数: $1 - 工具命令, $2 - 语言参数（用于显示）
 start_new_session() {
     local tool_cmd="$1"
-    local tool_name="$2"
+    local language="$2"
     
-    echo "start as new $tool_name"
+    echo "启动新的 $tool_cmd 会话"
+    if [ -n "$language" ]; then
+        echo "项目语言: $language"
+    fi
     
-    case "$tool_name" in
+    case "$tool_cmd" in
         opencode)
             opencode
             ;;
         codebuddy)
             codebuddy
             ;;
-        claudecode)
+        claude)
             claude
             ;;
         qodercli)
             qodercli
             ;;
         *)
-            echo "Unknown tool: $tool_name"
+            echo "错误: 不支持的工具命令: $tool_cmd"
             exit 1
             ;;
     esac

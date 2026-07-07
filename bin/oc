@@ -1,32 +1,26 @@
 #!/bin/bash
 
 # 导入公共函数
-SCRIPT_DIR="$HOME/code/markdown/self-ai-spec/bin"
+SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/common.sh"
 
-# 配置变量
-ID_FILE=".opencode_id"
-DST_FILE="AGENTS.md"
+# 配置工具变量
 TOOL_NAME="opencode"
+TOOL_CMD="opencode"
+ID_FILE=".opencode_id"
 
-# 检查会话恢复
-if check_and_resume_session "$ID_FILE" "-s" "$TOOL_NAME"; then
-    exit 0
-fi
-
-# 新会话：需要语言参数
-if [ $# -eq 1 ]; then
-    LANGUAGE="$1"
+# 主逻辑
+if [ $# -eq 0 ]; then
+    # 尝试恢复会话
+    check_and_resume_session "$TOOL_CMD" "$ID_FILE"
 else
-    echo "Error: First session needs language parameter"
-    echo ""
-    show_usage "$(basename "$0")" "$TOOL_NAME"
-    exit 1
+    # 启动新会话
+    LANG_ARG="$1"
+    
+    # 检查模板是否存在
+    check_and_copy_template "$LANG_ARG" "$AGENT_TEMPLATE_DIR" "$TOOL_NAME"
+    
+    # 启动新会话
+    start_new_session "$TOOL_CMD" "$LANG_ARG"
 fi
-
-# 检查并复制模板
-check_and_copy_template "$DST_FILE" "$LANGUAGE"
-
-# 启动新会话
-start_new_session "opencode" "$TOOL_NAME"
 

@@ -1,5 +1,24 @@
 # AI Skills 仓库
 
+## 环境变量配置
+
+**重要**：使用脚本前需要设置环境变量：
+
+```bash
+# 设置 AI_SPEC_ROOT 指向本仓库目录
+export AI_SPEC_ROOT="/disk2/helly_data/code/markdown/self-ai-spec"
+
+# 永久设置（添加到 ~/.bashrc 或 ~/.zshrc）
+echo 'export AI_SPEC_ROOT="/disk2/helly_data/code/markdown/self-ai-spec"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**验证配置**：
+```bash
+echo $AI_SPEC_ROOT  # 应该显示正确的路径
+ls $AI_SPEC_ROOT/agent-template/  # 应该能看到模板文件
+```
+
 ## 快速启动脚本
 
 `bin/` 目录包含 AI 编码工具的快速启动脚本，支持会话恢复和语言模板配置：
