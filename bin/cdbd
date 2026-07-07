@@ -5,7 +5,7 @@ def_file=CODEBUDDY.md
 
 src_dir=~/code/markdown/self-ai-spec/agent-template
 
-if [ -e $dst_file ];
+if [ -e $def_file ];
 then
     echo exist define, skip
 else

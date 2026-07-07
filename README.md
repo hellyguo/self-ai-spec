@@ -1,6 +1,101 @@
 # AI Skills 仓库
 
-AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具提供统一的技能定义。
+## 快速启动脚本
+
+`bin/` 目录包含 AI 编码工具的快速启动脚本，支持会话恢复和语言模板配置：
+
+### 主要工具启动脚本
+
+```bash
+# 启动 opencode（支持会话恢复）
+./bin/oc <language>
+
+# 启动 codebuddy（支持会话恢复）
+./bin/cdbd <language>
+
+# 启动 qodercli
+./bin/qcc <language>
+
+# 启动 claudecode（支持会话恢复）
+./bin/clc <language>
+```
+
+**支持的语言参数**：
+
+- `java` - Java 项目
+- `ansi_c` - ANSI C 项目  
+- `cpp` - C++ 项目
+- `rust` - Rust 项目
+- `python` - Python 项目
+- `js` - JavaScript 项目
+- `blank` - 空白模板
+
+### 会话ID更新脚本
+
+```bash
+# 更新 opencode 会话ID（从剪贴板）
+./bin/updocid
+
+# 更新 codebuddy 会话ID（从剪贴板）
+./bin/updcbid
+
+# 更新 claudecode 会话ID（从剪贴板）
+./bin/updccid
+```
+
+### 使用流程
+
+1. **首次启动**：
+
+   ```bash
+   ./bin/oc java          # 启动 opencode 处理 Java 项目
+   # 项目完成后会显示: Session ID: ses_xxx...
+   ```
+
+2. **保存会话ID**：
+
+   ```bash
+   # 复制 Session ID 到剪贴板
+   ./bin/updocid          # 更新本地会话ID记录
+   ```
+
+3. **恢复会话**：
+
+   ```bash
+   ./bin/oc java          # 自动使用保存的会话ID恢复
+   ```
+
+**脚本功能说明**：
+
+- **`oc`** - 启动 opencode，支持会话恢复（依赖 `opencode`）
+- **`cdbd`** - 启动 codebuddy，支持会话恢复（依赖 `codebuddy`）
+- **`qcc`** - 启动 qodercli（依赖 `qodercli`）
+- **`clc`** - 启动 claudecode，支持会话恢复（依赖 `claude`）
+- **`updocid`** - 更新 opencode 会话ID（依赖 `xclip`）
+- **`updcbid`** - 更新 codebuddy 会话ID（依赖 `xclip`）
+- **`updccid`** - 更新 claudecode 会话ID（依赖 `xclip`）
+
+### 会话文件格式
+
+每个工具使用独立的ID文件：
+
+- `.opencode_id` - opencode 会话ID
+- `.codebuddy_id` - codebuddy 会话ID  
+- `.claudecode_id` - claudecode 会话ID
+
+会话ID自动从剪贴板获取，需符合相应工具的格式要求。
+
+### 模板配置
+
+脚本从 `~/code/markdown/self-ai-spec/agent-template/` 复制对应的 AGENTS.md 模板：
+
+- `AGENTS.java.md` - Java 项目配置
+- `AGENTS.ansi_c.md` - ANSI C 项目配置
+- `AGENTS.cpp.md` - C++ 项目配置
+- `AGENTS.rust.md` - Rust 项目配置  
+- `AGENTS.python.md` - Python 项目配置
+- `AGENTS.js.md` - JavaScript 项目配置
+- `AGENTS.blank.md` - 空白模板
 
 ## 符号链接
 
