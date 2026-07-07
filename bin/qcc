@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 导入公共函数
-SCRIPT_DIR=$(dirname "$0")
+SCRIPT_DIR="$HOME/code/markdown/self-ai-spec/bin"
 source "$SCRIPT_DIR/common.sh"
 
 # 配置变量
