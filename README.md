@@ -2,7 +2,7 @@
 
 ## 环境变量配置
 
-**重要**：使用脚本前需要设置环境变量：
+**重要**：所有脚本都需要 `AI_SPEC_ROOT` 环境变量来定位资源文件：
 
 ```bash
 # 设置 AI_SPEC_ROOT 指向本仓库目录
@@ -14,9 +14,44 @@ source ~/.bashrc
 ```
 
 **验证配置**：
+
 ```bash
-echo $AI_SPEC_ROOT  # 应该显示正确的路径
-ls $AI_SPEC_ROOT/agent-template/  # 应该能看到模板文件
+echo $AI_SPEC_ROOT                    # 应该显示正确的路径
+ls $AI_SPEC_ROOT/bin/                 # 应该能看到脚本文件
+ls $AI_SPEC_ROOT/agent-template/      # 应该能看到模板文件
+```
+
+**为什么需要环境变量？**
+
+- 支持将脚本符号链接到任意目录（如 `~/bin/`）
+- 避免硬编码路径，提高可移植性
+- 简化多人协作时的配置
+
+## 脚本符号链接部署（推荐）
+
+为了方便使用，可以将脚本符号链接到个人bin目录：
+
+```bash
+# 确保 ~/bin 在 PATH 中
+export PATH="$HOME/bin:$PATH"
+mkdir -p ~/bin
+
+# 创建符号链接
+ln -sf $AI_SPEC_ROOT/bin/oc ~/bin/oc
+ln -sf $AI_SPEC_ROOT/bin/cdbd ~/bin/cdbd
+ln -sf $AI_SPEC_ROOT/bin/clc ~/bin/clc
+ln -sf $AI_SPEC_ROOT/bin/qcc ~/bin/qcc
+ln -sf $AI_SPEC_ROOT/bin/updocid ~/bin/updocid
+ln -sf $AI_SPEC_ROOT/bin/updcbid ~/bin/updcbid
+ln -sf $AI_SPEC_ROOT/bin/updccid ~/bin/updccid
+
+# 验证链接
+ls -la ~/bin/ | grep -E 'oc|cdbd|clc|qcc|upd'
+
+# 现在可以在任何目录使用：
+oc java
+cdbd python
+updocid
 ```
 
 ## 快速启动脚本
@@ -122,7 +157,7 @@ ls $AI_SPEC_ROOT/agent-template/  # 应该能看到模板文件
 
 ### 模板配置
 
-脚本从 `~/code/markdown/self-ai-spec/agent-template/` 复制对应的 AGENTS.md 模板：
+脚本从 `$AI_SPEC_ROOT/agent-template/` 复制对应的模板文件：
 
 - `AGENTS.java.md` - Java 项目配置
 - `AGENTS.ansi_c.md` - ANSI C 项目配置
@@ -132,15 +167,53 @@ ls $AI_SPEC_ROOT/agent-template/  # 应该能看到模板文件
 - `AGENTS.js.md` - JavaScript 项目配置
 - `AGENTS.blank.md` - 空白模板
 
-## 符号链接
+### 脚本架构设计
 
-```bash
-~/.opencode/skills → 本仓库
-~/.codebuddy/skills → 本仓库
-~/.qoder/skills → 本仓库
+**设计原则**：
+
+1. **环境变量驱动**：所有路径通过 `AI_SPEC_ROOT` 环境变量推导
+2. **符号链接友好**：脚本可以从任意位置通过符号链接调用
+3. **错误处理**：明确的环境变量验证和文件存在检查
+4. **统一函数库**：公共逻辑集中在 `common.sh` 中
+5. **会话管理**：支持智能会话恢复和跨工具工作流
+
+**脚本依赖**：
+
+- `opencode`, `codebuddy`, `claude`, `qodercli` - 对应的AI工具
+- `xclip` - 剪贴板操作（会话ID更新脚本）
+- `bash` - Shell环境
+
+**文件结构**：
+
+```
+$AI_SPEC_ROOT/
+├── bin/
+│   ├── common.sh           # 公共函数库
+│   ├── oc                  # opencode启动脚本
+│   ├── cdbd                # codebuddy启动脚本
+│   ├── clc                 # claudecode启动脚本
+│   ├── qcc                 # qodercli启动脚本
+│   ├── updocid             # 更新opencode会话ID
+│   ├── updcbid             # 更新codebuddy会话ID
+│   └── updccid             # 更新claudecode会话ID
+└── agent-template/
+    ├── AGENTS.java.md      # Java模板
+    ├── AGENTS.ansi_c.md    # ANSI C模板
+    ├── AGENTS.cpp.md       # C++模板
+    ├── AGENTS.rust.md      # Rust模板
+    ├── AGENTS.python.md    # Python模板
+    ├── AGENTS.js.md        # JavaScript模板
+    └── AGENTS.blank.md     # 空白模板
 ```
 
 ## 最新更新
+
+**2025-07-07**: 脚本系统全面重构，支持符号链接部署：
+
+- **环境变量驱动**：所有脚本通过 `AI_SPEC_ROOT` 环境变量定位资源
+- **符号链接友好**：脚本可以符号链接到任意目录（如 `~/bin/`）
+- **架构优化**：公共函数集中在 `common.sh`，各脚本独立验证环境变量
+- **错误处理增强**：明确的配置验证和错误提示
 
 **2025-07-06**: code-review 技能重要更新：
 
