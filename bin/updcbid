@@ -1,0 +1,12 @@
+#!/bin/bash
+
+id=$(xclip -o)
+cnt=$(echo $id | grep ".*-.*-.*-.*-.*" | wc -l)
+
+if [ $cnt -eq 1 ]; then
+    echo $id > .codebuddy_id
+    echo $id, now is the marked id
+else
+    echo not valid codebuddy id: $id
+fi
+

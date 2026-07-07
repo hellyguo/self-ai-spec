@@ -1,0 +1,12 @@
+#!/bin/bash
+
+id=$(xclip -o)
+cnt=$(echo $id | grep "^\([a-z0-9]\+\)\(-\([a-z0-9]\+\)\)\{4\}$" | wc -l)
+
+if [ $cnt -eq 1 ]; then
+    echo $id > .claudecode_id
+    echo $id, now is the marked id
+else
+    echo not valid claudecode id: $id
+fi
+

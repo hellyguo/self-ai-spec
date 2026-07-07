@@ -1,0 +1,12 @@
+#!/bin/bash
+
+id=$(xclip -o)
+cnt=$(echo $id | grep "^ses_" | wc -l)
+
+if [ $cnt -eq 1 ]; then
+    echo $id > .opencode_id
+    echo $id, now is the marked id
+else
+    echo not valid opencode id: $id
+fi
+
