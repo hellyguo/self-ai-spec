@@ -271,42 +271,127 @@ public enum CurrFlag {
 
 ## 线程与并发规范
 
-### 线程创建与管理
+### ForkJoinPool 使用规范
 
-- 禁止使用 `new Thread()` 创建线程，成本极大，性能影响严重
-- 必须使用线程池（`ExecutorService`、`ThreadPoolExecutor`）创建线程
-- 线程必须命名，方便问题排查：`new ThreadFactory() { ... }` 或 `ThreadBuilder`
-- 线程池必须在应用关闭时正确停止，否则造成容器中线程泄漏
-- 禁止反复创建线程池，应作为单例或 Spring Bean 复用
-- 使用线程池减少线程创建开销
-- **禁止使用 `Executors.newCachedThreadPool()`**：创建无界线程池，高并发下可能OOM崩溃
-  - 核心线程数为0，最大线程数为Integer.MAX_VALUE
-  - 任务队列是SynchronousQueue，不缓存任务
-  - 应使用 `ThreadPoolExecutor` 配合有界队列
-- **`parallelStream()` 必须指定独立线程池**：
-  - 默认共用 `ForkJoinPool.commonPool()`，所有并行流相互影响
-  - 阻塞任务会拖慢整个系统的并行处理能力
-  - 应使用 `submit(()->list.parallelStream())` 或独立 ForkJoinPool
-
-### 线程停止
-
-- 线程必须可停止，不能使用 `while(true)` 无限循环
-- 使用 `volatile boolean` 标志位控制循环退出
-
+#### 1. **CompletableFuture 异步执行器**
+- **`CompletableFuture.runAsync()` / `supplyAsync()`** 默认使用 `ForkJoinPool.commonPool()`
+- **`thenApplyAsync()` / `thenAcceptAsync()` / `whenCompleteAsync()`** 等 Async 后缀方法，未指定 Executor 时都使用公共池
+- **必须指定独立线程池**：高并发场景下，公共池可能成为性能瓶颈
 ```java
-// 正确写法
-private volatile boolean running = true;
+// 错误写法：使用默认公共池
+CompletableFuture.runAsync(() -> heavyTask());
 
-public void run() {
-    while (running) {
-        // do work
-    }
-}
-
-public void shutdown() {
-    running = false;
-}
+// 正确写法：指定独立线程池
+ExecutorService customExecutor = new ThreadPoolExecutor(...);
+CompletableFuture.runAsync(() -> heavyTask(), customExecutor);
 ```
+
+#### 2. **Stream 并行流**
+- **`parallelStream()`** 默认使用 `ForkJoinPool.commonPool()`
+- **阻塞任务危害**：并行流中任何阻塞操作（IO、sleep、锁等待）都会拖慢所有使用公共池的并行流
+- **必须隔离高风险并行流**：包含 IO、网络、数据库等阻塞操作的并行流必须使用独立线程池
+```java
+// 错误写法：可能阻塞公共池
+list.parallelStream().map(item -> {
+    db.query(item);  // 阻塞操作
+    return result;
+});
+
+// 正确写法1：使用独立 ForkJoinPool
+ForkJoinPool customPool = new ForkJoinPool(4);
+customPool.submit(() -> list.parallelStream().map(...)).join();
+
+// 正确写法2：使用 CompletableFuture 包装
+list.parallelStream()
+    .map(item -> CompletableFuture.supplyAsync(() -> process(item), ioExecutor))
+    .collect(Collectors.toList());
+```
+
+#### 3. **JDK 8 内部使用 ForkJoinPool 的位置**
+- **java.util.concurrent.CompletableFuture**：所有 Async 方法默认使用公共池
+- **java.util.stream 并行流**：`parallel()` 操作使用公共池
+- **java.util.Arrays.parallelSort()**：并行排序使用公共池
+- **java.util.concurrent.CountedCompleter**：CompletableFuture 内部使用
+- **java.util.concurrent.Phaser**：与 ForkJoinPool.managedBlock() 集成
+
+#### 4. **ForkJoinPool.commonPool() 特性**
+- **懒加载**：首次使用时才创建，任何上述使用场景都会触发初始化
+- **共享性**：所有使用默认配置的并行流、CompletableFuture 等都共享同一个池
+- **默认配置**：`Runtime.getRuntime().availableProcessors() - 1` 个线程
+- **守护线程**：公共池使用守护线程，不会阻止 JVM 退出
+- **任务排队风险**：即使没有阻塞操作，当大量任务竞争公共池时，任务排队会导致单位耗时和延时上升超出预期
+  ```java
+  // 风险场景：大量并行流同时执行，即使每个任务都是纯CPU计算
+  list1.parallelStream().forEach(item -> cpuIntensiveTask1(item));  // 使用公共池
+  list2.parallelStream().forEach(item -> cpuIntensiveTask2(item));  // 排队等待公共池线程
+  
+  // 结果：list2 的执行会等待 list1 释放线程资源
+  // 延时 = list1处理时间 + 线程切换开销 + 任务调度延迟
+  ```
+- **默认池容量有限**：默认只有 CPU核数-1 个线程，很容易被多个并发任务耗尽
+- **隐式竞争**：不同业务模块、不同服务调用可能都在不知不觉中使用了公共池
+
+#### 5. **最佳实践**
+1. **IO密集型任务**：使用独立线程池（`ThreadPoolExecutor`），不要用 `parallelStream()`
+2. **CPU密集型任务**：可使用 `parallelStream()`，但必须考虑任务排队风险
+3. **混合型任务**：使用 `CompletableFuture` + 独立线程池组合
+4. **资源隔离**：不同业务模块使用不同的线程池，避免相互影响
+5. **容量规划**：根据并发任务数量配置独立的 `ForkJoinPool` 线程数
+6. **监控**：监控线程池使用情况，及时发现瓶颈
+
+#### 6. **性能风险场景**
+```java
+// 场景1：大量并行流同时执行，竞争公共池资源（即使任务无阻塞）
+list1.parallelStream().forEach(item -> cpuIntensiveTask1(item));
+list2.parallelStream().forEach(item -> cpuIntensiveTask2(item));  // 排队等待，延时上升
+
+// 场景2：阻塞操作拖慢公共池
+list.parallelStream().map(item -> {
+    TimeUnit.SECONDS.sleep(1);  // ❌ 阻塞公共池线程
+    return process(item);
+});
+
+// 场景3：递归任务占用所有公共池线程
+class RecursiveTask extends ForkJoinTask { ... }
+pool.invoke(new RecursiveTask());  // 可能占用所有公共池线程
+
+// 场景4：CompletableFuture 默认使用公共池
+CompletableFuture.runAsync(() -> task1());
+CompletableFuture.runAsync(() -> task2());  // 与所有使用默认配置的任务竞争公共池
+```
+
+#### 7. **任务排队与延时风险**
+- **核心问题**：公共池默认线程数有限（CPU核数-1），大量并发任务会排队等待
+- **延时公式**：任务总延时 = 任务执行时间 + 队列等待时间 + 线程切换开销
+- **排队放大效应**：少量任务排队就会显著放大整体延时
+```java
+// 示例：4核CPU，公共池默认3个线程
+for (int i = 0; i < 10; i++) {
+    list.parallelStream().forEach(item -> {
+        // 每个任务执行时间10ms
+        Thread.sleep(10);
+    });
+}
+// 结果：后面7个任务需要等待前3个完成，总延时远超预期
+```
+
+- **隐蔽性风险**：
+  - 代码中没有阻塞操作，看起来"安全"
+  - 单次测试可能无法发现问题
+  - 随着业务增长，并发量增加时突然暴露
+  - 不同模块、不同服务不自觉地共用公共池，相互影响
+
+- **诊断指标**：
+  - 监控 `ForkJoinPool.commonPool()` 的活跃线程数、队列长度
+  - 观察任务执行时间的 P95/P99 延迟分布
+  - 识别并发任务数超过 CPU 核心数的场景
+
+- **防范措施**：
+  1. **容量隔离**：关键业务使用独立 `ForkJoinPool`
+  2. **流量控制**：限制并发并行流数量
+  3. **超时保护**：为异步任务设置超时时间
+  4. **熔断降级**：检测到公共池繁忙时降级为串行处理
+  5. **容量规划**：预估峰值并发量，配置足够的独立线程池容量
 
 ### CountDownLatch 使用规范
 
@@ -681,7 +766,12 @@ try (InputStream is = new FileInputStream(tempFile)) {
 ### 必须修正
 
 - 循环依赖
-- 线程安全问题
+- **线程安全问题**：
+  - `CompletableFuture.runAsync()/supplyAsync()` 未指定独立线程池
+  - `parallelStream()` 中包含阻塞操作
+  - `ForkJoinPool.commonPool()` 被多个并行流/异步任务竞争，造成任务排队延时
+  - 未考虑大量并发任务在公共池中的排队风险
+  - 未处理 `CountDownLatch.await()` 的线程中断
 - SQL 注入风险
 - 敏感信息泄露
 - 内存溢出风险
