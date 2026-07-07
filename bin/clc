@@ -25,7 +25,22 @@ ID_FILE=".claudecode_id"
 # 主逻辑
 if [ $# -eq 0 ]; then
     # 尝试恢复会话
-    check_and_resume_session "$TOOL_CMD" "$ID_FILE"
+    if check_and_resume_session "$TOOL_CMD" "$ID_FILE"; then
+        exit 0  # 成功恢复会话
+    else
+        # 没有找到会话ID，显示使用帮助
+        echo ""
+        echo "错误: 当前目录没有找到之前保存的会话ID"
+        echo ""
+        show_usage "$(basename "$0")" "$TOOL_NAME"
+        echo ""
+        echo "请指定项目语言启动新会话:"
+        echo "  $(basename "$0") java    # Java项目"
+        echo "  $(basename "$0") python  # Python项目"
+        echo "  $(basename "$0") cpp     # C++项目"
+        echo ""
+        exit 1
+    fi
 else
     # 启动新会话
     LANG_ARG="$1"

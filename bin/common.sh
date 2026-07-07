@@ -108,6 +108,7 @@ check_and_copy_template() {
 
 # 检查会话ID并恢复会话
 # 参数: $1 - 工具命令, $2 - ID文件名
+# 返回值: 0-成功恢复并退出, 1-没有会话ID需要继续
 check_and_resume_session() {
     local tool_cmd="$1"
     local id_file="$2"
