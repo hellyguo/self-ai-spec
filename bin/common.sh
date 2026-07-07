@@ -119,7 +119,93 @@ start_new_session() {
     esac
 }
 
-# 显示使用帮助
+# 验证并保存会话ID
+# 参数: $1 - 工具名称 (opencode, codebuddy, claudecode)
+validate_and_save_session_id() {
+    local tool_name="$1"
+    local id_file
+    local pattern
+    local tool_label
+    
+    # 从剪贴板获取ID
+    local id
+    id=$(xclip -o 2>/dev/null)
+    
+    if [ -z "$id" ]; then
+        echo "Error: Clipboard is empty or xclip not available"
+        return 1
+    fi
+    
+    # 根据工具配置
+    case "$tool_name" in
+        opencode)
+            id_file=".opencode_id"
+            pattern="^ses_"
+            tool_label="opencode"
+            ;;
+        codebuddy)
+            id_file=".codebuddy_id"
+            pattern=".*-.*-.*-.*-.*"
+            tool_label="codebuddy"
+            ;;
+        claudecode)
+            id_file=".claudecode_id"
+            pattern="^\([a-z0-9]\+\)\(-\([a-z0-9]\+\)\)\{4\}$"
+            tool_label="claudecode"
+            ;;
+        *)
+            echo "Error: Unknown tool: $tool_name"
+            return 1
+            ;;
+    esac
+    
+    # 验证ID格式
+    local cnt
+    cnt=$(echo "$id" | grep -c "$pattern")
+    
+    if [ "$cnt" -eq 1 ]; then
+        echo "$id" > "$id_file"
+        echo "$id, now is the marked $tool_label id"
+        return 0
+    else
+        echo "not valid $tool_label id: $id"
+        return 1
+    fi
+}
+
+# 显示会话ID更新脚本的使用帮助
+show_update_id_usage() {
+    local script_name="$1"
+    local tool_name="$2"
+    
+    echo "Usage: $script_name"
+    echo ""
+    echo "更新 $tool_name 会话ID"
+    echo ""
+    echo "功能:"
+    echo "  - 从剪贴板读取会话ID"
+    echo "  - 验证ID格式是否正确"
+    echo "  - 保存到 .${tool_name}_id 文件"
+    echo ""
+    echo "使用步骤:"
+    echo "  1. 复制 $tool_name 的 Session ID 到剪贴板"
+    echo "  2. 运行 $script_name"
+    echo ""
+    echo "ID格式要求:"
+    case "$tool_name" in
+        opencode)
+            echo "  - 以 'ses_' 开头"
+            ;;
+        codebuddy)
+            echo "  - 包含4个连字符 (5段)"
+            ;;
+        claudecode)
+            echo "  - 5段字母数字用连字符连接"
+            ;;
+    esac
+}
+
+# 显示使用帮助（启动工具）
 show_usage() {
     local script_name="$1"
     local tool_name="$2"

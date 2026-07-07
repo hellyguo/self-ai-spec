@@ -1,12 +1,18 @@
 #!/bin/bash
 
-id=$(xclip -o)
-cnt=$(echo $id | grep "^ses_" | wc -l)
+# 导入公共函数
+SCRIPT_DIR=$(dirname "$0")
+source "$SCRIPT_DIR/common.sh"
 
-if [ $cnt -eq 1 ]; then
-    echo $id > .opencode_id
-    echo $id, now is the marked id
-else
-    echo not valid opencode id: $id
+# 配置工具名称
+TOOL_NAME="opencode"
+
+# 验证并保存会话ID
+validate_and_save_session_id "$TOOL_NAME"
+
+# 如果出错，显示帮助信息
+if [ $? -ne 0 ]; then
+    echo ""
+    show_update_id_usage "$(basename "$0")" "$TOOL_NAME"
 fi
 
