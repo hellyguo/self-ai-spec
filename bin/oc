@@ -5,6 +5,16 @@ dst_file=AGENTS.md
 
 src_dir=~/code/markdown/self-ai-spec/agent-template
 
+# 如果有会话ID，直接恢复会话，跳过模板复制
+if [ -e $id_file ];
+then
+    echo exist prev id, use the id
+    ID=$(cat $id_file)
+    opencode -s $ID
+    exit 0
+fi
+
+# 新会话：需要检查模板文件
 if [ -e $dst_file ];
 then
     echo exist define, skip
@@ -49,13 +59,6 @@ else
     cp $src_dir/$src_file $dst_file
 fi
 
-if [ -e $id_file ];
-then
-    echo exist prev id, use the id
-    ID=$(cat $id_file)
-    opencode -s $ID
-else
-    echo start as new
-    opencode
-fi
+echo start as new
+opencode
 

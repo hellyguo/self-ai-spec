@@ -1,11 +1,21 @@
 #!/bin/bash
 
 id_file=.codebuddy_id
-def_file=CODEBUDDY.md
+dst_file=CODEBUDDY.md
 
 src_dir=~/code/markdown/self-ai-spec/agent-template
 
-if [ -e $def_file ];
+# 如果有会话ID，直接恢复会话，跳过模板复制
+if [ -e $id_file ];
+then
+    echo exist prev id, use the id
+    ID=$(cat $id_file)
+    codebuddy --resume $ID
+    exit 0
+fi
+
+# 新会话：需要检查模板文件
+if [ -e $dst_file ];
 then
     echo exist define, skip
 else
@@ -49,13 +59,6 @@ else
     cp $src_dir/$src_file $dst_file
 fi
 
-if [ -e $id_file ];
-then
-    echo exist prev id, use the id
-    ID=$(cat $id_file)
-    codebuddy --resume $ID
-else
-    echo start as new
-    codebuddy
-fi
+echo start as new
+codebuddy
 

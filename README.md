@@ -7,17 +7,18 @@
 ### 主要工具启动脚本
 
 ```bash
-# 启动 opencode（支持会话恢复）
-./bin/oc <language>
+# 新会话：需要指定语言参数
+./bin/oc java          # 启动 opencode 处理 Java 项目
+./bin/cdbd java        # 启动 codebuddy 处理 Java 项目
+./bin/clc java         # 启动 claudecode 处理 Java 项目
 
-# 启动 codebuddy（支持会话恢复）
-./bin/cdbd <language>
+# 恢复会话：无需参数，自动恢复
+./bin/oc              # 自动恢复 opencode 会话
+./bin/cdbd            # 自动恢复 codebuddy 会话  
+./bin/clc             # 自动恢复 claudecode 会话
 
-# 启动 qodercli
-./bin/qcc <language>
-
-# 启动 claudecode（支持会话恢复）
-./bin/clc <language>
+# qodercli 不支持会话恢复
+./bin/qcc <language>  # 启动 qodercli
 ```
 
 **支持的语言参数**：
@@ -45,25 +46,40 @@
 
 ### 使用流程
 
-1. **首次启动**：
+1. **首次启动**（需要语言参数）：
 
-   ```bash
-   ./bin/oc java          # 启动 opencode 处理 Java 项目
-   # 项目完成后会显示: Session ID: ses_xxx...
-   ```
+```bash
+./bin/oc java          # 启动 opencode 处理 Java 项目
+# 项目完成后会显示: Session ID: ses_xxx...
+```
 
-2. **保存会话ID**：
+1. **保存会话ID**：
 
-   ```bash
-   # 复制 Session ID 到剪贴板
-   ./bin/updocid          # 更新本地会话ID记录
-   ```
+```bash
+# 复制 Session ID 到剪贴板
+./bin/updocid          # 更新本地会话ID记录
+```
 
-3. **恢复会话**：
+1. **恢复会话**（无需参数）：
 
-   ```bash
-   ./bin/oc java          # 自动使用保存的会话ID恢复
-   ```
+```bash
+./bin/oc              # 自动使用保存的会话ID恢复
+```
+
+1. **跨工具工作**：
+
+```bash
+./bin/oc java          # 开始 Java 项目
+./bin/updocid          # 保存 opencode 会话ID
+./bin/clc java         # 切换到 claudecode 继续
+./bin/updccid          # 保存 claudecode 会话ID
+```
+
+**智能恢复逻辑**：
+
+- 检测到会话ID文件存在 → 直接恢复会话，跳过模板复制
+- 无会话ID → 需要语言参数来设置项目模板
+- 各工具独立：opencode、codebuddy、claudecode 各自管理会话状态
 
 **脚本功能说明**：
 
