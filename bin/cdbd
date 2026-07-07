@@ -1,64 +1,32 @@
 #!/bin/bash
 
-id_file=.codebuddy_id
-dst_file=CODEBUDDY.md
+# 导入公共函数
+SCRIPT_DIR=$(dirname "$0")
+source "$SCRIPT_DIR/common.sh"
 
-src_dir=~/code/markdown/self-ai-spec/agent-template
+# 配置变量
+ID_FILE=".codebuddy_id"
+DST_FILE="CODEBUDDY.md"
+TOOL_NAME="codebuddy"
 
-# 如果有会话ID，直接恢复会话，跳过模板复制
-if [ -e $id_file ];
-then
-    echo exist prev id, use the id
-    ID=$(cat $id_file)
-    codebuddy --resume $ID
+# 检查会话恢复
+if check_and_resume_session "$ID_FILE" "--resume" "$TOOL_NAME"; then
     exit 0
 fi
 
-# 新会话：需要检查模板文件
-if [ -e $dst_file ];
-then
-    echo exist define, skip
+# 新会话：需要语言参数
+if [ $# -eq 1 ]; then
+    LANGUAGE="$1"
 else
-    echo cp from defined agent md
-
-    if [ $# -eq 1 ];
-    then
-        echo $1
-        case $1 in
-            java)
-                src_file=AGENTS.java.md
-                ;;
-            ansi_c)
-                src_file=AGENTS.ansi_c.md
-                ;;
-            cpp)
-                src_file=AGENTS.cpp.md
-                ;;
-            rust)
-                src_file=AGENTS.rust.md
-                ;;
-            python)
-                src_file=AGENTS.python.md
-                ;;
-            js)
-                src_file=AGENTS.js.md
-                ;;
-            blank)
-                src_file=AGENTS.blank.md
-                ;;
-            *)
-                echo $1 not a valid program language, please set another language
-                exit 1
-                ;;
-        esac
-    else
-        echo need to set program language
-        exit 1
-    fi
-
-    cp $src_dir/$src_file $dst_file
+    echo "Error: First session needs language parameter"
+    echo ""
+    show_usage "$(basename "$0")" "$TOOL_NAME"
+    exit 1
 fi
 
-echo start as new
-codebuddy
+# 检查并复制模板
+check_and_copy_template "$DST_FILE" "$LANGUAGE"
+
+# 启动新会话
+start_new_session "codebuddy" "$TOOL_NAME"
 

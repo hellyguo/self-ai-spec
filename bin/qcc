@@ -1,52 +1,27 @@
 #!/bin/bash
 
-dst_file=AGENTS.md
+# 导入公共函数
+SCRIPT_DIR=$(dirname "$0")
+source "$SCRIPT_DIR/common.sh"
 
-src_dir=~/code/markdown/self-ai-spec/agent-template
+# 配置变量
+DST_FILE="AGENTS.md"
+TOOL_NAME="qodercli"
 
-if [ -e $dst_file ];
-then
-    echo exist define, skip
-else
-    echo cp from defined agent md
-
-    if [ $# -eq 1 ];
-    then
-        echo $1
-        case $1 in
-            java)
-                src_file=AGENTS.java.md
-                ;;
-            ansi_c)
-                src_file=AGENTS.ansi_c.md
-                ;;
-            cpp)
-                src_file=AGENTS.cpp.md
-                ;;
-            rust)
-                src_file=AGENTS.rust.md
-                ;;
-            python)
-                src_file=AGENTS.python.md
-                ;;
-            js)
-                src_file=AGENTS.js.md
-                ;;
-            blank)
-                src_file=AGENTS.blank.md
-                ;;
-            *)
-                echo $1 not a valid program language, please set another language
-                exit 1
-                ;;
-        esac
-    else
-        echo need to set program language
-        exit 1
-    fi
-
-    cp $src_dir/$src_file $dst_file
+# qodercli不支持会话恢复，始终需要语言参数
+if [ $# -eq 0 ]; then
+    echo "Error: qodercli needs language parameter (no session resume support)"
+    echo ""
+    echo "Usage: $(basename "$0") <language>"
+    echo "支持的语音: java, ansi_c, cpp, rust, python, js, blank"
+    exit 1
 fi
 
-qodercli
+LANGUAGE="$1"
+
+# 检查并复制模板
+check_and_copy_template "$DST_FILE" "$LANGUAGE"
+
+# 启动qodercli
+start_new_session "qodercli" "$TOOL_NAME"
 
