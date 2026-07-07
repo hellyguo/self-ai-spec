@@ -3,14 +3,9 @@
 # AI工具启动脚本公共函数库
 # 用于 oc, cdbd, clc, qcc, updocid, updcbid, updccid 等脚本
 
-# 配置变量 - 从环境变量读取
-if [ -z "$AI_SPEC_ROOT" ]; then
-    echo "错误: 环境变量 AI_SPEC_ROOT 未设置"
-    echo "请设置: export AI_SPEC_ROOT=/path/to/self-ai-spec"
-    exit 1
-fi
+# 注意：调用脚本必须已设置并验证AI_SPEC_ROOT环境变量
 
-# 从根目录推导脚本目录
+# 从环境变量推导目录
 SCRIPT_DIR="$AI_SPEC_ROOT/bin"
 AGENT_TEMPLATE_DIR="$AI_SPEC_ROOT/agent-template"
 
