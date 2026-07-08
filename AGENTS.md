@@ -42,6 +42,7 @@ description: "技能简介"
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
 | `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 |
 | `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
+| `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 |
 | `java-compile` | Java 编译指引 |
 | `java-env` | Java 环境信息 |
 | `java-gen-unittest` | Java 单元测试生成 |
