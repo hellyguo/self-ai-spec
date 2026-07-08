@@ -749,7 +749,144 @@ chmod 777 /app/data # 过度授权
 - 实现详细的日志记录
 - 编写单元测试和集成测试
 
-### 12. 审查输出文件规范
+### 12. 禁止无限循环审查
+
+**问题描述**：使用 `while(true)` 或 `while(1)` 创建无限循环，缺少退出条件，可能导致线程阻塞、资源泄漏、难以调试。
+
+**检测方法**：
+
+```java
+// Java 示例
+while (true) {  // 缺少退出条件
+    processRequest();
+}
+```
+
+```cpp
+// C++ 示例
+while (1) {  // 危险模式
+    handleEvent();
+}
+```
+
+```python
+# Python 示例
+while True:  # 无退出条件
+    do_something()
+```
+
+**审查要点**：
+
+1. 所有语言中都禁止使用 `while(true)` / `while(1)` / `while True`
+2. 必须使用明确的退出条件（布尔变量、计数器、状态标志）
+3. 必须考虑异常路径下的退出机制
+4. 长时间运行的循环必须有超时保护
+
+**重构建议**：
+
+```java
+// 正确模式：使用退出条件
+boolean running = true;
+while (running) {
+    try {
+        processRequest();
+        running = shouldContinue();
+    } catch (Exception e) {
+        logger.error("处理失败", e);
+        running = false;  // 异常时退出
+    }
+}
+```
+
+```cpp
+// 正确模式：使用原子标志
+std::atomic<bool> running{true};
+while (running.load()) {
+    if (!handleEvent()) {
+        running.store(false);
+    }
+}
+```
+
+### 13. Logger 参数空指针风险审查（C++/Java/JavaScript）
+
+**问题描述**：在日志输出中直接调用可能为 null 的对象方法，导致二次异常。尤其在 catch 块内，二次异常会逃逸到外层导致线程崩溃。
+
+**检测方法**：
+
+```java
+// Java 示例：catch 块内二次 NPE
+FidDef fiddef = dictionary.getFidDef(id);  // 可能返回 null
+try {
+    process(fiddef.getType());  // 第一次 NPE
+} catch (Exception e) {
+    logger.error("错误: {}", fiddef.getName(), e);  // 二次 NPE → 异常逃逸
+}
+```
+
+```cpp
+// C++ 示例
+Object* obj = getObject();  // 可能返回 nullptr
+try {
+    obj->process();  // 第一次崩溃
+} catch (...) {
+    LOG_ERROR("错误: {}", obj->getName());  // 二次崩溃
+}
+```
+
+```javascript
+// JavaScript 示例
+const user = getUser();  // 可能是 null
+try {
+    user.doSomething();  // 第一次 TypeError
+} catch (e) {
+    console.log(`错误: ${user.name}`);  // 二次 TypeError
+}
+```
+
+**审查要点**：
+
+1. 检查日志参数中是否调用了对象方法（如 `obj.getName()`）
+2. 判断该对象是否可能为 null（方法返回值、查找结果）
+3. 特别关注 catch 块内的日志输出
+4. 对象是否在 try 块前已判空
+
+**重构建议**：
+
+```java
+// 正确模式：提前判空
+FidDef fiddef = dictionary.getFidDef(id);
+if (fiddef == null) {
+    logger.warn("字段ID未定义: {}", id);
+    return;
+}
+try {
+    process(fiddef.getType());
+} catch (Exception e) {
+    logger.error("处理失败, 字段: {}", fiddef.getName(), e);
+}
+```
+
+```cpp
+// 正确模式：智能指针 + 判空
+auto obj = getObject();
+if (!obj) {
+    LOG_WARN("对象为空");
+    return;
+}
+try {
+    obj->process();
+} catch (...) {
+    LOG_ERROR("处理失败, 名称: {}", obj->getName());
+}
+```
+
+**注意**：此检查项为**参考级别**，不强制要求修复。原因：
+1. 静态分析可能无法准确判断对象是否为 null
+2. 需要结合业务逻辑上下文判断
+3. 建议在代码审查时人工确认风险
+
+### 14. 审查输出文件规范
 
 为每个专项检查点生成独立的输出文件，命名格式：
 
