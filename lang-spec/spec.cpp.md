@@ -441,3 +441,124 @@ add_executable(app main.cpp util.cpp) # 未分离库
 - 添加测试目标和安装目标
 - 支持多种构建类型（Debug/Release/RelWithDebInfo）
 - 使用CPack生成安装包
+
+### 11. 时钟回拨攻击审查（金融系统必查）
+
+**问题描述**：使用 `std::chrono::system_clock` 进行超时计算，受NTP同步和系统时间修改影响，时钟回拨可能导致超时逻辑失效。
+
+**适用场景**：
+- 高性能低延时系统（金融报价、交易系统、高频交易）
+- 分布式锁控、主从选举、心跳检测
+- 任何依赖时间间隔判断的分布式系统
+
+**检测方法**：
+
+**C++危险模式**：
+```cpp
+auto start = std::chrono::system_clock::now(); // 受系统时钟影响
+// ... 业务逻辑
+auto elapsed = std::chrono::system_clock::now() - start; // 可能倒退
+if (elapsed >= timeout) {
+    triggerElection(); // 可能永远不触发
+}
+```
+
+**审查要点**：
+1. 检查超时计算、心跳检测、选举超时是否使用系统时钟
+2. `std::chrono::system_clock` 是否用于间隔测量
+3. 时间差计算是否可能为负数
+4. 是否存在 `elapsed >= timeout` 判断逻辑
+
+**技术原理**：
+
+| API | 时间基准 | 受时钟回拨影响 | 适用场景 |
+|-----|---------|---------------|----------|
+| `std::chrono::system_clock` | 墙钟时间 | ✅ 受影响 | 绝对时间、日志时间戳 |
+| `std::chrono::steady_clock` | 单调时钟 | ❌ 不受影响 | 间隔测量、超时计算 |
+| `gettimeofday()` | 墙钟时间 | ✅ 受影响 | 绝对时间 |
+| `clock_gettime(CLOCK_MONOTONIC)` | 单调时钟 | ❌ 不受影响 | 间隔测量 |
+
+**重构建议**：
+
+**C++正确模式**：
+```cpp
+auto lastHeartbeat = std::chrono::steady_clock::now();
+
+auto elapsed = std::chrono::steady_clock::now() - lastHeartbeat;
+auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+if (elapsedMs >= timeout) {
+    triggerElection();
+}
+```
+
+**注意**：
+- `steady_clock` 是单调时钟，不受系统时间调整影响
+- 日志时间戳仍应使用 `system_clock` 获取可读时间
+- 金融系统必须使用单调时钟防止时钟回拨攻击
+
+### 12. 禁止无限循环审查
+
+**问题描述**：使用 `while(true)`、`while(1)` 或 `for(;;)` 创建无限循环，缺少明确的退出条件。
+
+**检测方法**：
+- C++：`while (1)`、`for (;;)`
+- 所有语言中都禁止使用 `while(true)` / `while(1)` / `for(;;)` / `while True`
+
+**审查要点**：
+1. 必须使用明确的退出条件变量
+2. 必须考虑异常路径下的优雅退出机制
+3. 长时间运行的循环必须有超时保护
+4. 循环退出应确保资源正确释放
+
+**重构建议**：
+
+**C++示例**：
+```cpp
+// 使用 atomic<bool> + RAII 资源管理
+std::atomic<bool> running_{true};
+while (running_.load()) {
+    auto task = queue_.pop();  // 可超时等待
+    if (!task) break;
+    process(*task);
+}
+```
+
+**核心原则**：
+- **可控制性**：循环必须能被外部停止
+- **资源安全**：退出时必须清理资源
+- **异常处理**：异常路径也要能正常退出
+- **线程友好**：支持线程中断和超时机制
+
+### 13. Logger 参数空指针风险审查
+
+**问题描述**：在日志输出中直接调用可能为 null 的对象方法，导致二次异常。尤其在 catch 块内，二次异常会逃逸到外层导致线程崩溃。
+
+**检测方法**：
+- C++：`LOG_ERROR("错误: {}", obj->getName())`，obj可能为nullptr
+
+**审查要点**：
+1. 检查日志参数中是否调用了对象方法（如 `obj->getName()`）
+2. 判断该对象是否可能为 nullptr（方法返回值、查找结果）
+3. 特别关注 catch 块内的日志输出
+4. 对象是否在 try 块前已判空
+
+**重构建议**：
+
+**C++示例**：
+```cpp
+auto obj = getObject();
+if (!obj) {
+    LOG_WARN("对象为空");
+    return;
+}
+try {
+    obj->process();
+} catch (...) {
+    LOG_ERROR("处理失败, 名称: {}", obj->getName());
+}
+```
+
+**注意**：此检查项为**参考级别**，不强制要求修复。原因：
+1. 静态分析可能无法准确判断对象是否为 nullptr
+2. 需要结合业务逻辑上下文判断
+3. 建议在代码审查时人工确认风险

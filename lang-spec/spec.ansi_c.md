@@ -601,3 +601,135 @@ int* p;
 - 使用静态分析工具检测指针问题
 - 实施指针生命周期管理
 - 使用智能指针模式（引用计数）
+
+### 13. 时钟回拨攻击审查（金融系统必查）
+
+**问题描述**：使用 `gettimeofday()` 或 `time()` 进行超时计算，受NTP同步和系统时间修改影响，时钟回拨可能导致超时逻辑失效。
+
+**适用场景**：
+- 高性能低延时系统（金融报价、交易系统、高频交易）
+- 分布式锁控、主从选举、心跳检测
+- 任何依赖时间间隔判断的分布式系统
+
+**检测方法**：
+
+**C危险模式**：
+```c
+struct timeval start;
+gettimeofday(&start, NULL); // 受系统时钟影响
+// ... 业务逻辑
+struct timeval now;
+gettimeofday(&now, NULL);
+long elapsed = (now.tv_sec - start.tv_sec) * 1000 + 
+               (now.tv_usec - start.tv_usec) / 1000; // 可能为负数
+if (elapsed >= timeout) {
+    trigger_election(); // 可能永远不触发
+}
+```
+
+**审查要点**：
+1. 检查超时计算、心跳检测、选举超时是否使用墙钟时间
+2. `gettimeofday()` 是否用于间隔测量
+3. 时间差计算是否可能为负数
+4. 是否存在 `elapsed >= timeout` 判断逻辑
+
+**技术原理**：
+
+| API | 时间基准 | 受时钟回拨影响 | 适用场景 |
+|-----|---------|---------------|----------|
+| `gettimeofday()` | 墙钟时间 | ✅ 受影响 | 绝对时间 |
+| `clock_gettime(CLOCK_REALTIME)` | 墙钟时间 | ✅ 受影响 | 绝对时间 |
+| `clock_gettime(CLOCK_MONOTONIC)` | 单调时钟 | ❌ 不受影响 | 间隔测量 |
+| `clock_gettime(CLOCK_MONOTONIC_RAW)` | 原始单调时钟 | ❌ 不受影响 | 高精度间隔测量 |
+
+**重构建议**：
+
+**C正确模式**：
+```c
+#include <time.h>
+
+struct timespec last_heartbeat;
+clock_gettime(CLOCK_MONOTONIC, &last_heartbeat);
+
+struct timespec now;
+clock_gettime(CLOCK_MONOTONIC, &now);
+long elapsed_ms = (now.tv_sec - last_heartbeat.tv_sec) * 1000 + 
+                  (now.tv_nsec - last_heartbeat.tv_nsec) / 1000000;
+if (elapsed_ms >= timeout) {
+    trigger_election();
+}
+```
+
+**注意**：
+- `CLOCK_MONOTONIC` 是单调时钟，不受系统时间调整影响
+- 日志时间戳仍应使用 `gettimeofday()` 获取可读时间
+- 金融系统必须使用单调时钟防止时钟回拨攻击
+- 对于嵌入式系统，可能需要硬件支持的单调计数器
+
+### 14. 禁止无限循环审查
+
+**问题描述**：使用 `while(1)` 或 `for(;;)` 创建无限循环，缺少明确的退出条件。
+
+**检测方法**：
+- C：`while (1)`、`for (;;)`
+- 所有语言中都禁止使用 `while(true)` / `while(1)` / `for(;;)` / `while True`
+
+**审查要点**：
+1. 必须使用明确的退出条件变量
+2. 必须考虑异常路径下的优雅退出机制
+3. 长时间运行的循环必须有超时保护
+4. 循环退出应确保资源正确释放
+
+**重构建议**：
+
+**C示例**：
+```c
+// 使用条件变量 + 线程同步
+volatile int running = 1;
+while (running) {
+    struct timespec timeout;
+    clock_gettime(CLOCK_REALTIME, &timeout);
+    timeout.tv_sec += 1;  // 1秒超时
+    
+    pthread_cond_timedwait(&worker->cond, &worker->lock, &timeout);
+    // 处理任务
+}
+```
+
+**核心原则**：
+- **可控制性**：循环必须能被外部停止
+- **资源安全**：退出时必须清理资源
+- **异常处理**：异常路径也要能正常退出
+- **线程友好**：支持线程中断和超时机制
+
+### 15. Logger 参数空指针风险审查
+
+**问题描述**：在日志输出中直接调用可能为 NULL 的函数或访问可能为 NULL 的指针，导致二次异常。尤其在错误处理块内，二次异常会逃逸到外层导致程序崩溃。
+
+**检测方法**：
+- C：`log_error("错误: %s", obj->name)`，obj可能为NULL
+
+**审查要点**：
+1. 检查日志参数中是否调用了可能为 NULL 的函数指针
+2. 判断该指针是否可能为 NULL（函数返回值、查找结果）
+3. 特别关注错误处理块内的日志输出
+4. 指针是否在调用前已判空
+
+**重构建议**：
+
+**C示例**：
+```c
+struct object* obj = get_object();
+if (obj == NULL) {
+    log_warn("对象为空");
+    return;
+}
+if (process_object(obj) != 0) {
+    log_error("处理失败, 名称: %s", obj->name);
+}
+```
+
+**注意**：此检查项为**参考级别**，不强制要求修复。原因：
+1. 静态分析可能无法准确判断指针是否为 NULL
+2. 需要结合业务逻辑上下文判断
+3. 建议在代码审查时人工确认风险
