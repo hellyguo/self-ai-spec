@@ -1,5 +1,30 @@
 # 更新历史
 
+## 2026-07-09
+
+### 新增Java静态分析技能
+- **java-check-spotbugs技能**：SpotBugs静态分析工具技能，支持Find Security Bugs和fb-contrib插件集成
+  - 检测范围：代码缺陷、安全漏洞、性能问题
+  - 工具版本：SpotBugs 4.7.3（最高支持Java 17）
+  - 位置：`skills/java-check-spotbugs/SKILL.md`
+  
+- **java-check-pmd技能**：PMD代码质量分析工具技能
+  - 检测范围：编码规范、代码坏味道、复杂度分析、安全漏洞
+  - 工具版本：PMD 6.19.0（支持Java 25）
+  - 位置：`skills/java-check-pmd/SKILL.md`
+
+### 工具验证结果
+- **PMD验证成功**：工具工作正常，正确检测出空catch块、未使用变量等问题
+- **SpotBugs版本兼容性**：SpotBugs 4.7.3因ASM版本限制不支持Java 25，需要Java 17或更早版本
+- **技能文档更新**：在SpotBugs技能中添加版本兼容性说明和解决方案
+
+### 技能列表更新
+- 在README.md中添加两个新技能到Java开发工具部分
+- 更新技能描述和适用场景说明
+
+### 提交记录
+- Commit: `a193e16` feat: add java-check-spotbugs and java-check-pmd skills
+
 ## 2025-07-07
 
 ### 新增功能
