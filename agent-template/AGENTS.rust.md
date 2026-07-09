@@ -29,12 +29,12 @@
 
 ### 交互规则
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/agent-template/interaction.rules.md
+授权读取：${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/interaction.rules.md
+Read ${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 
 ### 编码规范
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.rust.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.rust.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.rust.md
+Read ${AI_SPEC_ROOT}/lang-spec/spec.rust.md

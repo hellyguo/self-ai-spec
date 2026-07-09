@@ -66,9 +66,9 @@ svn diff -r 100:200
 根据项目使用的编程语言，读取对应的编码规范：
 
 ```bash
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.{lang}.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.{lang}.md
+Read ${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md
 ```
 
 ## 审查流程

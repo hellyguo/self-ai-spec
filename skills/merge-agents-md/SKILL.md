@@ -33,9 +33,9 @@ description: "该skill没有执行文件，为操作指引：通用 AGENTS.md �
 ### 2. 授权读取模板
 
 ```
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/agent-template/AGENTS.{lang}.md
+授权读取：${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/AGENTS.{lang}.md
+Read ${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
 ```
 
 ### 3. 合并规则
@@ -64,7 +64,7 @@ Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/AGENTS.{lang}.m
 
 ```
 # 读取 Java 模板
-Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/AGENTS.java.md
+Read ${AI_SPEC_ROOT}/agent-template/AGENTS.java.md
 
 # 读取项目现有 AGENTS.md（如存在）
 Read ./AGENTS.md
@@ -77,7 +77,7 @@ Write ./AGENTS.md
 
 ```
 # 读取 Python 模板
-Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/AGENTS.python.md
+Read ${AI_SPEC_ROOT}/agent-template/AGENTS.python.md
 
 # 读取项目现有 AGENTS.md（如存在）
 Read ./AGENTS.md

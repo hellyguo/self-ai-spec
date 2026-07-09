@@ -62,8 +62,8 @@ description: "技能简介"
 ## 跨文件引用规范
 
 ```markdown
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.java.md
-Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.java.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.java.md
+Read ${AI_SPEC_ROOT}/lang-spec/spec.java.md
 ```
 
 ## 新增技能流程

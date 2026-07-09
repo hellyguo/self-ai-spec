@@ -30,18 +30,18 @@
 
 ### 交互规则
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/agent-template/interaction.rules.md
+授权读取：${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/agent-template/interaction.rules.md
+Read ${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 
 ### 编码规范
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.shell.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.shell.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.shell.md
+Read ${AI_SPEC_ROOT}/lang-spec/spec.shell.md
 
 ### 构建工具
 
-授权读取：/disk2/helly_data/code/markdown/self-ai-spec/lang-spec/ci.shell.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/ci.shell.md
 
-Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/ci.shell.md
+Read ${AI_SPEC_ROOT}/lang-spec/ci.shell.md
