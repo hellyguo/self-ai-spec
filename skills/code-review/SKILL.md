@@ -116,6 +116,89 @@ Read /disk2/helly_data/code/markdown/self-ai-spec/lang-spec/spec.{lang}.md
 | ThreadLocal | 需要考虑到内存泄漏问题 |
 | 同步锁 | Lock 轻量锁，需要观察评估合理性 |
 | 线程安全类 | SimpleDateFormat、DecimalFormat 等禁止声明为全局静态变量 |
+| **时钟回拨攻击** | **高性能低延时系统必须使用 `System.nanoTime()` 而非 `System.currentTimeMillis()` 进行超时计算和间隔测量** |
+
+#### 时钟回拨攻击审查（Java/C++/Rust）
+
+**问题描述**：使用 `System.currentTimeMillis()` 或 `gettimeofday()` 进行超时计算，受NTP同步和系统时间修改影响，时钟回拨可能导致超时逻辑失效。
+
+**适用场景**：
+- 高性能低延时系统（金融报价、交易系统、高频交易）
+- 分布式锁控、主从选举、心跳检测
+- 任何依赖时间间隔判断的分布式系统
+
+**检测方法**：
+
+```java
+// Java 危险模式
+long timeout = 150;
+long start = System.currentTimeMillis();
+// ... 时钟回拨 ...
+long elapsed = System.currentTimeMillis() - start; // 可能为负数！
+if (elapsed >= timeout) {
+    triggerElection(); // 永远不触发
+}
+```
+
+```cpp
+// C++ 危险模式
+auto start = std::chrono::system_clock::now(); // 受系统时钟影响
+// ... 时钟回拨 ...
+auto elapsed = std::chrono::system_clock::now() - start; // 可能倒退
+```
+
+**审查要点**：
+
+1. 检查超时计算、心跳检测、选举超时是否使用墙钟时间
+2. `System.currentTimeMillis()` / `gettimeofday()` 是否用于间隔测量
+3. 时间差计算是否可能为负数
+4. 是否存在 `elapsed >= timeout` 判断逻辑
+
+**技术原理**：
+
+| API | 时间基准 | 受时钟回拨影响 | 适用场景 |
+|-----|---------|---------------|----------|
+| `currentTimeMillis()` | 墙钟时间(UTC) | ✅ 受影响 | 绝对时间、日志时间戳 |
+| `nanoTime()` | 单调时钟(JVM启动) | ❌ 不受影响 | 间隔测量、超时计算 |
+| `gettimeofday()` | 墙钟时间 | ✅ 受影响 | 绝对时间 |
+| `clock_gettime(CLOCK_MONOTONIC)` | 单调时钟 | ❌ 不受影响 | 间隔测量 |
+
+**重构建议**：
+
+```java
+// Java 正确模式
+private volatile long lastHeartbeatNanos;
+
+// 初始化
+this.lastHeartbeatNanos = System.nanoTime();
+
+// 更新心跳
+lastHeartbeatNanos = System.nanoTime();
+
+// 计算间隔
+long elapsedNanos = System.nanoTime() - lastHeartbeatNanos;
+long elapsedMs = TimeUnit.NANOSECONDS.toMillis(elapsedNanos);
+if (elapsedMs >= timeout) {
+    triggerElection();
+}
+```
+
+```cpp
+// C++ 正确模式
+auto lastHeartbeat = std::chrono::steady_clock::now(); // 单调时钟
+
+// 计算间隔
+auto elapsed = std::chrono::steady_clock::now() - lastHeartbeat;
+auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+if (elapsedMs >= timeout) {
+    triggerElection();
+}
+```
+
+**注意**：
+- `nanoTime()` 返回值无绝对意义，仅用于差值计算
+- 日志时间戳仍应使用 `currentTimeMillis()` 获取可读时间
+- 金融系统必须使用单调时钟防止时钟回拨攻击
 
 ### 6. 安全审查
 
