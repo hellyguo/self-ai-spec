@@ -766,6 +766,11 @@ try (InputStream is = new FileInputStream(tempFile)) {
 ### 必须修正
 
 - 循环依赖
+- **无限循环风险**：
+  - 使用 `while(true)`、`for(;;)` 创建无限循环
+  - 循环缺少明确的退出条件，难以优雅停止
+  - 线程可能被强制中断，导致资源泄漏
+  - 推荐使用明确的退出标志变量
 - **线程安全问题**：
   - `CompletableFuture.runAsync()/supplyAsync()` 未指定独立线程池
   - `parallelStream()` 中包含阻塞操作

@@ -834,14 +834,22 @@ chmod 777 /app/data # 过度授权
 
 ### 12. 禁止无限循环审查
 
-**问题描述**：使用 `while(true)` 或 `while(1)` 创建无限循环，缺少退出条件，可能导致线程阻塞、资源泄漏、难以调试。
+**问题描述**：使用 `while(true)`、`while(1)` 或 `for(;;)` 创建无限循环，缺少明确的退出条件，导致以下问题：
+1. **线程阻塞**：难以优雅退出，可能需要强制终止线程
+2. **资源泄漏**：循环退出路径不明确，资源可能无法正确释放
+3. **调试困难**：无法控制循环执行流程，调试时需要打断点
+4. **不优雅退出**：缺乏退出条件，必须通过中断信号或外部干预才能退出
 
 **检测方法**：
 
 ```java
-// Java 示例
+// Java 示例 - 多种危险模式
 while (true) {  // 缺少退出条件
     processRequest();
+}
+
+for (;;) {  // C风格无限循环，同样危险
+    handleEvent();
 }
 ```
 
@@ -850,46 +858,185 @@ while (true) {  // 缺少退出条件
 while (1) {  // 危险模式
     handleEvent();
 }
+
+for (;;) {  // C风格无限循环，难以优雅退出
+    processData();
+}
 ```
 
 ```python
 # Python 示例
-while True:  # 无退出条件
+while True:  // 无退出条件
     do_something()
+```
+
+```c
+// C 示例
+for (;;) {  // 传统C风格，不利于控制流管理
+    read_socket();
+}
 ```
 
 **审查要点**：
 
-1. 所有语言中都禁止使用 `while(true)` / `while(1)` / `while True`
-2. 必须使用明确的退出条件（布尔变量、计数器、状态标志）
-3. 必须考虑异常路径下的退出机制
-4. 长时间运行的循环必须有超时保护
+1. 所有语言中都禁止使用 `while(true)` / `while(1)` / `for(;;)` / `while True`
+2. 必须使用明确的退出条件变量（布尔变量、计数器、状态标志）
+3. 必须考虑异常路径下的优雅退出机制
+4. 长时间运行的循环必须有超时保护和心跳检测
+5. 循环退出应确保资源正确释放（文件句柄、网络连接、锁等）
 
 **重构建议**：
 
 ```java
-// 正确模式：使用退出条件
-boolean running = true;
-while (running) {
-    try {
-        processRequest();
-        running = shouldContinue();
-    } catch (Exception e) {
-        logger.error("处理失败", e);
-        running = false;  // 异常时退出
+// 正确模式：使用明确的退出条件
+private volatile boolean running = true;
+
+public void start() {
+    while (running) {
+        try {
+            Request request = queue.take();  // 阻塞但可中断
+            process(request);
+        } catch (InterruptedException e) {
+            logger.info("循环被中断，准备退出");
+            running = false;  // 优雅退出
+            Thread.currentThread().interrupt();  // 恢复中断状态
+        } catch (Exception e) {
+            logger.error("处理异常", e);
+            running = shouldRetry() ? true : false;  // 根据策略决定是否退出
+        }
     }
+    cleanup();  // 资源清理
+}
+
+public void stop() {
+    running = false;  // 外部可控制退出
 }
 ```
 
 ```cpp
-// 正确模式：使用原子标志
-std::atomic<bool> running{true};
-while (running.load()) {
-    if (!handleEvent()) {
-        running.store(false);
+// 正确模式：原子标志 + 优雅退出
+class Worker {
+private:
+    std::atomic<bool> running_{true};
+    std::thread worker_thread_;
+
+public:
+    void start() {
+        worker_thread_ = std::thread([this]() {
+            while (running_.load()) {
+                try {
+                    auto task = queue_.pop();  // 可超时等待
+                    if (!task) break;  // 超时或队列关闭
+                    process(*task);
+                } catch (const std::exception& e) {
+                    LOG_ERROR("处理失败: {}", e.what());
+                    if (shouldStopOnError()) {
+                        running_.store(false);
+                    }
+                }
+            }
+            cleanup();  // RAII确保资源释放
+        });
     }
-}
+
+    void stop() {
+        running_.store(false);
+        queue_.close();  // 唤醒阻塞的pop操作
+        if (worker_thread_.joinable()) {
+            worker_thread_.join();  // 等待线程退出
+        }
+    }
+
+    ~Worker() {
+        stop();  // 析构时自动停止
+    }
+};
 ```
+
+```python
+# Python 正确模式：事件驱动 + 优雅退出
+import threading
+import time
+
+class Worker:
+    def __init__(self):
+        self._running = threading.Event()
+        self._running.set()
+        self._thread = None
+        
+    def start(self):
+        self._thread = threading.Thread(target=self._run)
+        self._thread.start()
+        
+    def _run(self):
+        while self._running.is_set():
+            try:
+                task = self.queue.get(timeout=1.0)  # 可超时获取
+                self.process(task)
+                self.queue.task_done()
+            except queue.Empty:
+                continue  # 超时继续检查running标志
+            except Exception as e:
+                logging.error(f"处理失败: {e}")
+                if self._should_stop_on_error:
+                    break
+                    
+    def stop(self):
+        self._running.clear()  # 清除事件标志
+        if self._thread:
+            self._thread.join(timeout=5.0)  # 等待5秒
+        self.cleanup()
+        
+    def cleanup(self):
+        # 资源清理
+        self.queue.close()
+```
+
+```c
+// C 正确模式：条件变量控制循环
+typedef struct {
+    pthread_mutex_t lock;
+    pthread_cond_t cond;
+    bool running;
+    int socket_fd;
+} worker_t;
+
+void* worker_thread(void* arg) {
+    worker_t* worker = (worker_t*)arg;
+    
+    pthread_mutex_lock(&worker->lock);
+    while (worker->running) {
+        pthread_mutex_unlock(&worker->lock);
+        
+        // 工作逻辑（可中断）
+        if (poll_socket(worker->socket_fd, 1000) > 0) {
+            process_data(worker->socket_fd);
+        }
+        
+        pthread_mutex_lock(&worker->lock);
+        // 检查是否需要继续
+        if (!worker->running) {
+            break;
+        }
+        
+        // 可选的超时等待，允许外部唤醒
+        struct timespec timeout;
+        clock_gettime(CLOCK_REALTIME, &timeout);
+        timeout.tv_sec += 1;
+        pthread_cond_timedwait(&worker->cond, &worker->lock, &timeout);
+    }
+    pthread_mutex_unlock(&worker->lock);
+    
+    cleanup_resources(worker);
+    return NULL;
+}
+
+void stop_worker(worker_t* worker) {
+    pthread_mutex_lock(&worker->lock);
+    worker->running = false;
+    pthread_cond_signal(&worker->cond);  // 唤醒等待的线程
+    pthread_mutex_unlock(&worker->lock);
+}
 
 ### 13. Logger 参数空指针风险审查（C++/Java/JavaScript）
 
