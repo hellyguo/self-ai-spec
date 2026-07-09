@@ -129,28 +129,24 @@ Read ${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md
 
 **检测方法**：
 
+**Java危险模式**：
 ```java
-// Java 危险模式
-long timeout = 150;
 long start = System.currentTimeMillis();
-// ... 时钟回拨 ...
-long elapsed = System.currentTimeMillis() - start; // 可能为负数！
+long elapsed = System.currentTimeMillis() - start; // 可能为负数
 if (elapsed >= timeout) {
     triggerElection(); // 永远不触发
 }
 ```
 
+**C++危险模式**：
 ```cpp
-// C++ 危险模式
 auto start = std::chrono::system_clock::now(); // 受系统时钟影响
-// ... 时钟回拨 ...
 auto elapsed = std::chrono::system_clock::now() - start; // 可能倒退
 ```
 
 **审查要点**：
-
 1. 检查超时计算、心跳检测、选举超时是否使用墙钟时间
-2. `System.currentTimeMillis()` / `gettimeofday()` 是否用于间隔测量
+2. `currentTimeMillis()` / `gettimeofday()` 是否用于间隔测量
 3. 时间差计算是否可能为负数
 4. 是否存在 `elapsed >= timeout` 判断逻辑
 
@@ -165,17 +161,10 @@ auto elapsed = std::chrono::system_clock::now() - start; // 可能倒退
 
 **重构建议**：
 
+**Java正确模式**：
 ```java
-// Java 正确模式
-private volatile long lastHeartbeatNanos;
+private volatile long lastHeartbeatNanos = System.nanoTime();
 
-// 初始化
-this.lastHeartbeatNanos = System.nanoTime();
-
-// 更新心跳
-lastHeartbeatNanos = System.nanoTime();
-
-// 计算间隔
 long elapsedNanos = System.nanoTime() - lastHeartbeatNanos;
 long elapsedMs = TimeUnit.NANOSECONDS.toMillis(elapsedNanos);
 if (elapsedMs >= timeout) {
@@ -183,11 +172,9 @@ if (elapsedMs >= timeout) {
 }
 ```
 
+**C++正确模式**：
 ```cpp
-// C++ 正确模式
-auto lastHeartbeat = std::chrono::steady_clock::now(); // 单调时钟
-
-// 计算间隔
+auto lastHeartbeat = std::chrono::steady_clock::now();
 auto elapsed = std::chrono::steady_clock::now() - lastHeartbeat;
 auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
 if (elapsedMs >= timeout) {
@@ -841,44 +828,12 @@ chmod 777 /app/data # 过度授权
 4. **不优雅退出**：缺乏退出条件，必须通过中断信号或外部干预才能退出
 
 **检测方法**：
-
-```java
-// Java 示例 - 多种危险模式
-while (true) {  // 缺少退出条件
-    processRequest();
-}
-
-for (;;) {  // C风格无限循环，同样危险
-    handleEvent();
-}
-```
-
-```cpp
-// C++ 示例
-while (1) {  // 危险模式
-    handleEvent();
-}
-
-for (;;) {  // C风格无限循环，难以优雅退出
-    processData();
-}
-```
-
-```python
-# Python 示例
-while True:  // 无退出条件
-    do_something()
-```
-
-```c
-// C 示例
-for (;;) {  // 传统C风格，不利于控制流管理
-    read_socket();
-}
-```
+- Java：`while (true)`、`for (;;)`
+- C++：`while (1)`、`for (;;)`
+- Python：`while True:`
+- C：`for (;;)`
 
 **审查要点**：
-
 1. 所有语言中都禁止使用 `while(true)` / `while(1)` / `for(;;)` / `while True`
 2. 必须使用明确的退出条件变量（布尔变量、计数器、状态标志）
 3. 必须考虑异常路径下的优雅退出机制
@@ -887,195 +842,64 @@ for (;;) {  // 传统C风格，不利于控制流管理
 
 **重构建议**：
 
+**Java示例**：
 ```java
-// 正确模式：使用明确的退出条件
+// 使用 volatile boolean 控制循环
 private volatile boolean running = true;
-
-public void start() {
-    while (running) {
-        try {
-            Request request = queue.take();  // 阻塞但可中断
-            process(request);
-        } catch (InterruptedException e) {
-            logger.info("循环被中断，准备退出");
-            running = false;  // 优雅退出
-            Thread.currentThread().interrupt();  // 恢复中断状态
-        } catch (Exception e) {
-            logger.error("处理异常", e);
-            running = shouldRetry() ? true : false;  // 根据策略决定是否退出
-        }
+while (running) {
+    try {
+        processRequest();
+    } catch (InterruptedException e) {
+        running = false;  // 优雅退出
+        Thread.currentThread().interrupt();
     }
-    cleanup();  // 资源清理
-}
-
-public void stop() {
-    running = false;  // 外部可控制退出
 }
 ```
 
+**C++示例**：
 ```cpp
-// 正确模式：原子标志 + 优雅退出
-class Worker {
-private:
-    std::atomic<bool> running_{true};
-    std::thread worker_thread_;
-
-public:
-    void start() {
-        worker_thread_ = std::thread([this]() {
-            while (running_.load()) {
-                try {
-                    auto task = queue_.pop();  // 可超时等待
-                    if (!task) break;  // 超时或队列关闭
-                    process(*task);
-                } catch (const std::exception& e) {
-                    LOG_ERROR("处理失败: {}", e.what());
-                    if (shouldStopOnError()) {
-                        running_.store(false);
-                    }
-                }
-            }
-            cleanup();  // RAII确保资源释放
-        });
-    }
-
-    void stop() {
-        running_.store(false);
-        queue_.close();  // 唤醒阻塞的pop操作
-        if (worker_thread_.joinable()) {
-            worker_thread_.join();  // 等待线程退出
-        }
-    }
-
-    ~Worker() {
-        stop();  // 析构时自动停止
-    }
-};
+// 使用 atomic<bool> + RAII 资源管理
+std::atomic<bool> running_{true};
+while (running_.load()) {
+    auto task = queue_.pop();  // 可超时等待
+    if (!task) break;
+    process(*task);
+}
+~Worker() { stop(); }  // 析构时自动停止
 ```
 
+**Python示例**：
 ```python
-# Python 正确模式：事件驱动 + 优雅退出
-import threading
-import time
-
-class Worker:
-    def __init__(self):
-        self._running = threading.Event()
-        self._running.set()
-        self._thread = None
-        
-    def start(self):
-        self._thread = threading.Thread(target=self._run)
-        self._thread.start()
-        
-    def _run(self):
-        while self._running.is_set():
-            try:
-                task = self.queue.get(timeout=1.0)  # 可超时获取
-                self.process(task)
-                self.queue.task_done()
-            except queue.Empty:
-                continue  # 超时继续检查running标志
-            except Exception as e:
-                logging.error(f"处理失败: {e}")
-                if self._should_stop_on_error:
-                    break
-                    
-    def stop(self):
-        self._running.clear()  # 清除事件标志
-        if self._thread:
-            self._thread.join(timeout=5.0)  # 等待5秒
-        self.cleanup()
-        
-    def cleanup(self):
-        # 资源清理
-        self.queue.close()
+# 使用 threading.Event 控制循环
+while self._running.is_set():
+    task = self.queue.get(timeout=1.0)  // 可超时获取
+    self.process(task)
 ```
 
+**C示例**：
 ```c
-// C 正确模式：条件变量控制循环
-typedef struct {
-    pthread_mutex_t lock;
-    pthread_cond_t cond;
-    bool running;
-    int socket_fd;
-} worker_t;
-
-void* worker_thread(void* arg) {
-    worker_t* worker = (worker_t*)arg;
-    
-    pthread_mutex_lock(&worker->lock);
-    while (worker->running) {
-        pthread_mutex_unlock(&worker->lock);
-        
-        // 工作逻辑（可中断）
-        if (poll_socket(worker->socket_fd, 1000) > 0) {
-            process_data(worker->socket_fd);
-        }
-        
-        pthread_mutex_lock(&worker->lock);
-        // 检查是否需要继续
-        if (!worker->running) {
-            break;
-        }
-        
-        // 可选的超时等待，允许外部唤醒
-        struct timespec timeout;
-        clock_gettime(CLOCK_REALTIME, &timeout);
-        timeout.tv_sec += 1;
-        pthread_cond_timedwait(&worker->cond, &worker->lock, &timeout);
-    }
-    pthread_mutex_unlock(&worker->lock);
-    
-    cleanup_resources(worker);
-    return NULL;
+// 使用条件变量 + 线程同步
+while (worker->running) {
+    pthread_cond_timedwait(&worker->cond, &worker->lock, &timeout);
 }
+```
 
-void stop_worker(worker_t* worker) {
-    pthread_mutex_lock(&worker->lock);
-    worker->running = false;
-    pthread_cond_signal(&worker->cond);  // 唤醒等待的线程
-    pthread_mutex_unlock(&worker->lock);
-}
+**核心原则**：
+- **可控制性**：循环必须能被外部停止
+- **资源安全**：退出时必须清理资源
+- **异常处理**：异常路径也要能正常退出
+- **线程友好**：支持线程中断和超时机制
 
 ### 13. Logger 参数空指针风险审查（C++/Java/JavaScript）
 
 **问题描述**：在日志输出中直接调用可能为 null 的对象方法，导致二次异常。尤其在 catch 块内，二次异常会逃逸到外层导致线程崩溃。
 
 **检测方法**：
-
-```java
-// Java 示例：catch 块内二次 NPE
-FidDef fiddef = dictionary.getFidDef(id);  // 可能返回 null
-try {
-    process(fiddef.getType());  // 第一次 NPE
-} catch (Exception e) {
-    logger.error("错误: {}", fiddef.getName(), e);  // 二次 NPE → 异常逃逸
-}
-```
-
-```cpp
-// C++ 示例
-Object* obj = getObject();  // 可能返回 nullptr
-try {
-    obj->process();  // 第一次崩溃
-} catch (...) {
-    LOG_ERROR("错误: {}", obj->getName());  // 二次崩溃
-}
-```
-
-```javascript
-// JavaScript 示例
-const user = getUser();  // 可能是 null
-try {
-    user.doSomething();  // 第一次 TypeError
-} catch (e) {
-    console.log(`错误: ${user.name}`);  // 二次 TypeError
-}
-```
+- Java：`logger.error("错误: {}", obj.getName(), e)`，obj可能为null
+- C++：`LOG_ERROR("错误: {}", obj->getName())`，obj可能为nullptr
+- JavaScript：`console.log(`错误: ${user.name}`)`，user可能为null
 
 **审查要点**：
-
 1. 检查日志参数中是否调用了对象方法（如 `obj.getName()`）
 2. 判断该对象是否可能为 null（方法返回值、查找结果）
 3. 特别关注 catch 块内的日志输出
@@ -1083,8 +907,8 @@ try {
 
 **重构建议**：
 
+**Java示例**：
 ```java
-// 正确模式：提前判空
 FidDef fiddef = dictionary.getFidDef(id);
 if (fiddef == null) {
     logger.warn("字段ID未定义: {}", id);
@@ -1097,8 +921,8 @@ try {
 }
 ```
 
+**C++示例**：
 ```cpp
-// 正确模式：智能指针 + 判空
 auto obj = getObject();
 if (!obj) {
     LOG_WARN("对象为空");
