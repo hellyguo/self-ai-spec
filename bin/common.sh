@@ -50,7 +50,7 @@ check_and_copy_template() {
             ;;
     esac
     
-    # 如果目标文件已存在，跳过
+    # 如果目标文件已存在，跳过（但保留这个检查用于日志输出）
     if [ -e "$dst_file" ]; then
         echo "已存在定义文件，跳过复制: $dst_file"
         return 0

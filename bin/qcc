@@ -20,20 +20,28 @@ source "$COMMON_SH"
 # 配置工具变量
 TOOL_NAME="qodercli"
 TOOL_CMD="qodercli"
+AGENTS_FILE="AGENTS.md"
 
-# qodercli不支持会话恢复，始终需要语言参数
+# 主逻辑
 if [ $# -eq 0 ]; then
-    echo "错误: qodercli 需要语言参数（不支持会话恢复）"
-    echo ""
-    show_usage "$(basename "$0")" "$TOOL_NAME"
-    exit 1
+    # qodercli不支持会话恢复，但检查是否存在AGENTS.md
+    if [ -f "$AGENTS_FILE" ]; then
+        echo "发现 $AGENTS_FILE，启动qodercli新会话..."
+        start_new_session "$TOOL_CMD" ""
+    else
+        # 无AGENTS.md，需要语言参数
+        echo "错误: qodercli 需要语言参数（不支持会话恢复）"
+        echo ""
+        show_usage "$(basename "$0")" "$TOOL_NAME"
+        exit 1
+    fi
+else
+    LANG_ARG="$1"
+    
+    # 检查模板是否存在
+    check_and_copy_template "$LANG_ARG" "$AGENT_TEMPLATE_DIR" "$TOOL_NAME"
+    
+    # 启动qodercli
+    start_new_session "$TOOL_CMD" "$LANG_ARG"
 fi
-
-LANG_ARG="$1"
-
-# 检查模板是否存在
-check_and_copy_template "$LANG_ARG" "$AGENT_TEMPLATE_DIR" "$TOOL_NAME"
-
-# 启动qodercli
-start_new_session "$TOOL_CMD" "$LANG_ARG"
 
