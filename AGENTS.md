@@ -42,6 +42,8 @@ description: "技能简介"
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
 | `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 |
 | `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
+| `full-analysis` | 完整分析流程：设计解构→代码审查→重复检测→问题侦测→定性评估 |
+| `qualitative-assessment` | 系统定性评估：基于全面分析输出，从设计、开发、运维、非功能等维度总结系统性质 |
 | `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 |
 | `java-compile` | Java 编译指引 |
 | `java-env` | Java 环境信息 |
