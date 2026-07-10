@@ -53,6 +53,7 @@ description: "技能简介"
 | `java-g2m` | Gradle 转 Maven |
 | `java-asprof` | Java 性能分析（async-profiler） |
 | `jmh-bench` | JMH 基准测试 |
+| `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） |
 
 ## 文件命名约定
 
