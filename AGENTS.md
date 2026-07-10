@@ -39,6 +39,8 @@ description: "技能简介"
 | `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
 | `code-detect-dup` | 代码重复度检测 |
 | `code-refactor` | 重构方法论 |
+| `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） |
+| `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
 | `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 |
 | `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
