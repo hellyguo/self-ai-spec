@@ -39,6 +39,7 @@ description: "技能简介"
 | `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
 | `code-detect-dup` | 代码重复度检测 |
 | `code-refactor` | 重构方法论 |
+| `code-part` | 局部代码修改：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证 |
 | `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） |
 | `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
