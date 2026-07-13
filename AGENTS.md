@@ -54,6 +54,8 @@ description: "技能简介"
 | `java-g2m` | Gradle 转 Maven |
 | `java-asprof` | Java 性能分析（async-profiler） |
 | `jmh-bench` | JMH 基准测试 |
+| `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 |
+| `cpp-clang-tidy` | Clang-Tidy 静态分析：C/C++ 代码质量检测（基于 Clang AST，支持自动修复） |
 | `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） |
 
 ## 文件命名约定
