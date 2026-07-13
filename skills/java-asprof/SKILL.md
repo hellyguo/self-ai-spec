@@ -19,9 +19,9 @@ description: "该skill没有执行文件，为操作指引：采集Java执行情
 #  itimer
 #  ctimer
 
-asprof -i 1000 -e $2 -d $wait_time -f /tmp/profile.html $(jps | grep $1 | cut -d" " -f 1)
-#asprof -i 1000 -e $2 -t -d $wait_time -f /tmp/profile.html $(jps | grep $1 | cut -d" " -f 1)
-#asprof -i 1000 -e $2 -t -d $wait_time --cstack dwarf -f /tmp/profile.html $(jps | grep $1 | cut -d" " -f 1)
-#asprof -e $2 -t -d 60 -f /tmp/profile.html $(ps | grep $1 | grep -v grep | sed 's/\t/ /g' | tr -s ' ' | cut -d' ' -f 2)
+asprof -i 1000 -e $2 -d $wait_time -f /tmp/profile.txt $(jps | grep $1 | cut -d" " -f 1)
+#asprof -i 1000 -e $2 -t -d $wait_time -f /tmp/profile.txt $(jps | grep $1 | cut -d" " -f 1)
+#asprof -i 1000 -e $2 -t -d $wait_time --cstack dwarf -f /tmp/profile.txt $(jps | grep $1 | cut -d" " -f 1)
+#asprof -e $2 -t -d 60 -f /tmp/profile.txt $(ps | grep $1 | grep -v grep | sed 's/\t/ /g' | tr -s ' ' | cut -d' ' -f 2)
 ```
 
