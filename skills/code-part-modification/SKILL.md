@@ -1,9 +1,9 @@
 ---
-name: code-part
+name: code-part-modification
 description: "局部代码修改技能：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证和全量关联检查"
 ---
 
-# 局部代码修改技能（code-part）
+# 局部代码修改技能（code-part-modification）
 
 ## 核心原则
 
@@ -90,7 +90,7 @@ digraph code_part {
 - **功能修改**：修改前行为、修改后行为、兼容性要求
 - **功能封闭**：关闭范围、保留功能、清理范围
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/requirement.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/requirement.md`
 
 ```markdown
 # 需求说明
@@ -145,7 +145,7 @@ digraph code_part {
 | **UI界面** | 界面显示哪些字段？ | 前端代码分析 |
 | **配置** | 依赖哪些配置项？ | 配置文件分析 |
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/impact-analysis.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/impact-analysis.md`
 
 ```markdown
 # 影响范围分析
@@ -197,7 +197,7 @@ digraph code_part {
 
 ### 2.2 任务清单模板
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/tasks.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/tasks.md`
 
 ```markdown
 # 任务清单
@@ -332,7 +332,7 @@ public void testNewProcess() {
 
 ### 3.3 测试用例模板
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/test-cases.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/test-cases.md`
 
 ```markdown
 # 测试用例
@@ -369,7 +369,7 @@ public void testNewProcess() {
 
 ### 4.2 修改记录模板
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/changes.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/changes.md`
 
 ```markdown
 # 修改记录
@@ -453,7 +453,7 @@ digraph self_healing {
 | 4-5次 | 重新评估方案，可能需要人工介入 |
 | >5次 | 停止，记录问题，请求人工帮助 |
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/verification.log`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/verification.log`
 
 ```markdown
 # 验证日志
@@ -545,7 +545,7 @@ digraph self_healing {
 3. **字段追踪**：追踪字段的所有读写点
 4. **接口追踪**：追踪接口的所有调用点
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/butterfly-check.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/butterfly-check.md`
 
 ```markdown
 # 蝴蝶效应检查报告
@@ -584,7 +584,7 @@ Controller.order()
 
 ### 7.1 任务完成报告
 
-**输出**：`docs/code-part/task-{yyyymmdd}-{seq}/report.md`
+**输出**：`docs/code-part-modification/task-{yyyymmdd}-{seq}/report.md`
 
 ```markdown
 # 代码修改完成报告
@@ -625,7 +625,7 @@ Controller.order()
 ### 7.2 文件结构
 
 ```
-docs/code-part/
+docs/code-part-modification/
 └── task-{yyyymmdd}-{seq}/
     ├── requirement.md      # 需求说明
     ├── impact-analysis.md  # 影响范围分析
@@ -685,7 +685,7 @@ docs/code-part/
 
 ```bash
 # 修改完成后进行代码审查
-/code-part    # 完成修改
+/code-part-modification    # 完成修改
 /code-review  # 审查修改代码
 ```
 
@@ -693,7 +693,7 @@ docs/code-part/
 
 ```bash
 # 检查是否引入重复代码
-/code-part        # 完成修改
+/code-part-modification        # 完成修改
 /code-detect-dup  # 检查重复代码
 ```
 
@@ -701,7 +701,7 @@ docs/code-part/
 
 ```bash
 # 自动生成单元测试
-/code-part           # 定位修改点
+/code-part-modification           # 定位修改点
 /java-gen-unittest   # 生成测试代码
 ```
 

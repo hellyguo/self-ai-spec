@@ -4,13 +4,13 @@
 
 ### 新增局部代码修改技能
 
-- **code-part技能**：局部代码修改技能，支持最小化修改完成功能
+- **code-part-modification技能**：局部代码修改技能，支持最小化修改完成功能
   - 核心原则：确保无蝴蝶效应，支持独立测试验证和全量关联检查
-  - 位置：`skills/code-part/SKILL.md`
+  - 位置：`skills/code-part-modification/SKILL.md`
 
 ### 提交记录
 
-- Commit: `cab4697` feat: add code-part skill for minimal code modification
+- Commit: `cab4697` feat: add code-part-modification skill for minimal code modification
 
 ## 2026-07-10
 
