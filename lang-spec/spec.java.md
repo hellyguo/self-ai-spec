@@ -785,6 +785,109 @@ try {
 - 成员变量被多线程反复赋值存在竞态条件
 - 赋值和使用必须原子化或加锁
 
+### 类初始化死锁（强制禁止）
+
+**问题描述**：JVM 为每个类维护一个初始化锁（`<clinit>`），多线程同时初始化互相依赖的类时，可能导致死锁。Java 标准死锁检测（`ThreadMXBean.findDeadlockedThreads()`）无法检测此类死锁。
+
+**死锁模式**：
+
+| 模式 | 场景 | 死锁原因 |
+| -------- | ------ | ------ |
+| 父子类初始化 | 父类静态块实例化子类，子类静态块访问父类 | 线程A持有父类锁等待子类，线程B持有子类锁等待父类 |
+| 循环依赖 | 类A静态块访问类B，类B静态块访问类A | 线程A持有A锁等待B，线程B持有B锁等待A |
+| 静态内部类 | 外部类静态块访问内部类，内部类静态块访问外部类 | 线程A持有外部类锁等待内部类，线程B持有内部类锁等待外部类 |
+
+**禁止的高风险代码模式**：
+
+```java
+// 禁止：类A的静态初始化依赖类B
+class ClassA {
+    static {
+        ClassB.someStaticMethod();  // 危险！
+    }
+}
+
+// 禁止：类B的静态初始化依赖类A
+class ClassB {
+    static {
+        ClassA.someStaticMethod();  // 循环依赖，死锁风险！
+    }
+}
+
+// 禁止：父子类静态初始化交叉依赖
+class Parent {
+    static {
+        CHILD = new Child();  // 危险！需要初始化Child
+    }
+}
+
+class Child {
+    static {
+        int value = Parent.getStaticValue();  // 危险！需要初始化Parent
+    }
+}
+
+// 禁止：外部类与静态内部类交叉依赖
+class OuterClass {
+    static {
+        StaticInnerClass.getStaticValue();  // 危险！
+    }
+    
+    static class StaticInnerClass {
+        static {
+            OuterClass.getStaticValue();  // 循环依赖，死锁风险！
+        }
+    }
+}
+```
+
+**诊断特征**：
+
+- 堆栈顶有 `<clinit>` 方法调用
+- 线程状态显示 RUNNABLE，但实际在等待类初始化锁
+- Java 标准死锁检测无法发现
+
+**解决方案**：
+
+1. **避免循环静态初始化依赖**：设计时确保类初始化不形成循环依赖
+2. **延迟初始化**：将静态依赖移到实例方法或延迟加载
+3. **单一线程初始化**：应用启动时由主线程完成关键类的初始化
+4. **重构为依赖注入**：避免静态块中的跨类调用
+
+```java
+// 正确写法：延迟初始化
+class ClassA {
+    private static ClassB instance;
+    
+    public static ClassB getInstance() {
+        if (instance == null) {
+            synchronized (ClassA.class) {
+                if (instance == null) {
+                    instance = new ClassB();
+                }
+            }
+        }
+        return instance;
+    }
+}
+
+// 正确写法：启动时预加载
+public class Initializer {
+    public static void init() {
+        // 主线程单线程初始化所有相关类
+        ClassA.getStaticValue();
+        ClassB.getStaticValue();
+    }
+}
+```
+
+**审查要点**：
+
+1. 静态初始化块（`static {}`）是否访问其他类的静态成员
+2. 静态块中是否实例化其他类（`new OtherClass()`）
+3. 是否存在类间的双向静态依赖
+4. 父子类、内部类是否存在静态初始化交叉引用
+
 ## 事务管理规范
 
 ### Spring 事务管理
@@ -1113,6 +1216,10 @@ try (InputStream is = new FileInputStream(tempFile)) {
 ### 必须修正
 
 - 循环依赖
+- **类初始化死锁风险**：
+  - 静态初始化块访问其他类的静态成员
+  - 父子类/内外类静态初始化交叉依赖
+  - 类间双向静态依赖
 - **无限循环风险**：
   - 使用 `while(true)`、`for(;;)` 创建无限循环
   - 循环缺少明确的退出条件，难以优雅停止
