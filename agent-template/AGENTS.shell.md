@@ -8,7 +8,7 @@
 
 ## {project.other3 placeholder}
 
-## 更多配置
+## ...
 
 ## {project.otherN placeholder}
 
@@ -34,20 +34,11 @@ ${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取
 
 ### 交互规则
 
-授权读取：${AI_SPEC_ROOT}/agent-template/interaction.rules.md
+必须遵循 interaction.rules.md 中描述的规则
 
-Read ${AI_SPEC_ROOT}/agent-template/interaction.rules.md
+授权读取：${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 
 ### 编码规范
 
 授权读取：${AI_SPEC_ROOT}/lang-spec/spec.shell.md
 授权读取：${AI_SPEC_ROOT}/lang-spec/review.shell.md
-
-Read ${AI_SPEC_ROOT}/lang-spec/spec.shell.md
-Read ${AI_SPEC_ROOT}/lang-spec/review.shell.md
-
-### 构建工具
-
-授权读取：${AI_SPEC_ROOT}/lang-spec/ci.shell.md
-
-Read ${AI_SPEC_ROOT}/lang-spec/ci.shell.md
