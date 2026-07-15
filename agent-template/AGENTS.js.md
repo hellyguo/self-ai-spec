@@ -35,5 +35,7 @@ Read ${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 ### 编码规范
 
 授权读取：${AI_SPEC_ROOT}/lang-spec/spec.js.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/review.js.md
 
 Read ${AI_SPEC_ROOT}/lang-spec/spec.js.md
+Read ${AI_SPEC_ROOT}/lang-spec/review.js.md

@@ -39,8 +39,10 @@ Read ${AI_SPEC_ROOT}/agent-template/interaction.rules.md
 ### 编码规范
 
 授权读取：${AI_SPEC_ROOT}/lang-spec/spec.shell.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/review.shell.md
 
 Read ${AI_SPEC_ROOT}/lang-spec/spec.shell.md
+Read ${AI_SPEC_ROOT}/lang-spec/review.shell.md
 
 ### 构建工具
 

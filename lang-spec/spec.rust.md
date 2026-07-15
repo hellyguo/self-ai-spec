@@ -168,3 +168,13 @@ fn process(items: &[Item]) -> usize {
 // 迭代器优于循环
 let sum: i32 = (1..=100).sum();
 ```
+
+## 签名
+
+---
+**Rust编码规范版本**：1.2.0  
+**最后更新**：2025-01-01  
+**规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.rust.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.rust.md  
+**关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
+**适用场景**：企业级Rust项目、系统编程、高性能服务
