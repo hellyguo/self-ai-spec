@@ -176,3 +176,13 @@ describe('UserService', () => {
   });
 });
 ```
+
+## 签名
+
+---
+**JavaScript/TypeScript编码规范版本**：1.2.0  
+**最后更新**：2025-01-01  
+**规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.js.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.js.md  
+**关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
+**适用场景**：企业级JavaScript/TypeScript项目、Node.js服务、前端应用

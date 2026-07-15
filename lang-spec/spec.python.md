@@ -143,3 +143,13 @@ def sample_user():
 def test_user_name(sample_user):
     assert sample_user.name == "test"
 ```
+
+## 签名
+
+---
+**Python编码规范版本**：1.2.0  
+**最后更新**：2025-01-01  
+**规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.python.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.python.md  
+**关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
+**适用场景**：企业级Python项目、Web服务、数据科学、自动化脚本

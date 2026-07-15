@@ -122,3 +122,13 @@ jobs:
         severity: error
         exclude: SC1090,SC1091
 ```
+
+## 签名
+
+---
+**Shell代码审查规则版本**：1.2.0  
+**最后更新**：2025-01-01  
+**编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.shell.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.shell.md  
+**关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
+**适用场景**：企业级Shell脚本、运维自动化、CI/CD脚本
