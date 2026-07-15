@@ -24,16 +24,16 @@ description: "代码审查框架：通用审查流程 + 语言特定规则引用
 
 ### 直接源码文件
 
-| 语言 | 文件类型 | 规则文件 | 加载指令 |
-|------|----------|----------|----------|
-| Java | `*.java` | `spec.java.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.java.md` |
-| Python | `*.py` | `spec.python.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.python.md` |
-| C++ | `*.cpp *.hpp *.cxx *.hxx *.c *.h` | `spec.cpp.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.cpp.md` |
-| Rust | `*.rs` | `spec.rust.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.rust.md` |
-| ANSI C | `*.c *.h` | `spec.ansi_c.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.ansi_c.md` |
-| JavaScript | `*.js *.mjs *.cjs` | `spec.js.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.js.md` |
-| TypeScript | `*.ts *.tsx *.mts *.cts` | `spec.js.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.js.md` |
-| Shell | `*.sh *.bash *.zsh` | `spec.shell.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.shell.md` |
+| 语言 | 文件类型 | 编码规范文件 | 审查规则文件 | 加载指令 |
+|------|----------|--------------|--------------|----------|
+| Java | `*.java` | `spec.java.md` | `review.java.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.java.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.java.md` |
+| Python | `*.py` | `spec.python.md` | `review.python.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.python.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.python.md` |
+| C++ | `*.cpp *.hpp *.cxx *.hxx *.c *.h` | `spec.cpp.md` | `review.cpp.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.cpp.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.cpp.md` |
+| Rust | `*.rs` | `spec.rust.md` | `review.rust.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.rust.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.rust.md` |
+| ANSI C | `*.c *.h` | `spec.ansi_c.md` | `review.ansi_c.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.ansi_c.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.ansi_c.md` |
+| JavaScript | `*.js *.mjs *.cjs` | `spec.js.md` | `review.js.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.js.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.js.md` |
+| TypeScript | `*.ts *.tsx *.mts *.cts` | `spec.js.md` | `review.js.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.js.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.js.md` |
+| Shell | `*.sh *.bash *.zsh` | `spec.shell.md` | `review.shell.md` | `Read ${AI_SPEC_ROOT}/lang-spec/spec.shell.md` + `Read ${AI_SPEC_ROOT}/lang-spec/review.shell.md` |
 
 ### SQL 来源（需拼接提取）
 
