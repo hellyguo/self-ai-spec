@@ -243,4 +243,3 @@ int main() {
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.ansi_c.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
 **适用场景**：企业级C项目、嵌入式系统、高性能系统
-

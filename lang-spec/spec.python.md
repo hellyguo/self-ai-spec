@@ -123,8 +123,6 @@ logger.info("处理用户 %s", user_id)
 logger.error("操作失败: %s", error, exc_info=True)
 ```
 
-
-
 ## 测试规范
 
 - 使用 `pytest` 作为测试框架

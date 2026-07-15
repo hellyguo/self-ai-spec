@@ -1,4 +1,5 @@
 # Shell 代码审查规则
+
 ## ShellCheck 规则参考
 
 以下规则来自 ShellCheck 静态分析工具，用于代码审查时识别常见问题。

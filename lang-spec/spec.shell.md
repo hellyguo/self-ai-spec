@@ -726,4 +726,3 @@ trap 'echo "Line $LINENO: $BASH_COMMAND"' DEBUG
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.shell.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
 **适用场景**：企业级Shell脚本、运维自动化、CI/CD脚本
-
