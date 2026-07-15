@@ -60,19 +60,38 @@ description: "技能简介"
 
 ## 文件命名约定
 
-| 类型 | 模式 | 示例 |
-| :--- | :--- | :--- |
-| 技能目录 | `kebab-case` | `code-review` |
-| 技能文件 | `SKILL.md`（大写） | `SKILL.md` |
-| 语言规范 | `spec.{lang}.md` | `spec.java.md` |
-| 代理模板 | `AGENTS.{lang}.md` | `AGENTS.java.md` |
+| 类型         | 模式               | 示例             |
+| :----------- | :----------------- | :--------------- |
+| 技能目录     | `kebab-case`       | `code-review`    |
+| 技能文件     | `SKILL.md`（大写） | `SKILL.md`       |
+| 语言规范     | `spec.{lang}.md`   | `spec.java.md`   |
+| 审查规则     | `review.{lang}.md` | `review.java.md` |
+| 代理模板     | `AGENTS.{lang}.md` | `AGENTS.java.md` |
 
 ## 跨文件引用规范
 
 ```markdown
 授权读取：${AI_SPEC_ROOT}/lang-spec/spec.java.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/review.java.md
+
 Read ${AI_SPEC_ROOT}/lang-spec/spec.java.md
+Read ${AI_SPEC_ROOT}/lang-spec/review.java.md
 ```
+
+### 语言规范文件结构
+
+每个编程语言有两个关联文件：
+
+| 文件类型           | 用途                                           | 示例             |
+|--------------------|------------------------------------------------|------------------|
+| `spec.{lang}.md`   | 编码规范、最佳实践、语言特性指南               | `spec.java.md`   |
+| `review.{lang}.md` | 代码审查规则、静态分析规则、问题模式检测       | `review.java.md` |
+
+**组合使用**：
+
+- **编码时**：参考 `spec.{lang}.md` 确保代码符合规范
+- **审查时**：同时参考 `spec.{lang}.md` 和 `review.{lang}.md` 进行全面检查
+- **技能集成**：`/code-review` 技能自动加载对应语言的规范文件和审查规则
 
 ## 新增技能流程
 
