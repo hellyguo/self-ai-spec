@@ -599,4 +599,7 @@ ANSI C代码审查还应参考以下通用规则：
 ---
 **ANSI C代码审查规则版本**：1.2.0  
 **最后更新**：2025-01-01  
-**规则来源**：${AI_SPEC_ROOT}/lang-spec/spec.ansi_c.md  
+**编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.ansi_c.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.ansi_c.md  
+**关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
+**适用场景**：企业级C项目、嵌入式系统、高性能系统  

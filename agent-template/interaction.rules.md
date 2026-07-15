@@ -13,4 +13,3 @@
 11. 禁止在编码使用stdout/stderr，测试代码也尽可能使用日志输出
 12. 重要内容(plan、design等)，随时记录到 MEMORY.md 和 memrec
 13. 版本管理忽略 MEMORY.md，写入 .gitignore，不提交到 git
-
