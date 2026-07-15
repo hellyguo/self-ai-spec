@@ -123,27 +123,7 @@ logger.info("处理用户 %s", user_id)
 logger.error("操作失败: %s", error, exc_info=True)
 ```
 
-## 性能优化
 
-- 使用生成器表达式处理大数据集
-- 使用 `collections` 模块的高效数据结构（`defaultdict`、`Counter`、`deque`）
-- 避免在循环中重复计算
-- 使用 `functools.lru_cache` 缓存计算结果
-
-```python
-from functools import lru_cache
-from collections import defaultdict
-
-@lru_cache(maxsize=128)
-def expensive_computation(n: int) -> int:
-    return n * n
-
-# 使用生成器
-def process_large_file(file_path: str):
-    with open(file_path) as f:
-        for line in f:
-            yield process_line(line)
-```
 
 ## 测试规范
 
