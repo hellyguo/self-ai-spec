@@ -1,11 +1,11 @@
 ---
 name: memrec
-description: AI记忆持久化系统。使用memrec存储、检索、管理跨会话记忆。支持项目隔离和语义检索。触发场景：(1)重要决策需记录，(2)关键知识需保存，(3)项目上下文需跨会话保持，(4)用户偏好需记忆，(5)检索历史知识辅助当前任务。
+description: AI记忆持久化系统。使用memrec存储、检索、管理跨会话记忆。支持项目隔离、混合检索（KNN+BM25）、MMR重排、中文搜索。触发场景：(1)重要决策需记录，(2)关键知识需保存，(3)项目上下文需跨会话保持，(4)用户偏好需记忆，(5)检索历史知识辅助当前任务。
 ---
 
 # MemRec - AI记忆持久化系统
 
-为AI CLI工具提供跨会话记忆能力，支持项目隔离和语义检索。
+为AI CLI工具提供跨会话记忆能力，支持项目隔离和混合检索（KNN + BM25）。
 
 ## 触发场景
 
@@ -68,7 +68,7 @@ MemRec 可作为 MCP Server 直接被 AI 客户端（Claude Code、Codex、OpenC
 ### 存储记忆
 
 ```bash
-memrec add "内容" --mtype <type> [--tag <tag>] [--global]
+memrec add "内容" --mtype <type> [--tag <tag>] [--global] [--source <source>] [--scope <scope>]
 ```
 
 **记忆类型：**
@@ -78,13 +78,13 @@ memrec add "内容" --mtype <type> [--tag <tag>] [--global]
 - `preference` - 用户偏好（推荐--global）
 - `conversation` - 对话记录（默认）
 
-**knowledge通过tag细分：**
-| tag | 用途 | 示例 |
-|-----|------|------|
-| `fact` | 物理定律、数学公式、客观事实 | `--tag fact --tag physics` |
-| `best-practice` | 最佳实践、设计模式 | `--tag best-practice` |
-| `algorithm` | 算法、公式推导 | `--tag algorithm` |
-| `tool` | 工具使用技巧 | `--tag tool --tag rust` |
+**来源权重（--source）：**
+| 值 | 说明 | 搜索权重 |
+|-----|------|----------|
+| `user`（默认） | 用户输入 | 最高 |
+| `system` | 系统生成 | 中等 |
+| `inferred` | AI推断 | 较低 |
+| `external` | 外部导入 | 较低 |
 
 **示例：**
 ```bash
@@ -98,18 +98,29 @@ memrec add "RAII模式：资源获取即初始化，析构自动释放" --mtype 
 # 决策
 memrec add "选择JWT认证方案" --mtype decision --tag auth --tag critical
 
-# 用户偏好
-memrec add "用户偏好详细输出" --mtype preference --tag output --global
+# 用户偏好（来源明确标记）
+memrec add "用户偏好详细输出" --mtype preference --tag output --global --source user
 
 # 项目上下文
 memrec add "技术栈：Rust+Tokio+RocksDB" --mtype context --tag tech
+
+# AI推断的知识
+memrec add "根据代码模式推断偏好函数式风格" --mtype knowledge --source inferred
 ```
 
-### 语义检索
+### 混合检索
 
 ```bash
 memrec search "关键词" [--project-only] [--global-only] [--all] [-k <num>]
 ```
+
+**搜索流程：**
+1. KNN + BM25 并行搜索，合并归一化分数
+2. 时间衰减：近期记忆权重更高（knowledge/decision 豁免）
+3. 来源权重：user > system > inferred/external
+4. MMR 重排：结果多样性，减少冗余
+
+**中文搜索：** 自动支持，使用 N-gram 分词器（2-4 字）
 
 **搜索范围：**
 | 选项 | 范围 | 用途 |
@@ -119,13 +130,24 @@ memrec search "关键词" [--project-only] [--global-only] [--all] [-k <num>]
 | `--global-only` | 仅公共记忆 | 查找用户偏好 |
 | `--all` | 所有项目（跨项目） | 查找跨项目关联记忆 |
 
+**高级选项：**
+| 选项 | 说明 | 默认值 |
+|------|------|--------|
+| `--hybrid-alpha` | KNN vs BM25权重（0=纯BM25，1=纯KNN） | 0.5 |
+| `--mmr-enabled` | 启用MMR重排 | true |
+| `--mmr-lambda` | MMR多样性（0=最大多样性，1=最大相关性） | 0.7 |
+| `--min-score` | 最低相似度阈值 | 0.5（BGE-M3）/ 0.75（MiniLM） |
+
 **示例：**
 ```bash
 memrec search "认证方案"
 memrec search "Rust最佳实践" --project-only
 memrec search "用户偏好" --global-only -k 20
 memrec search "xlsb" --all                    # 跨项目搜索
-memrec search "架构" --human
+memrec search "架构" --human                  # 中文搜索
+memrec search "算法" --hybrid-alpha 0.8       # 更偏重向量检索
+memrec search "决策" --mmr-enabled false      # 禁用MMR
+memrec search "知识" --mmr-lambda 0.5         # 更多样的结果
 ```
 
 ### 其他命令
@@ -211,6 +233,7 @@ memrec stats
 ├── memrecd.sock        # Unix Socket
 ├── data/               # RocksDB记忆元数据
 ├── vectors/            # RocksDB向量存储
+├── fts/                # Tantivy全文检索索引
 ├── models/             # ONNX embedding模型
 └── memrecd.log         # 服务日志
 ```
