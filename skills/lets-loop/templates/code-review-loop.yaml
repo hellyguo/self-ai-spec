@@ -1,0 +1,39 @@
+# 代码审查自动化Loop
+
+```yaml
+name: "code_review_automation_loop"
+level: "L4"
+automation: "pr_created"
+worktrees: 2
+
+sub_agents:
+  - builder:
+      skill: "code-refactor"
+      model: "claude-code"
+    
+  - reviewer:
+      skill: "code-review"
+      model: "gpt-4o"
+      checkpoints: ["security", "performance", "maintainability"]
+    
+  - tester:
+      skill: "java-gen-unittest"
+      model: "claude-3.5"
+      coverage_target: 80
+
+state_management:
+  memory: "errors.json"
+  progress: "review_progress.md"
+  patterns: "success_patterns/"
+
+quality_gates:
+  - test_coverage >= 80
+  - security_issues == 0
+  - performance_score >= 70
+  - reviewer_consensus >= 2/3
+
+cost_control:
+  max_tokens_per_pr: 50000
+  max_iterations: 10
+  budget_alert_threshold: 0.8
+```

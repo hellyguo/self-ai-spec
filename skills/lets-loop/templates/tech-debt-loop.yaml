@@ -1,0 +1,34 @@
+# 技术债务管理Loop
+
+```yaml
+name: "tech_debt_management_loop"
+schedule: "weekly"
+trigger: "sunday_02:00"
+
+phases:
+  - detection:
+      skills: ["code-detect-problem", "code-detect-dup"]
+      depth: "deep"
+    
+  - prioritization:
+      criteria: ["impact", "effort", "risk", "frequency"]
+      matrix: "impact_vs_effort"
+    
+  - planning:
+      skills: ["requirement-collect", "code-deconstruct"]
+      output: "refactoring_plan.md"
+    
+  - execution:
+      concurrency: 3
+      isolation: "git_worktree"
+      skills: ["code-refactor", "java-gen-unittest"]
+    
+  - validation:
+      skills: ["code-review", "jmh-bench"]
+      gates: ["tests_pass", "performance_improved", "no_regressions"]
+
+reporting:
+  format: "executive_dashboard"
+  metrics: ["debt_reduction", "quality_improvement", "roi"]
+  recipients: ["tech_leads", "engineering_manager"]
+```

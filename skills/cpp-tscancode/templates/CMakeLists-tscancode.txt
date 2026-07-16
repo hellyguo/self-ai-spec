@@ -1,0 +1,12 @@
+# CMake TscanCode integration target
+
+add_custom_target(tscancode
+  COMMAND /home/helly/app/TscanCode.linux/tscancode
+    --enable=all
+    --quiet
+    --xml
+    ${CMAKE_SOURCE_DIR}/src
+    2> ${CMAKE_BINARY_DIR}/tscancode.xml
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "Running TscanCode static analysis..."
+)

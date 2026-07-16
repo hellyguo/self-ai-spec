@@ -1,0 +1,50 @@
+# 风险管理和成本控制
+
+```yaml
+risk_management:
+  cost_controls:
+    max_tokens_per_run: 100000
+    max_sub_agents: 5
+    budget_alerts:
+      - at: "50%"
+        action: "notify"
+      - at: "80%"
+        action: "pause_non_critical"
+      - at: "95%"
+        action: "stop_all"
+  
+  reliability_guards:
+    - deadlock_detection:
+        timeout: "30m"
+        action: "kill_and_restart"
+    
+    - state_corruption:
+        detection: "checksum_validation"
+        recovery: "rollback_to_last_valid"
+    
+    - triage_errors:
+        fallback: "human_review_queue"
+        escalation: "senior_engineer"
+  
+  comprehension_preservation:
+    - mandatory_code_walkthroughs: "weekly"
+    - architecture_documentation: "loop_generated_code.md"
+    - knowledge_transfer: "pair_review_sessions"
+
+budget_strategies:
+  progressive:
+    phase_1: "100k tokens/month"
+    phase_2: "500k tokens/month"
+    phase_3: "unlimited_with_approval"
+  
+  roi_based:
+    allocation_logic: "expected_savings * 0.3"
+    roi_threshold: "2.0"
+    tracking: "actual_vs_expected_roi"
+  
+  priority_based:
+    critical: "unlimited"
+    high: "500k/month"
+    medium: "100k/month"
+    low: "10k/month"
+```

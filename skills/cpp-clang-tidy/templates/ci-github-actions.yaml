@@ -1,0 +1,11 @@
+name: Clang-Tidy
+on: [push, pull_request]
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -B build
+      - name: Run clang-tidy
+        run: run-clang-tidy -p build

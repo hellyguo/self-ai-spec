@@ -1,0 +1,20 @@
+# 诊断框架：问题在哪一层？
+
+```yaml
+diagnostic_flow:
+  if quality_variance > 30%:
+    check: "L1_prompt_clarity"
+    fix: "improve_prompt_template"
+  
+  if same_error_recurring:
+    check: "L2_context_rot"
+    fix: "refresh_rag_pipeline"
+  
+  if business_rules_violated:
+    check: "L3_harness_gaps"
+    fix: "add_ci_check"
+  
+  if cost_exceeds_budget:
+    check: "L4_loop_configuration"
+    fix: "add_token_limits"
+```

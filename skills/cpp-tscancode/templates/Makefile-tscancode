@@ -1,0 +1,6 @@
+# Makefile TscanCode integration
+
+TSCANCODE=/home/helly/app/TscanCode.linux/tscancode
+
+tscancode:
+	$(TSCANCODE) --enable=all --quiet -I include src/ 2>tscancode.xml

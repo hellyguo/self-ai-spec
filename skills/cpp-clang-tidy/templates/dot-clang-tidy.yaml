@@ -1,0 +1,25 @@
+---
+Checks: >
+  *,
+  -readability-*,
+  -llvm-*,
+  -fuchsia-*,
+  -altera-*,
+  bugprone-*,
+  performance-*,
+  modernize-*,
+  readability-braces-around-statements,
+  readability-identifier-naming,
+CheckOptions:
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.FunctionCase: camelBack
+  readability-identifier-naming.VariableCase: camelBack
+  readability-identifier-naming.MemberCase: CamelCase
+  readability-identifier-naming.MemberPrefix: 'm_'
+  readability-identifier-naming.ConstantCase: UPPER_CASE
+  modernize-use-auto.MinTypeNameLength: 5
+  modernize-pass-by-value.ValuesOnly: true
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+AnalyzeTemporaryDtors: false
+FormatStyle: file

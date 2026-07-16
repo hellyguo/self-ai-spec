@@ -1,0 +1,13 @@
+<FindBugsFilter>
+  <Match>
+    <Source name="~.*Test\.java"/>
+  </Match>
+
+  <Match>
+    <Bug pattern="NM_CONFUSING"/>
+  </Match>
+
+  <Match>
+    <Priority value="1"/>
+  </Match>
+</FindBugsFilter>

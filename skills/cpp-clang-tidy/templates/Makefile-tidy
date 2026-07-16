@@ -1,0 +1,9 @@
+CLANG_TIDY=/usr/bin/clang-tidy
+COMPILE_DB=build
+
+clang-tidy:
+	run-clang-tidy -p $(COMPILE_DB) -j 4
+
+clang-tidy-fix:
+	find src -name '*.cpp' | \
+	  xargs -I{} $(CLANG_TIDY) --fix-errors {} -p $(COMPILE_DB)

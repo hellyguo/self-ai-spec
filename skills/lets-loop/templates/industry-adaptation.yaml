@@ -1,0 +1,40 @@
+# 行业适配模板
+
+## 金融行业（合规优先）
+
+```yaml
+industry: "finance"
+constraints: ["zero_error", "audit_trail", "regulatory_compliance"]
+loop_config:
+  focus_layers: ["L3", "L4_auxiliary"]
+  critical_components:
+    - "observability_pipeline"
+    - "compliance_checker"
+    - "maker_checker_separation"
+  forbidden_patterns: ["fully_autonomous_decision", "unattended_trading"]
+```
+
+## 软件工程（原生场景）
+
+```yaml
+industry: "software_engineering"
+constraints: ["code_quality", "test_coverage", "performance"]
+loop_config:
+  focus_layers: ["L3", "L4_full"]
+  patterns: ["generate_critique_rewrite", "reflexion", "branch_exploration"]
+  integration_points:
+    - "ci_cd_pipeline"
+    - "code_review_platform"
+    - "project_management"
+```
+
+## 客户服务（体验优先）
+
+```yaml
+industry: "customer_service"
+constraints: ["brand_voice", "escalation_logic", "customer_satisfaction"]
+loop_config:
+  focus_layers: ["L2", "L3_light"]
+  patterns: ["multi_critic", "dynamic_workflow"]
+  human_in_loop: "always_available"
+```
