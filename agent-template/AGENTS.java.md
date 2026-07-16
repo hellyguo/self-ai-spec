@@ -34,7 +34,7 @@
 
 ### 环境变量
 
-${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取
+${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取: `echo ${AI_SPEC_ROOT}`
 
 ### 交互规则
 
