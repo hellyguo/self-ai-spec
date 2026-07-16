@@ -59,10 +59,15 @@ fn perf_xxx() {
 }
 ```
 
-### Step 3: 生成火焰图
+### Step 3: 临时移除 #[inline] 并生成火焰图
+
+**关键**：`--no-inline` 仅控制编译器内联策略，源码中 `#[inline]` 标注的函数仍会被内联导致火焰图无法捕获。需先注释掉所有 `#[inline]`。
 
 ```bash
-# 推荐参数
+# 1. 注释掉所有 #[inline]（分析前）
+fd -t f -e rs -X sed -i 's/#\[inline/\/\/ #\[inline/g' {}
+
+# 2. 生成火焰图
 cargo flamegraph \
   --dev \                          # debug 编译（保留函数名）
   --no-inline \                    # 不内联，保留函数调用栈
@@ -77,7 +82,7 @@ cargo flamegraph \
 | 参数 | 说明 | 建议值 |
 |------|------|--------|
 | `--dev` | debug 编译，保留符号 | 必选 |
-| `--no-inline` | 禁止内联，展开调用栈 | 推荐 |
+| `--no-inline` | 禁止编译器内联，展开调用栈 | 推荐（需配合源码注释 #[inline]） |
 | `--image-width` | SVG 宽度(px) | 1500-2000 |
 | `--freq` | perf 采样频率(Hz) | 8000-99999 |
 | `--palette` | 配色方案 | rust / io / hot |
@@ -85,6 +90,13 @@ cargo flamegraph \
 | `--bench` | bench 文件名 | benches/ 下的文件 |
 
 **输出**: 项目根目录生成 `flamegraph.svg`
+
+```bash
+# 3. 恢复 #[inline]（分析后）
+fd -t f -e rs -X sed -i 's/\/\/ #\[inline/#\[inline/g' {}
+```
+
+> **注意**：务必在分析后恢复 `#[inline]`，否则生产构建性能会严重退化。
 
 ### Step 4: 提取热点数据
 
@@ -150,6 +162,14 @@ Error: crate has no automatically selectable target
 
 ### samples too few
 火焰图信息稀疏 → 提高测试数据量或提高 `--freq`
+
+### 火焰图中 inline 函数缺失
+源码 `#[inline]` 标注的函数在火焰图中不可见 → 临时注释掉 `#[inline]` 后重新生成：
+```bash
+fd -t f -e rs -X sed -i 's/#\[inline/\/\/ #\[inline/g' {}
+# 生成火焰图后恢复：
+fd -t f -e rs -X sed -i 's/\/\/ #\[inline/#\[inline/g' {}
+```
 
 ### build_trie 阶段占比过高
 测试中 build 阶段被采样 → 在测试函数中仅对目标操作计时，build 放在计时外
