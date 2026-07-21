@@ -7,7 +7,8 @@ description: "该skill没有执行文件，为操作指引：通用 AGENTS.md �
 
 ## 概述
 
-将语言特定的 AGENTS.md 模板与项目当前目录下的 AGENTS.md 进行合并，生成更新后的 AGENTS.md 文件。
+1. 将语言特定的 AGENTS.md 模板与项目当前目录下的 AGENTS.md 进行合并，生成更新后的 AGENTS.md 文件。
+2. 填充模板中的占位符，按项目实际情况进行填充
 
 ### 环境变量
 
