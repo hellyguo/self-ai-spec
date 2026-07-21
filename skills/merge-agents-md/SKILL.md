@@ -9,10 +9,6 @@ description: "该skill没有执行文件，为操作指引：通用 AGENTS.md �
 
 将语言特定的 AGENTS.md 模板与项目当前目录下的 AGENTS.md 进行合并，生成更新后的 AGENTS.md 文件。
 
-<HARD-GATE>
-在合并时，如遇雷同条款，模板优先级高于项目 AGENTS.md。
-</HARD-GATE>
-
 ## 语言支持
 
 | 语言 | 模板文件 |
@@ -53,6 +49,10 @@ Read ${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
 | 项目特定内容 | - | 保留不变 |
 
 ### 4. 合并优先级
+
+<HARD-GATE>
+在合并时，如遇雷同条款，模板优先级高于项目 AGENTS.md。
+</HARD-GATE>
 
 1. **保留项目特有内容**：项目特有的配置、命令、规则不覆盖
 2. **补充模板内容**：模板中有但项目中没有的内容，添加到项目
