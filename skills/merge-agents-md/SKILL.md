@@ -9,6 +9,10 @@ description: "该skill没有执行文件，为操作指引：通用 AGENTS.md �
 
 将语言特定的 AGENTS.md 模板与项目当前目录下的 AGENTS.md 进行合并，生成更新后的 AGENTS.md 文件。
 
+### 环境变量
+
+${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取: `echo ${AI_SPEC_ROOT}`
+
 ## 语言支持
 
 | 语言 | 模板文件 |
