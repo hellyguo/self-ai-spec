@@ -151,6 +151,30 @@ Use this skill when the user:
 3. **公共API** - Controller端点
 4. **工具类** - 静态方法、工具函数
 
+### AST 辅助定位（ast-grep-mcp 联动）
+
+当 ast-grep-mcp 可用时，可快速定位未覆盖的方法签名：
+
+```
+find_code(pattern: 'public $RET $METHOD($$$ARGS) { $$$BODY }', language: java, project_folder: "<dir>")
+```
+
+定位 Controller 端点（公共 API 优先）：
+```
+find_code_by_rule(
+  project_folder: "<dir>",
+  yaml: '''
+    id: controller-endpoint
+    language: java
+    rule:
+      pattern: '@$ANNOTATION($PATH)'
+    constraints:
+      ANNOTATION:
+        regex: '(?i)(GetMapping|PostMapping|PutMapping|DeleteMapping|RequestMapping)'
+  '''
+)
+```
+
 ## 编译执行效率优化
 
 详见 [templates/build-optimization.md](templates/build-optimization.md)，包括：

@@ -63,10 +63,31 @@ digraph code_part {
 
 | 方法 | 工具 | 适用场景 |
 | ------ | ------ | ---------- |
-| 关键字搜索 | grep/rg | 根据错误信息定位 |
+| AST 精准搜索 | ast-grep-mcp `find_code_by_rule` | 按方法签名、调用模式精准定位 |
+| 简单模式搜索 | ast-grep-mcp `find_code` | 按方法名/字段名快速搜索引用点 |
+| 关键字搜索 | grep/rg | 根据错误信息定位（兜底） |
 | 调用链追踪 | IDE/代码分析 | 理解数据流 |
 | 日志追踪 | 日志文件 | 定位运行时位置 |
 | 堆栈分析 | 异常堆栈 | Bug修复定位 |
+
+**ast-grep-mcp 用法**：
+
+按方法签名定位：
+```
+find_code(pattern: 'void $METHOD($$$ARGS)', language: java, project_folder: "<dir>")
+```
+
+按方法调用点定位（蝴蝶效应检查用）：
+```
+find_code(pattern: '$OBJ.methodName($$$ARGS)', language: java, project_folder: "<dir>")
+```
+
+按字段读写点定位：
+```
+find_code(pattern: '$OBJ.fieldName', language: java, project_folder: "<dir>")
+```
+
+> **注意**：MCP 不支持 `--globs` 排除目录，需限定 `project_folder` 或人工过滤。大型项目（>10k 文件）可能超时。
 
 输出：修改点清单（文件、行号、修改类型、说明）
 
@@ -180,10 +201,39 @@ digraph test_strategy {
 
 ### 6.2 蝴蝶效应检查方法
 
-1. **静态分析**：IDE"查找用法"
-2. **调用链追踪**：追踪方法调用链
-3. **字段追踪**：追踪字段所有读写点
-4. **接口追踪**：追踪接口所有调用点
+1. **AST 搜索**：ast-grep-mcp `find_code` 按方法名/字段名搜索所有引用点
+2. **静态分析**：IDE"查找用法"
+3. **调用链追踪**：追踪方法调用链
+4. **字段追踪**：追踪字段所有读写点
+5. **接口追踪**：追踪接口所有调用点
+
+**ast-grep-mcp 蝴蝶效应检查示例**：
+
+搜索方法所有调用点：
+```
+find_code(pattern: '$OBJ.targetMethod($$$ARGS)', language: java, project_folder: "<dir>")
+```
+
+搜索字段所有读写点：
+```
+find_code(pattern: 'this.targetField', language: java, project_folder: "<dir>")
+```
+
+搜索接口所有实现类：
+```
+find_code_by_rule(
+  project_folder: "<dir>",
+  yaml: '''
+    id: interface-impl
+    language: java
+    rule:
+      pattern: 'class $NAME implements $IFACE $$$REST'
+    constraints:
+      IFACE:
+        regex: 'TargetInterface'
+  '''
+)
+```
 
 输出：`templates/association-checklist.md`、`templates/butterfly-check.md`
 
@@ -228,6 +278,7 @@ docs/code-part-modification/
 | `code-review` | 修改完成后审查代码 |
 | `code-detect-dup` | 检查是否引入重复代码 |
 | `java-gen-unittest` | 自动生成单元测试 |
+| `sql-extract` | SQL 相关修改点的 SQL 语句抽取 |
 
 ---
 

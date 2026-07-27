@@ -111,6 +111,68 @@ description: "该skill没有执行文件，为操作指引：如何重构"
 
 **关系退化**：循环依赖、高耦合、依赖具体实现而非接口
 
+### AST 自动信号识别（ast-grep-mcp）
+
+当 ast-grep-mcp 可用时，优先使用 `find_code_by_rule` 自动扫描退化信号，替代人工 grep。
+
+**类型退化 — 字符串常量比较**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: type-degradation-string-compare
+    language: java
+    rule:
+      pattern: '$VAR.equals("$VAL")'
+    constraints:
+      VAL:
+        regex: '(?i)(ACTIVE|INACTIVE|PENDING|APPROVED|REJECTED|ENABLED|DISABLED|SUCCESS|FAILED|RUNNING|COMPLETED)'
+  '''
+)
+```
+
+**类型退化 — if-else 链**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: if-else-chain
+    language: java
+    rule:
+      pattern: |
+        if ($COND) {
+          $$$BODY
+        } else if ($COND2) {
+          $$$BODY2
+        }
+  '''
+)
+```
+
+**关系退化 — @Autowired 过多**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: too-many-autowired
+    language: java
+    rule:
+      pattern: '@Autowired'
+  '''
+)
+```
+> 单个类 @Autowired 数量 > 5 提示耦合过高，需人工统计。
+
+**行为退化 — 方法过长（辅助定位）**：
+```
+find_code(pattern: 'public void $METHOD($$$ARGS) { $$$BODY }', language: java, project_folder: "<dir>")
+```
+
+**使用方式**：
+1. 在"问题识别"阶段，先调用上述 rule 自动扫描
+2. 命中结果作为退化信号候选，人工确认后进入三问分析法
+3. MCP 不可用时回退到 grep/rg 人工扫描
+
 ## 四、决策树
 
 **类型退化**：大量if-else → 行为差异明显？→ 是：多态(变体稳定？→ 是：继承 / 否：策略模式) / 否：配置表

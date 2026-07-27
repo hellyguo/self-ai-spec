@@ -41,6 +41,32 @@ description: "读取所有源代码，解构为设计图、设计文档、数据
 - Java注解: 从 `@Query` `@NamedQuery` 注解提取
 - 字符串: 正则匹配 `(SELECT|INSERT|UPDATE|DELETE)\s+` 开头的字符串
 
+### SQL 提取（ast-grep-mcp 联动）
+
+当 ast-grep-mcp 可用时，优先使用 `find_code_by_rule` 精准提取内嵌 SQL，替代正则匹配。
+
+**Java 内嵌 SQL**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: sql-string-java
+    language: java
+    rule:
+      pattern: '"$SQL"'
+    constraints:
+      SQL:
+        regex: '(?i)\\b(select|insert|update|delete)\\b.*\\b(from|into|set)\\b'
+  '''
+)
+```
+
+**C++ 内嵌 SQL**：同上，改 `language: cpp`。
+
+**SQL 拼接点识别**：参见 `sql-extract` 技能的 `templates/recipes.md`。
+
+> **注意**：XML（MyBatis mapper）ast-grep 不支持，需用 rg 兜底。详见 `sql-extract` 技能。
+
 ## 内存使用分析
 
 识别内存热点：大对象创建、集合操作、字符串处理、字节数组、流处理、缓存对象
@@ -49,6 +75,50 @@ description: "读取所有源代码，解构为设计图、设计文档、数据
 
 模板: `templates/memory_usage.md`
 
+### 内存泄漏 AST 探测（ast-grep-mcp 联动）
+
+**静态集合增长**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: static-map-leak
+    language: java
+    rule:
+      pattern: 'private static final $MAP_TYPE $VAR = new $CTOR$$$ARGS();'
+    constraints:
+      MAP_TYPE:
+        regex: '(?i).*(Map|HashMap|ConcurrentMap|ConcurrentHashMap|Cache|LinkedHashMap)'
+  '''
+)
+```
+
+**ThreadLocal 未清理**：
+```
+find_code(
+  pattern: 'ThreadLocal $VAR = $$$INIT',
+  language: java,
+  project_folder: "<dir>"
+)
+```
+> 命中后需人工检查是否有对应的 `.remove()` 调用。
+
+**JDBC 资源未关闭**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: jdbc-resource-leak
+    language: java
+    rule:
+      any:
+        - pattern: '$TYPE $VAR = $CONN.createStatement()'
+        - pattern: '$TYPE $VAR = $CONN.prepareStatement($$$ARGS)'
+  '''
+)
+```
+> 命中后需人工检查是否在 finally/try-with-resources 中关闭。
+
 ## 中间件消息追踪
 
 识别中间件：xnet、webnet、TDMQ、RabbitMQ、IBMMQ、RocketMQ、Kafka
@@ -56,6 +126,56 @@ description: "读取所有源代码，解构为设计图、设计文档、数据
 扫描：配置文件、注解配置、编程式API、硬编码字符串
 
 模板: `templates/middleware_tracing.md`
+
+### 中间件 AST 探测（ast-grep-mcp 联动）
+
+**Spring 消息注解**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: mq-annotation
+    language: java
+    rule:
+      pattern: '@$ANNOTATION($PATH)'
+    constraints:
+      ANNOTATION:
+        regex: '(?i)(RabbitListener|KafkaListener|RocketMQMessageListener|JmsListener|SqsListener)'
+  '''
+)
+```
+
+**消息发送 API**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: mq-send-api
+    language: java
+    rule:
+      pattern: '$OBJ.$METHOD($$$ARGS)'
+    constraints:
+      METHOD:
+        regex: '(?i)(send|publish|produce|convertAndSend|push)'
+  '''
+)
+```
+
+**Controller 端点识别**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: controller-endpoint
+    language: java
+    rule:
+      pattern: '@$ANNOTATION($PATH)'
+    constraints:
+      ANNOTATION:
+        regex: '(?i)(GetMapping|PostMapping|PutMapping|DeleteMapping|RequestMapping|PatchMapping)'
+  '''
+)
+```
 
 ## 网络估算
 

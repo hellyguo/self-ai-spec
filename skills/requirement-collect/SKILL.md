@@ -84,6 +84,51 @@ description: "读取所有源代码，解构为需求文档; 没有执行文件�
 | 数据库约束 | 提取 CHECK/DEFAULT 约束      | `age CHECK (0-150)` → 年龄范围规则                           |
 | 注释/文档  | 提取业务规则线索             | `VIP用户20%折扣` → VIP折扣规则                               |
 
+### AST 辅助挖掘（ast-grep-mcp 联动）
+
+当 ast-grep-mcp 可用时，使用 `find_code_by_rule` 自动扫描业务规则候选点。
+
+**条件判断挖掘**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: business-condition
+    language: java
+    rule:
+      pattern: 'if ($VAR.equals("$VAL"))'
+    constraints:
+      VAL:
+        regex: '(?i)(ACTIVE|PENDING|APPROVED|REJECTED|ENABLED|DISABLED|SUCCESS|FAILED|PAID|SHIPPED|CANCELLED)'
+  '''
+)
+```
+
+**状态赋值挖掘**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: state-assignment
+    language: java
+    rule:
+      pattern: '$OBJ.setStatus("$VAL")'
+    constraints:
+      VAL:
+        regex: '(?i)(ACTIVE|INACTIVE|PENDING|APPROVED|REJECTED|ENABLED|DISABLED|SUCCESS|FAILED|PAID|SHIPPED|CANCELLED)'
+  '''
+)
+```
+
+**异常类挖掘**：
+```
+find_code(pattern: 'throw new $EXCEPTION($$$ARGS)', language: java, project_folder: "<dir>")
+```
+
+**SQL 来源提取**：复用 `sql-extract` 技能的 rule，参见 `sql-extract/SKILL.md`。
+
+> **注意**：AST 命中结果为候选点，需人工确认业务语义后写入规则文档。
+
 ### 规则输出格式
 
 每条规则需记录：规则ID、规则名称、规则描述、触发条件/适用场景、代码位置
@@ -197,3 +242,5 @@ docs/requirements/
 ## 关联技能
 
 设计解构请使用技能：`code-deconstruct`
+
+SQL 提取请使用技能：`sql-extract`（ast-grep-mcp 联动，精准提取内嵌 SQL）

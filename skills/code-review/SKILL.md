@@ -166,6 +166,102 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 - **审查效率**：优先严重问题，批量处理相同模式
 - **报告质量**：问题定位到文件路径:行号，区分严重等级
 
+## AST 自动审查规则（ast-grep-mcp）
+
+当 ast-grep-mcp 可用时，优先使用 `find_code_by_rule` 自动扫描以下规则，替代人工 grep/rg 遍历。
+
+### 安全规则
+
+**硬编码敏感信息**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: hardcoded-secret
+    language: java
+    rule:
+      pattern: 'String $VAR = "$VAL";'
+    constraints:
+      VAR:
+        regex: '(?i)(password|secret|key|token|api_key|apikey|access_key|private_key)'
+  '''
+)
+```
+
+**SQL 注入风险**：复用 `sql-extract` 技能的 rule，参见 `sql-extract/templates/recipes.md`。
+
+### 性能规则
+
+**资源泄漏（JDBC Statement 未关闭）**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: jdbc-resource-leak
+    language: java
+    rule:
+      pattern: '$TYPE $VAR = $CONN.createStatement()'
+  '''
+)
+```
+
+**System.out.println（生产代码）**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: system-out-print
+    language: java
+    rule:
+      any:
+        - pattern: 'System.out.println($$$ARGS)'
+        - pattern: 'System.out.print($$$ARGS)'
+  '''
+)
+```
+
+**e.printStackTrace（生产代码）**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: print-stack-trace
+    language: java
+    rule:
+      pattern: '$E.printStackTrace()'
+  '''
+)
+```
+
+### 代码质量规则
+
+**空 catch 块**：
+```
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: empty-catch
+    language: java
+    rule:
+      pattern: 'catch ($TYPE $VAR) {}'
+  '''
+)
+```
+> **注意**：多行空 catch 块（`{` 和 `}` 不在同一行）需用 `find_code(pattern: 'catch ($TYPE $VAR) {')` 辅助定位。
+
+### 使用方式
+
+1. 在"代码遍历"步骤中，先调用上述 `find_code_by_rule` 自动扫描
+2. 将命中结果纳入审查报告，标注文件路径和行号
+3. 人工复核命中结果，排除误报
+4. MCP 不可用时回退到 grep/rg 人工遍历
+
+### MCP 限制
+
+- 不支持 XML 语言（MyBatis mapper 需用 rg 兜底）
+- 不支持 `--globs` 排除目录（需限定 `project_folder` 或人工过滤）
+- 大型项目（>10k 文件）可能超时，需分目录搜索或回退 CLI
+
 ## 与其他技能集成
 
 | 技能                 | 用途             |
@@ -173,3 +269,4 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 | `lets-loop`          | 循环性能专项审查 |
 | `code-detect-dup`    | 重复代码专项检测 |
 | `code-detect-problem`| 项目层面问题检测 |
+| `sql-extract`        | SQL 注入风险点抽取（ast-grep-mcp 联动） |
