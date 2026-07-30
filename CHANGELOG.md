@@ -1,5 +1,34 @@
 # 更新历史
 
+## 2026-07-30
+
+### 文档刷新
+
+- **README.md刷新**：重新整理技能列表，新增多个技能分类
+  - 新增`code-part-modification`技能到核心技能库
+  - 新增`sql-extract`技能：SQL抽取功能
+  - 新增`memrec`技能：AI记忆持久化系统
+  - 新增`gdb-heap-analysis`技能到性能分析工具分类
+  - 新增`rust-flamegraph`技能到性能分析工具分类
+  - 新增`java-coverage`技能到Java开发工具分类
+  - 新增`cpp-clang-tidy`技能到静态分析工具分类
+  - 新增`ast-grep-block`技能到静态分析工具分类
+  - 调整技能分类结构：静态分析工具、性能分析工具独立分类
+
+- **AGENTS.md刷新**：同步更新技能列表
+
+### 技能完整性补齐
+
+本次刷新补齐了以下已存在但文档未记录的技能：
+- `code-part-modification` (2026-07-12新增，文档遗漏)
+- `gdb-heap-analysis` (长期存在，文档遗漏)
+- `java-coverage` (长期存在，文档遗漏)
+- `rust-flamegraph` (长期存在，文档遗漏)
+- `sql-extract` (长期存在，文档遗漏)
+- `cpp-clang-tidy` (长期存在，文档遗漏)
+- `memrec` (长期存在，文档遗漏)
+- `ast-grep-block` (长期存在，文档遗漏)
+
 ## 2026-07-12
 
 ### 新增局部代码修改技能

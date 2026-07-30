@@ -21,18 +21,34 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 | 技能 | 描述 |
 | :--- | :--- |
-| `code-review` | 多语言代码审查 + 数据库审查 |
+| `code-review` | 多语言代码审查（Java/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
 | `code-deconstruct` | 源代码解构为设计文档、ER图、内存/网络分析 |
 | `requirement-collect` | 源代码解构为需求文档 |
-| `code-detect-problem` | 项目问题侦测、评分、重构方案 |
+| `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
 | `code-detect-dup` | 代码重复度检测（Simian + JSCPD） |
 | `code-refactor` | 重构方法论 |
+| `code-part-modification` | 局部代码修改：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证 |
 | `lets-loop` | 循环调度组合技能的通用框架 |
 | `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
 | `full-analysis` | 完整分析流程：设计解构→代码审查→重复检测→问题侦测→定性评估 |
 | `qualitative-assessment` | 系统定性评估：基于全面分析输出，从设计、开发、运维、非功能等维度总结系统性质 |
 | `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
+| `sql-extract` | SQL抽取：从C++/Java/XML源代码中抽取内嵌SQL语句，识别SQL拼接点 |
+| `memrec` | AI记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
+
+### 静态分析工具
+
+| 技能 | 描述 |
+| :--- | :--- |
+| `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） |
+| `cpp-clang-tidy` | Clang-Tidy 静态分析：C/C++ 代码质量检测（基于 Clang AST，支持自动修复） |
+| `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 |
+| `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） |
+| `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 |
+| `java-check-spotbugs` | SpotBugs静态分析：Java代码缺陷和安全漏洞检测 |
+| `java-check-pmd` | PMD静态分析：Java代码质量、编码规范和安全问题检测 |
+| `ast-grep-block` | 基于 ast-grep 的代码审查门禁：code-checklist 规则集分级扫描 Java/C++/ANSI C |
 
 ### Java开发工具
 
@@ -44,8 +60,14 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 | `java-gen-unittest` | Java 单元测试生成 |
 | `java-asprof` | Java 性能分析（async-profiler） |
 | `jmh-bench` | JMH 基准测试 |
-| `java-check-spotbugs` | SpotBugs静态分析：Java代码缺陷和安全漏洞检测 |
-| `java-check-pmd` | PMD静态分析：Java代码质量、编码规范和安全问题检测 |
+| `java-coverage` | Java测试覆盖率提升策略：80%+行覆盖/60%+分支覆盖，支持增量/全量测试 |
+
+### 性能分析工具
+
+| 技能 | 描述 |
+| :--- | :--- |
+| `gdb-heap-analysis` | GDB堆内存分析：core dump中的glibc ptmalloc内存泄漏/arena分析 |
+| `rust-flamegraph` | Rust火焰图：CPU热点分析、性能瓶颈定位（cargo flamegraph） |
 
 ## 代理模板配置
 
