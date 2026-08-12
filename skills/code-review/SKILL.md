@@ -27,6 +27,7 @@ description: "代码审查框架：通用审查流程 + 语言特定规则引用
 | Python     | `*.py`                        | `spec.python.md`  |
 | C++        | `*.cpp *.hpp *.cxx *.hxx *.h` | `spec.cpp.md`     |
 | Rust       | `*.rs`                        | `spec.rust.md`    |
+| Kotlin     | `*.kt *.kts`                  | `spec.kotlin.md`  |
 | ANSI C     | `*.c *.h`                     | `spec.ansi_c.md`  |
 | JavaScript | `*.js *.mjs *.cjs`            | `spec.js.md`      |
 | TypeScript | `*.ts *.tsx *.mts *.cts`      | `spec.js.md`      |

@@ -44,6 +44,9 @@ check_and_copy_template() {
         qodercli)
             dst_file="AGENTS.md"
             ;;
+        pi)
+            dst_file="AGENTS.md"
+            ;;
         *)
             echo "错误: 未知的工具名称: $tool_name"
             exit 1
@@ -78,6 +81,9 @@ check_and_copy_template() {
         rust)
             src_file="AGENTS.rust.md"
             ;;
+        kotlin)
+            src_file="AGENTS.kotlin.md"
+            ;;
         python)
             src_file="AGENTS.python.md"
             ;;
@@ -92,7 +98,7 @@ check_and_copy_template() {
             ;;
         *)
             echo "错误: 无效的编程语言: $language"
-            echo "支持的语言: java, ansi_c, cpp, rust, python, js, shell, blank"
+            echo "支持的语言: java, ansi_c, cpp, rust, kotlin, python, js, shell, blank"
             exit 1
             ;;
     esac
@@ -138,6 +144,10 @@ check_and_resume_session() {
             echo "恢复 claudecode 会话: $session_id"
             claude --resume "$session_id"
             ;;
+        pi)
+            echo "恢复 pi 会话: $session_id"
+            pi --session "$session_id"
+            ;;
         *)
             echo "错误: 不支持的工具命令: $tool_cmd"
             return 1
@@ -170,6 +180,9 @@ start_new_session() {
             ;;
         qodercli)
             qodercli
+            ;;
+        pi)
+            pi
             ;;
         *)
             echo "错误: 不支持的工具命令: $tool_cmd"
@@ -211,6 +224,11 @@ validate_and_save_session_id() {
             id_file=".claudecode_id"
             pattern="^\([a-z0-9]\+\)\(-\([a-z0-9]\+\)\)\{4\}$"
             tool_label="claudecode"
+            ;;
+        pi)
+            id_file=".pi_id"
+            pattern=".*-.*-.*-.*-.*"
+            tool_label="pi"
             ;;
         *)
             echo "Error: Unknown tool: $tool_name"
@@ -275,7 +293,7 @@ show_usage() {
     echo ""
     echo "参数:"
     echo "  language  - 项目语言（可选，恢复会话时不需要）"
-    echo "             支持的语言: java, ansi_c, cpp, rust, python, js, shell, blank"
+    echo "             支持的语言: java, ansi_c, cpp, rust, kotlin, python, js, shell, blank"
     echo ""
     echo "示例:"
     echo "  $script_name java     # 启动新 Java 项目"

@@ -21,7 +21,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 | 技能 | 描述 |
 | :--- | :--- |
-| `code-review` | 多语言代码审查（Java/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
+| `code-review` | 多语言代码审查（Java/Kotlin/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
 | `code-deconstruct` | 源代码解构为设计文档、ER图、内存/网络分析 |
 | `requirement-collect` | 源代码解构为需求文档 |
 | `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
@@ -79,6 +79,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 - `AGENTS.ansi_c.md` - ANSI C 项目配置  
 - `AGENTS.cpp.md` - C++ 项目配置
 - `AGENTS.rust.md` - Rust 项目配置
+- `AGENTS.kotlin.md` - Kotlin 项目配置
 - `AGENTS.python.md` - Python 项目配置
 - `AGENTS.js.md` - JavaScript 项目配置
 - `AGENTS.shell.md` - Shell/Bash 项目配置
@@ -116,6 +117,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 - `ansi_c` - ANSI C 项目  
 - `cpp` - C++ 项目
 - `rust` - Rust 项目
+- `kotlin` - Kotlin 项目
 - `python` - Python 项目
 - `js` - JavaScript 项目
 - `shell` - Shell/Bash 项目
