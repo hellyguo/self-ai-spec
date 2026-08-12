@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# 检查环境变量
+if [ -z "$AI_SPEC_ROOT" ]; then
+    echo "错误: 环境变量 AI_SPEC_ROOT 未设置"
+    echo "请设置: export AI_SPEC_ROOT=/path/to/self-ai-spec"
+    exit 1
+fi
+
+# 从环境变量定位公共函数
+COMMON_SH="$AI_SPEC_ROOT/bin/common.sh"
+if [ ! -f "$COMMON_SH" ]; then
+    echo "错误: 公共函数文件不存在: $COMMON_SH"
+    echo "请确保 AI_SPEC_ROOT 指向正确的 self-ai-spec 目录"
+    exit 1
+fi
+
+source "$COMMON_SH"
+
+# 配置工具变量
+TOOL_NAME="pi"
+TOOL_CMD="pi"
+ID_FILE=".pi_id"
+AGENTS_FILE="AGENTS.md"
+
+# 主逻辑
+if [ $# -eq 0 ]; then
+    # 尝试恢复会话
+    if check_and_resume_session "$TOOL_CMD" "$ID_FILE"; then
+        exit 0  # 成功恢复会话
+    else
+        # 没有找到会话ID，检查是否存在AGENTS.md文件
+        if [ -f "$AGENTS_FILE" ]; then
+            echo "发现 $AGENTS_FILE，直接启动新会话..."
+            start_new_session "$TOOL_CMD" ""
+        else
+            # 既无会话ID也无AGENTS.md，显示使用帮助
+            echo ""
+            echo "错误: 当前目录既无上次会话ID，也无 $AGENTS_FILE 文件"
+            echo ""
+            show_usage "$(basename "$0")" "$TOOL_NAME"
+            echo ""
+            echo "请指定项目语言启动新会话:"
+            echo "  $(basename "$0") java    # Java项目"
+            echo "  $(basename "$0") python  # Python项目"
+            echo "  $(basename "$0") cpp     # C++项目"
+            echo ""
+            exit 1
+        fi
+    fi
+else
+    # 启动新会话
+    LANG_ARG="$1"
+    
+    # 检查模板是否存在
+    check_and_copy_template "$LANG_ARG" "$AGENT_TEMPLATE_DIR" "$TOOL_NAME"
+    
+    # 启动新会话
+    start_new_session "$TOOL_CMD" "$LANG_ARG"
+fi
+
