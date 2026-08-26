@@ -25,6 +25,7 @@ ${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取: `echo ${AI_SP
 | Kotlin | `AGENTS.kotlin.md` |
 | JavaScript | `AGENTS.js.md` |
 | ANSI C | `AGENTS.ansi_c.md` |
+| Shell | `AGENTS.shell.md` |
 
 ## 合并流程
 
