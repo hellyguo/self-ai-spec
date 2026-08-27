@@ -8,7 +8,7 @@ description: "TscanCode静态分析技能：使用TscanCode（腾讯开源）进
 ## 工具位置
 
 ```bash
-TSCANCODE=/home/helly/app/TscanCode.linux/tscancode
+TSCANCODE=${HOME}/app/TscanCode.linux/tscancode
 ```
 
 ## 执行流程

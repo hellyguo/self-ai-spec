@@ -12,7 +12,7 @@ PMD（Programming Mistake Detector）检测Java代码中的编码规范违规、
 ```bash
 PMD_HOME=~/app/pmd-bin-6.19.0
 PMD_CLI=$PMD_HOME/bin/run.sh
-PMD_RULESETS=/home/helly/open_source/github/pmd/pmd-java/src/main/resources/rulesets
+PMD_RULESETS=${HOME}/open_source/github/pmd/pmd-java/src/main/resources/rulesets
 ```
 
 ## 执行流程

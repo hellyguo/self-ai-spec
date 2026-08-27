@@ -20,8 +20,8 @@ javap -verbose target/classes/com/example/Test.class | grep major
 ```bash
 SPOTBUGS_HOME=~/app/spotbugs-4.7.3
 SPOTBUGS_JAR=$SPOTBUGS_HOME/lib/spotbugs.jar
-FIND_SEC_BUGS_SRC=/home/helly/open_source/github/find-sec-bugs/
-FB_CONTRIB_SRC=/home/helly/open_source/github/fb-contrib/
+FIND_SEC_BUGS_SRC=${HOME}/open_source/github/find-sec-bugs/
+FB_CONTRIB_SRC=${HOME}/open_source/github/fb-contrib/
 ```
 
 ## 执行流程

@@ -6,7 +6,7 @@ description: "该skill没有执行文件，为操作指引：采集Java执行情
 # 代码编译
 
 1. 通过skill: java-env确定jdk版本，确定mvnd/mvn版本
-2. 通过asprof进行采集，路径在 /home/helly/app/async-profiler
+2. 通过asprof进行采集，路径在 ${HOME}/app/async-profiler
 3. 命令可参考
 
 ```shell
