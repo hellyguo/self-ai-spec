@@ -14,6 +14,9 @@ description: AI记忆持久化系统。使用memrec存储、检索、管理跨�
 3. 项目上下文需跨会话保持 → 自动关联项目ID
 4. 用户偏好需记忆 → `memrec add --mtype preference --global`
 5. 检索历史知识辅助当前任务 → `memrec search "关键词"`
+6. 创建主题聚合 → `memrec scene create "主题" --tag xxx`
+7. 查看统计信息 → `memrec stats`
+8. 恢复误删记忆 → `memrec list --deleted` → `memrec restore <id>`
 
 ## MCP Server
 
@@ -154,10 +157,19 @@ memrec search "知识" --mmr-lambda 0.5         # 更多样的结果
 
 ```bash
 memrec get <memory-id> [--merge]
-memrec list [--limit <num>] [--project-only] [--global-only]
+memrec list [--limit <num>] [--skip <num>] [--project-only] [--global-only] [--deleted]
+memrec list [--tag <tag>] [--type <type>]     # 按标签/类型过滤
 memrec stats
 memrec version
 memrec delete <memory-id>
+memrec restore <memory-id>                    # 恢复软删除记忆
+memrec scene create <theme> [--tag <tag>]     # 创建场景
+memrec scene list [--sort-by-heat]            # 列出场景
+memrec scene add-memory <scene-id> <memory-id>
+memrec scene remove-memory <scene-id> <memory-id>
+memrec scene get <scene-id>
+memrec scene update-heat <scene-id> <heat>
+memrec dream [--force]                        # 手动触发Dream整合
 ```
 
 ## 项目隔离
@@ -225,17 +237,5 @@ memrec stats
 6. **min_score默认0.75** - 过滤低相关度干扰项（可通过MEMREC_MIN_SCORE调整）
 7. **项目隔离自动** - 无需手动指定，自动检测git root
 8. **.mr_pid勿提交** - 添加到.gitignore，避免project_id冲突
-
-## 数据位置
-
-```
-~/.memrec/
-├── memrecd.sock        # Unix Socket
-├── data/               # RocksDB记忆元数据
-├── vectors/            # RocksDB向量存储
-├── fts/                # Tantivy全文检索索引
-├── models/             # ONNX embedding模型
-└── memrecd.log         # 服务日志
-```
 
 ---
