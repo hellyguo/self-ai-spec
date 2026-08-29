@@ -38,14 +38,17 @@ MemRec 可作为 MCP Server 直接被 AI 客户端（Claude Code、Codex、OpenC
 
 **MCP Tools：**
 
-| Tool | 功能 | 必需参数 |
-|------|------|----------|
-| `mr_add` | 添加记忆 | `content`, `memory_type` |
-| `mr_search` | 语义检索 | `query` |
-| `mr_get` | 获取单条记忆 | `id` |
-| `mr_list` | 列出记忆 | - |
-| `mr_delete` | 删除记忆 | `id` |
-| `mr_stats` | 统计信息 | - |
+| Tool | 功能 | 必需参数 | 范围参数 |
+|------|------|----------|----------|
+| `mr_add` | 添加记忆 | `content`, `memory_type` | `is_global` |
+| `mr_search` | 语义检索 | `query` | `scope`（project/global/all，缺省按 `.mr_pid` 推断） |
+| `mr_get` | 获取单条记忆 | `id` | - |
+| `mr_list` | 列出记忆 | - | `scope`（project/global/all，缺省按 `.mr_pid` 推断） |
+| `mr_delete` | 删除记忆 | `id` | - |
+| `mr_stats` | 统计信息 | - | - |
+
+> `scope` 与 CLI 的 `-p/-g/-a` 对齐：`project`=仅当前项目、`global`=仅公共记忆、`all`=跨所有项目。
+> 均未指定时按项目根 `.mr_pid` 是否存在推断（存在→project，不存在→global）。
 
 **MCP Resources：**
 
@@ -59,11 +62,23 @@ MemRec 可作为 MCP Server 直接被 AI 客户端（Claude Code、Codex、OpenC
 // mr_add
 {"name": "mr_add", "arguments": {"content": "选择JWT认证", "memory_type": "decision", "tags": ["auth", "critical"]}}
 
-// mr_search
-{"name": "mr_search", "arguments": {"query": "认证方案", "min_score": 0.75, "project_only": true}}
+// mr_search（默认范围：按 .mr_pid 推断）
+{"name": "mr_search", "arguments": {"query": "认证方案", "min_score": 0.75}}
+
+// mr_search 仅当前项目
+{"name": "mr_search", "arguments": {"query": "认证方案", "scope": "project"}}
+
+// mr_search 仅公共记忆
+{"name": "mr_search", "arguments": {"query": "用户偏好", "scope": "global"}}
 
 // mr_search 跨项目
-{"name": "mr_search", "arguments": {"query": "xlsb", "cross_project": true}}
+{"name": "mr_search", "arguments": {"query": "xlsb", "scope": "all"}}
+
+// mr_list 仅当前项目
+{"name": "mr_list", "arguments": {"limit": 20, "scope": "project"}}
+
+// mr_list 跨所有项目
+{"name": "mr_list", "arguments": {"limit": 50, "scope": "all"}}
 ```
 
 ## 核心命令
@@ -114,7 +129,7 @@ memrec add "根据代码模式推断偏好函数式风格" --mtype knowledge --s
 ### 混合检索
 
 ```bash
-memrec search "关键词" [--project-only] [--global-only] [--all] [-k <num>]
+memrec search "关键词" [-p|-g|-a] [-k <num>]
 ```
 
 **搜索流程：**
@@ -125,13 +140,13 @@ memrec search "关键词" [--project-only] [--global-only] [--all] [-k <num>]
 
 **中文搜索：** 自动支持，使用 N-gram 分词器（2-4 字）
 
-**搜索范围：**
+**搜索范围（三态互斥，未指定时按 `.mr_pid` 是否存在推断）：**
 | 选项 | 范围 | 用途 |
 |------|------|------|
-| 默认 | 当前项目 + 公共记忆 | 日常使用 |
-| `--project-only` | 仅当前项目 | 精确项目内搜索 |
-| `--global-only` | 仅公共记忆 | 查找用户偏好 |
-| `--all` | 所有项目（跨项目） | 查找跨项目关联记忆 |
+| 默认 | 有 `.mr_pid` → 仅当前项目；无 → 仅公共记忆 | 自动推断 |
+| `-p, --project` | 仅当前项目 | 精确项目内搜索 |
+| `-g, --global` | 仅公共记忆 | 查找用户偏好 |
+| `-a, --all` | 所有项目（跨项目） | 查找跨项目关联记忆 |
 
 **高级选项：**
 | 选项 | 说明 | 默认值 |
@@ -144,9 +159,9 @@ memrec search "关键词" [--project-only] [--global-only] [--all] [-k <num>]
 **示例：**
 ```bash
 memrec search "认证方案"
-memrec search "Rust最佳实践" --project-only
-memrec search "用户偏好" --global-only -k 20
-memrec search "xlsb" --all                    # 跨项目搜索
+memrec search "Rust最佳实践" -p
+memrec search "用户偏好" -g -k 20
+memrec search "xlsb" -a                      # 跨项目搜索
 memrec search "架构" --human                  # 中文搜索
 memrec search "算法" --hybrid-alpha 0.8       # 更偏重向量检索
 memrec search "决策" --mmr-enabled false      # 禁用MMR
@@ -157,7 +172,7 @@ memrec search "知识" --mmr-lambda 0.5         # 更多样的结果
 
 ```bash
 memrec get <memory-id> [--merge]
-memrec list [--limit <num>] [--skip <num>] [--project-only] [--global-only] [--deleted]
+memrec list [--limit <num>] [--skip <num>] [-p|-g|-a] [--deleted]
 memrec list [--tag <tag>] [--type <type>]     # 按标签/类型过滤
 memrec stats
 memrec version
@@ -184,10 +199,11 @@ memrec dream [--force]                        # 手动触发Dream整合
 | 公共记忆（--global） | 跨项目共享知识和用户偏好 | `Uuid::nil()`（全0） |
 | 项目记忆 | 项目特定决策和上下文 | `.mr_pid`中的UUID |
 
-**检索范围：**
-- 默认：项目记忆 + 公共记忆
-- `--project-only`：仅当前项目记忆
-- `--global-only`：仅公共记忆
+**检索范围（三态互斥，未指定时按 `.mr_pid` 是否存在推断）：**
+- 默认：有 `.mr_pid` → 仅当前项目；无 → 仅公共记忆
+- `-p, --project`：仅当前项目记忆
+- `-g, --global`：仅公共记忆
+- `-a, --all`：跨所有项目
 
 **示例：**
 ```bash
@@ -201,10 +217,10 @@ memrec add "hydrakiller项目决策" --mtype decision
 
 # 搜索时自动隔离
 cd /disk2/code/rust/memrec
-memrec search "决策" --project-only  # 仅返回memrec项目
+memrec search "决策" -p  # 仅返回memrec项目
 
 cd /disk2/code/java/hydrakiller
-memrec search "决策" --project-only  # 仅返回hydrakiller项目
+memrec search "决策" -p  # 仅返回hydrakiller项目
 ```
 
 **注意：**
