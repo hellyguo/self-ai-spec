@@ -18,33 +18,6 @@ ${HOME}/app/maven-mvnd
 
 ${HOME}/app/apache-maven
 
-## spotbug dir:
-
-${HOME}/app/spotbugs
-
-## pmd dir:
-
-${HOME}/app/pmd
-
-## arthas dir:
-
-${HOME}/app/arthas
-
-## async-profiler dir:
-
-${HOME}/app/async-profiler
-
-## jitwatch dir:
-
-${HOME}/app/jitwatch
-${HOME}/bin/jitwatch-ui # use FX UI, useless
-${HOME}/bin/jarScanMax325
-
-## dump parser:
-
-${HOME}/.cargo/bin/hprof-slurp
-${HOME}/.cargo/bin/jhh
-
 ## 核心原则
 
 - 基于pom.xml的配置查找jdk合适版本 
@@ -53,7 +26,20 @@ ${HOME}/.cargo/bin/jhh
 ## java bash profile 设置及别名
 
 ```bash
-env | grep JAVA
-alias | grep java
+# 注意：bash 工具需先加载 .bashrc 以获取 alias
+source ~/.bashrc && env | grep JAVA
+source ~/.bashrc && alias | grep java
+```
+
+### Java 版本切换 Alias
+
+```bash
+java7='JAVA_HOME=$JAVA_HOME7 PATH=$JAVA_HOME7/bin:$NOJAVA_HOME_PATH java'
+java8='JAVA_HOME=$JAVA_HOME8 PATH=$JAVA_HOME8/bin:$NOJAVA_HOME_PATH java'
+java11='JAVA_HOME=$JAVA_HOME11 PATH=$JAVA_HOME11/bin:$NOJAVA_HOME_PATH java'
+java17='JAVA_HOME=$JAVA_HOME17 PATH=$JAVA_HOME17/bin:$NOJAVA_HOME_PATH java'
+java21='JAVA_HOME=$JAVA_HOME21 PATH=$JAVA_HOME21/bin:$NOJAVA_HOME_PATH java'
+java23='JAVA_HOME=$JAVA_HOME23 PATH=$JAVA_HOME23/bin:$NOJAVA_HOME_PATH java'
+java25='JAVA_HOME=$JAVA_HOME25 PATH=$JAVA_HOME25/bin:$NOJAVA_HOME_PATH java'
 ```
 
