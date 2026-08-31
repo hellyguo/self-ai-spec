@@ -76,13 +76,16 @@ ${HOME}/app/arthas
 dir:
 
 ${HOME}/app/async-profiler
+${HOME}/bin/aspfit   # use async by pid 
+${HOME}/bin/aspfitn  # use async by name
+${HOME}/bin/aspflist # list support mode
 
 #### jitwatch jit分析
 
 dir:
 
 ${HOME}/app/jitwatch
-${HOME}/bin/jitwatch-ui # use FX UI, useless
+${HOME}/bin/jitwatch-ui   # use FX UI, useless
 ${HOME}/bin/jarScanMax325 # 代码静态扫描，超 325bytes 无法被 jit 加速的方法
 
 #### dump parser
