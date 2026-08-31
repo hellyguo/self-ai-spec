@@ -37,6 +37,8 @@ ${HOME}/app/async-profiler
 ## jitwatch dir:
 
 ${HOME}/app/jitwatch
+${HOME}/bin/jitwatch-ui # use FX UI, useless
+${HOME}/bin/jarScanMax325
 
 ## dump parser:
 
