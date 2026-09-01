@@ -143,9 +143,9 @@ chmod +x run_bench.sh
 ./run_bench.sh MyBenchmark "-wi 5 -i 5"
 ```
 
-### 方式三：jbpe 项目专用（Maven 管理的 JMH）
+### 方式三：Maven 管理的 JMH
 
-jbpe 项目将 JMH 依赖配置为 test scope，需通过 Maven 构建后直接运行：
+当 JMH 依赖配置为 test scope（如 jbpe 项目），需通过 Maven 构建后直接运行：
 
 ```bash
 # 编译并安装（生成 JMH 元数据）
@@ -155,10 +155,10 @@ mvn clean install -DskipTests
 java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main -rf json
 
 # 运行指定基准测试类
-java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.erayt.jbpe.bench.PositionAvgBench -f 1 -wi 2 -i 2
+java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.example.MyBenchmark -f 1 -wi 2 -i 2
 
 # 运行指定基准测试（自定义参数）
-java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.erayt.jbpe.bench.PositionAvgBench -wi 5 -i 5 -t 1 -f 3
+java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.example.MyBenchmark -wi 5 -i 5 -t 1 -f 3
 ```
 
 **参数说明：**
@@ -212,7 +212,7 @@ java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target
 | 标准测试 | `-wi 5 -i 5 -t 4 -f 2` |
 | 精确测试 | `-wi 10 -i 10 -t 1 -f 3` |
 | 列出所有Benchmark | `-l` |
-| jbpe 项目完整测试 | `mvn clean install -DskipTests && java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main -rf json` |
+| 项目完整测试（Maven 管理 JMH） | `mvn clean install -DskipTests && java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main -rf json` |
 
 ## 输出解读
 
