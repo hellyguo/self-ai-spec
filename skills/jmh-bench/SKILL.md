@@ -143,6 +143,67 @@ chmod +x run_bench.sh
 ./run_bench.sh MyBenchmark "-wi 5 -i 5"
 ```
 
+### 方式三：jbpe 项目专用（Maven 管理的 JMH）
+
+jbpe 项目将 JMH 依赖配置为 test scope，需通过 Maven 构建后直接运行：
+
+```bash
+# 编译并安装（生成 JMH 元数据）
+mvn clean install -DskipTests
+
+# 运行全部基准测试（JSON 输出）
+java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main -rf json
+
+# 运行指定基准测试类
+java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.erayt.jbpe.bench.PositionAvgBench -f 1 -wi 2 -i 2
+
+# 运行指定基准测试（自定义参数）
+java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main com.erayt.jbpe.bench.PositionAvgBench -wi 5 -i 5 -t 1 -f 3
+```
+
+**参数说明：**
+- `-rf json`: 结果保存为 JSON 文件
+- `-l`: 列出所有可用基准
+- 其他参数同上
+
+**项目配置要求：**
+```xml
+<!-- pom.xml 需包含 -->
+<dependencies>
+    <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>1.37</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-generator-annprocess</artifactId>
+        <version>1.37</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.13.0</version>
+            <configuration>
+                <annotationProcessorPaths>
+                    <path>
+                        <groupId>org.openjdk.jmh</groupId>
+                        <artifactId>jmh-generator-annprocess</artifactId>
+                        <version>1.37</version>
+                    </path>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ## 常用命令模板
 
 | 场景 | 命令 |
@@ -151,6 +212,7 @@ chmod +x run_bench.sh
 | 标准测试 | `-wi 5 -i 5 -t 4 -f 2` |
 | 精确测试 | `-wi 10 -i 10 -t 1 -f 3` |
 | 列出所有Benchmark | `-l` |
+| jbpe 项目完整测试 | `mvn clean install -DskipTests && java -cp "$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout):target/classes:target/test-classes" org.openjdk.jmh.Main -rf json` |
 
 ## 输出解读
 
