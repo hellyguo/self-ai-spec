@@ -145,7 +145,7 @@ chmod +x run_bench.sh
 
 ### 方式三：Maven 管理的 JMH
 
-当 JMH 依赖配置为 test scope（如 jbpe 项目），需通过 Maven 构建后直接运行：
+当 JMH 依赖配置为 test scope，需通过 Maven 构建后直接运行：
 
 ```bash
 # 编译并安装（生成 JMH 元数据）
