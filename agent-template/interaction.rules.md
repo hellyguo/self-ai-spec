@@ -21,4 +21,5 @@
     - plocate[类似Windows下的everything]
     - f2[批量重命名]
     - rrn[同f2,弱化]
+    - ntimes[重复执行，ntimes n -- cmd(串行执行) / ntimes n -p -- cmd(并行执行)]
 
