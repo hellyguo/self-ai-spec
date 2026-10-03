@@ -11,13 +11,19 @@ description: "virtualbox 三机测试环境，可供部分需要集群的系统�
 - debian002: vboxuser@vboxdeb002
 - debian003: vboxuser@vboxdeb003
 
-### 主-虚通讯 IP
+### 虚-主单向通讯 IP
+
+- debian001: 10.0.2.15
+- debian002: 10.0.2.15
+- debian003: 10.0.2.15
+
+### 主-虚单向通讯 IP
 
 - debian001: 172.22.133.251
 - debian002: 172.22.133.252
 - debian003: 172.22.133.253
 
-### 主-虚通讯 IP
+### 虚机间通讯 IP
 
 - debian001: 192.168.77.101
 - debian002: 192.168.77.102
