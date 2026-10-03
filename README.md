@@ -101,6 +101,7 @@ self-ai-spec/
 
 | 技能 | 用途 |
 | :--- | :--- |
+| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） |
 | `md2pdf` | Markdown 转 PDF，支持 Mermaid 和 PlantUML 图表自动渲染 |
 | `creating-mermaid-diagrams` | Mermaid 图表生成与导出（PNG/SVG/PDF），支持 11+ 图表类型 |
 | `plantuml-skill` | PlantUML 图表生成与导出（Kroki API，无需本地安装） |
@@ -116,10 +117,12 @@ self-ai-spec/
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
 | `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 |
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
+| `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） |
+| `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 |
 
 ## 语言规范（lang-spec）
 
-每个编程语言有两个关联文件：
+每个编程语言提供以下关联文件（`ci` 为部分语言提供）：
 
 | 文件类型           | 用途                                     | 示例             |
 | :----------------- | :--------------------------------------- | :--------------- |
@@ -229,6 +232,18 @@ updocid
 - `dsh-plugins/` - dsh 工具插件目录（以符号链接方式引入外部实现）
 
 目前两者均链接到 `memrec` 的对应实现（`pi-extension` / `dsh-plugin`）。
+
+### 技能目录的来源形态
+
+`skills/` 下的技能并非全部纳入本仓库版本管理，存在三种形态：
+
+- **本仓库维护**：目录与 `SKILL.md` 直接跟踪（如 `code-review`、`java-env`、`vbox-test-env`）。
+- **符号链接到外部仓库**：图表与演示类技能指向独立仓库
+  （`creating-mermaid-diagrams`、`drawio-skill`、`excalidraw-diagram`、`html-ppt`、`plantuml-skill`、`ppt-master`），
+  已在 `skills/.gitignore` 中忽略。
+- **本地维护、不纳入版本控制**：`memrec`、`multype2txt`、`semble-search` 等，本仓库仅保留占位与说明，实现由本地或外部来源提供。
+
+> 注：`.system` 为工具生成的运行态目录，同样被忽略。
 
 ## 安全审查原则
 

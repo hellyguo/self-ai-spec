@@ -108,6 +108,7 @@ description: "技能简介"
 
 | 技能 | 用途 |
 | :--- | :--- |
+| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） |
 | `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 |
 | `creating-mermaid-diagrams` | Mermaid 图表生成与导出（PNG/SVG/PDF），支持 11+ 图表类型 |
 | `plantuml-skill` | PlantUML 图表生成与导出（Kroki API，无需本地安装） |
@@ -123,6 +124,8 @@ description: "技能简介"
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
 | `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 |
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
+| `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） |
+| `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 |
 
 ## 文件命名约定
 
@@ -146,12 +149,13 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.java.md
 
 ### 语言规范文件结构
 
-每个编程语言有两个关联文件：
+每个编程语言提供以下关联文件（`ci` 为部分语言提供）：
 
 | 文件类型           | 用途                                           | 示例             |
 |--------------------|------------------------------------------------|------------------|
 | `spec.{lang}.md`   | 编码规范、最佳实践、语言特性指南               | `spec.java.md`   |
 | `review.{lang}.md` | 代码审查规则、静态分析规则、问题模式检测       | `review.java.md` |
+| `ci.{lang}.md`     | 构建/CI 指引（部分语言提供）                   | `ci.java.md`     |
 
 **组合使用**：
 

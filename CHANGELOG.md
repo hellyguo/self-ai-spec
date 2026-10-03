@@ -1,5 +1,135 @@
 # 更新历史
 
+## 2026-10-03
+
+### 文档刷新
+
+- **README.md / AGENTS.md 技能表刷新**：补齐文档中遗漏的技能条目并澄清技能目录形态
+  - 新增 `multype2txt` 到文档与图表生成分类
+  - 新增 `semble-search`、`vbox-test-env` 到工程与记忆分类
+  - AGENTS.md 语言规范文件结构补充 `ci.{lang}.md` 行
+  - README.md 扩展与插件章节说明 `skills/` 的三种来源形态（本仓库维护、符号链接外部仓库、本地不纳入版本控制）
+- **CHANGELOG.md 补齐**：补入 2026-08-12 至 2026-10-03 期间的变更记录
+
+### 新增测试环境技能
+
+- **vbox-test-env 技能**：VirtualBox 三机测试环境，适用于集群/分布式系统测试
+  - 提供 debian001/002/003 三台虚拟机，均已配置互信与 sudo 高权
+  - 位置：`skills/vbox-test-env/SKILL.md`
+- 提交记录：
+  - Commit: `3bd8047` doc: new skill vbox-test-env
+  - Commit: `6f35975` doc: update skill vbox-test-env
+  - Commit: `b647229` doc: update skill vbox-test-env
+
+## 2026-09-27
+
+### 新增文档转换技能
+
+- **multype2txt 技能**：用本地二进制将 Office/PDF 文档转换为纯文本，零 token 消耗
+  - 支持 doc/docx/ppt/pptx/xls/xlsx/pdf
+  - 位置：`skills/multype2txt/SKILL.md`
+
+### 技能归置调整
+
+- **memrec 技能本地化**：从 git 跟踪中移出，改由本地/外部来源维护，不再纳入本仓库版本管理
+  - 在 `skills/.gitignore` 中忽略对应目录
+- Commit: `d8340c9` chore: new skill
+
+## 2026-09-24
+
+### 交互规则增强：特化代码检索工具指引
+
+- 在 `agent-template/interaction.rules.md` 中新增三节检索指引
+  - **CodeGraph**：项目知识图谱，优先用于理解与定位代码
+  - **Semble**：语义代码检索
+  - **zvec-grep**：工作区混合检索（向量 + 词法）
+- Commit: `deffe89` doc: add codegraph/semble/zvec-grep guide
+
+## 2026-09-18 ~ 2026-09-26
+
+### 交互规则修订
+
+- 多次修订 `agent-template/interaction.rules.md`（交互约定与工具指引）
+- 提交记录：`4f277b7`、`2d3e939`、`82efe64`
+
+## 2026-09-16
+
+### 文档整理
+
+- **AGENTS.md 与 README.md 技能文档整理**：统一技能列表分类与描述
+  - Commit: `ad9d5fe` docs: 整理 AGENTS.md 与 README 技能文档
+
+### 忽略规则与外部扩展
+
+- **忽略规则拆分**：`skills/.gitignore`、`pi-extensions/.gitignore`、`dsh-plugins/.gitignore` 各自维护
+  - Commit: `00fd1c0` chore: ignore
+- **memrec 外部化**：移除内联的 `pi-extensions/memrec.ts`，改以符号链接引入外部实现
+  - Commit: `e5edf30` chore: remove
+
+## 2026-09-01
+
+### jmh-bench 通用化
+
+- 移除 jbpe 项目专用示例，改为通用执行方式
+- 提交记录：`cd57240`、`777fcd7`、`8f14e59`
+
+## 2026-08-31
+
+### Java 环境技能与模板
+
+- 精简 `java-env` 技能文档，补充 `AGENTS.java.md` 模板内容
+- 提交记录：`c1abad3`、`5d0ae90`、`12e926e`、`12ef55b`
+
+## 2026-08-28 ~ 2026-08-29
+
+### memrec 技能文档更新
+
+- 更新 `skills/memrec/SKILL.md`
+- 提交记录：`50c0bf7`、`95556d7`
+
+## 2026-08-27
+
+### 路径与交互规则
+
+- **移除硬编码路径**：`cpp-tscancode`、`java-asprof`、`java-check-pmd`、`java-check-spotbugs`、`java-env` 等技能统一使用环境变量
+  - Commit: `fa828a2` doc: remove hard-code path
+- 更新 `agent-template/interaction.rules.md`
+  - Commit: `2818386` doc: update interaction
+
+## 2026-08-26
+
+### 技能模板
+
+- 移除计划文档，新增 Shell 技能模板
+- Commit: `6e3f625` doc: remove plan; add skill template: shell
+
+## 2026-08-20
+
+### pi 扩展
+
+- **新增 pi extension**：`pi-extensions/memrec.ts`
+- Commit: `2c6eec9` feat: pi extension, memrec
+
+## 2026-08-12 ~ 2026-08-13
+
+### 新增 Kotlin 支持
+
+- **语言规范**：`lang-spec/spec.kotlin.md`、`review.kotlin.md`、`ci.kotlin.md`
+- **代理模板**：`agent-template/AGENTS.kotlin.md`
+- **技能适配**：`code-review`、`merge-agents-md` 纳入 Kotlin
+- **启动脚本**：`bin/common.sh` 支持 kotlin 语言参数
+- Commit: `16fea28` feat: add kotlin language spec, review rules and AGENTS template
+
+### pi 快速启动脚本
+
+- **新增脚本**：`bin/pc`（启动 pi）、`bin/updpiid`（更新 pi 会话 ID）
+- Commit: `b58b22b` feat: add pi quick-start scripts (pc, updpiid)
+
+### 规范修订
+
+- `lang-spec/spec.kotlin.md` 补充条目
+- Commit: `746f1a7` doc: update lang spec
+
 ## 2026-07-30
 
 ### 文档刷新
@@ -20,6 +150,7 @@
 ### 技能完整性补齐
 
 本次刷新补齐了以下已存在但文档未记录的技能：
+
 - `code-part-modification` (2026-07-12新增，文档遗漏)
 - `gdb-heap-analysis` (长期存在，文档遗漏)
 - `java-coverage` (长期存在，文档遗漏)
