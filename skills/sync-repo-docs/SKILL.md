@@ -17,5 +17,6 @@ description: "该skill没有执行文件，文件同步，请按步骤执行"
 
 特别地，README需引用CHANGELOG/MANUAL(引用各自语言)
 
-文件夹内文件布局与本规划不一致的，以本规划为准
+1. 文件夹内文件布局与本规划不一致的，以本规划为准
+2. 原文件夹下无三份文件的，自动补充 README/CHANGELOG，询问是否补充 MANUAL
 
