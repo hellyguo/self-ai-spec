@@ -1,5 +1,26 @@
 # 更新历史
 
+> 返回目录：[README.md](README.md)
+
+## 2026-10-08
+
+### 新增文档同步技能
+
+- **sync-repo-doc 技能**：基于 git 提交记录同步仓库文档（`skills/sync-repo-docs/SKILL.md`）
+  - 文件命名规范：全大写，中文不带后缀、英文以 `_en` 结尾
+  - 三对文档：README.md/README_en.md、CHANGELOG.md/CHANGELOG_en.md、MANUAL.md/MANUAL_en.md
+  - 两两互链，且 README 需引用各自语言的 CHANGELOG/MANUAL
+  - 缺失 README/CHANGELOG 时自动补充，MANUAL 与双语扩充需询问确认
+- 提交记录：
+  - Commit: `b2c16be` doc: new skill sync-repo-docs
+  - Commit: `62bc591` doc: update skill sync-repo-docs
+  - Commit: `0511a60` doc: update skill sync-repo-docs
+
+### 文档同步
+
+- **README.md / AGENTS.md 技能表收录 `sync-repo-doc`**（工程与记忆分类）
+- **CHANGELOG.md 与 README.md 互链补齐**：CHANGELOG 顶部增加返回 README 的链接
+
 ## 2026-10-03
 
 ### 文档刷新
