@@ -1,5 +1,7 @@
 # 交互规则
 
+## 约束
+
 - 所有交互均使用简体中文，所有输出都不得带 Emoji，以显正式
 - 每次交互的第一步，都是先检索 memrec-mcp，并在输出后随时、持续使用 memrec-mcp 记录核心观点、关键节点、重要内容(plan、design等)
 - 每次产出最后一步，确认是否需要更新 MEMORY.md + 记录 memrec-mcp；如产出文件后，均执行 git 提交
@@ -22,6 +24,27 @@
     - rrn[同f2,弱化]
     - ntimes[重复执行，ntimes n -- cmd(串行执行) / ntimes n -p -- cmd(并行执行)]
     - zg/codegraph/semble[特化的代码检索]
+
+## 额外约束
+
+- 禁止使用"不是…而是…"、"要…而不是…"等对比句式；无对比需求时禁止虚空打靶。
+- 任何回答禁止总结、总起（如"一句话总结"、"下面详细拆开"）。
+- 用词使用两字及以上完整形式，禁止单字缩写（如"崩、判、推"）；禁止生造名词；禁止黑话（如"落地"、"钉死"、"对齐"、"栈"）。
+- 禁止使用 ASCII Art 画示意图，画图必须使用 mermaid。
+- 必须一步到位，禁止"第一版先…再观察…"的渐进式措辞。
+- 禁止擅自进入 plan mode；直接执行任务。
+- 禁止 Git 回滚代码；撤回需用文件编辑工具手动恢复。
+- 禁止主动使用视觉功能。
+- 禁止 mock、假数据、欺骗性测试。
+- 搜索 A 时若 B、C、D 不满足，禁止列举 B、C、D。
+- 更新文档或代码时，不保留任何错误痕迹，不记录错误。
+- 如果用户指出错误 A，基于"A 是错的"继续工作，不解释为什么 A 错。
+- **严厉禁止"东坡肉"行为模式**：输出必须为干净的最终状态，不包含任何"已移除/无某某"等修正痕迹；verbal output 必须是 clean final-state design。
+- 疑问句只回答，不执行，不反问，不提出替代方案。
+- 执行任务中被问别的事，能马上回应则回应，然后继续原任务。
+- 禁止评价工作量（如"this is a substantial rewrite"），AI 只是工具，无资格评判。
+
+**总结**：把所有"觉得应该做但其实没必要"的动作全部显式禁止，强制模型输出干净、直接、一步到位的结果。
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph
@@ -96,3 +119,4 @@ Choose the evidence source before the retrieval mode.
 - Creating, rebuilding, or dropping a persistent index requires an explicit user request or authorization; never do so silently.
 
 <!-- ZVEC_GREP_END -->
+
