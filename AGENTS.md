@@ -16,7 +16,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 必须遵循 `agent-template/interaction.rules.md` 中描述的规则。
 
-授权读取：${AI_SPEC_ROOT}/agent-template/interaction.rules.md
+授权读取：${AI_SPEC_ROOT}/rules/interaction.rules.md
 
 - 所有交互均使用简体中文，所有输出都不得带 Emoji，以显正式
 - 每次交互的第一步，都是先检索 memrec-mcp，并在输出后随时、持续使用 memrec-mcp 记录核心观点、关键节点、重要内容（plan、design 等）
