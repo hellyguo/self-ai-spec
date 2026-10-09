@@ -27,23 +27,23 @@ source ~/.bashrc
 **验证配置**：
 
 ```bash
-echo $AI_SPEC_ROOT                    # 应该显示正确的路径
-ls $AI_SPEC_ROOT/bin/                 # 应该能看到脚本文件
-ls $AI_SPEC_ROOT/agent-template/      # 应该能看到模板文件
+echo $AI_SPEC_ROOT                     # 应该显示正确的路径
+ls $AI_SPEC_ROOT/bin/                  # 应该能看到脚本文件
+ls $AI_SPEC_ROOT/agent-templates/      # 应该能看到模板文件
 ```
 
 ## 目录结构
 
 ```text
 self-ai-spec/
-├── skills/            # 技能定义，每个技能一个 kebab-case 目录 + SKILL.md
-├── lang-spec/         # 语言规范：spec.{lang}.md 编码规范 + review.{lang}.md 审查规则
-├── agent-template/    # 代理模板：AGENTS.{lang}.md + interaction.rules.md
-├── bin/               # AI 工具快速启动脚本与公共函数库
-├── docs/              # 框架设计文档（代码审查框架、解构报告等）
-├── pi-extensions/     # pi 扩展（memrec 等，符号链接）
-├── dsh-plugins/       # dsh 插件（memrec 等，符号链接）
-├── CHANGELOG.md       # 更新历史
+├── skills/             # 技能定义，每个技能一个 kebab-case 目录 + SKILL.md
+├── lang-spec/          # 语言规范：spec.{lang}.md 编码规范 + review.{lang}.md 审查规则
+├── agent-templates/    # 代理模板：AGENTS.{lang}.md + interaction.rules.md
+├── bin/                # AI 工具快速启动脚本与公共函数库
+├── docs/               # 框架设计文档（代码审查框架、解构报告等）
+├── pi-extensions/      # pi 扩展（memrec 等，符号链接）
+├── dsh-plugins/        # dsh 插件（memrec 等，符号链接）
+├── CHANGELOG.md        # 更新历史
 └── README.md
 ```
 
@@ -137,7 +137,7 @@ self-ai-spec/
 
 ## 代理模板配置
 
-语言特定的代理模板位于 `agent-template/` 目录，用于配置 AI 工具的项目模板：
+语言特定的代理模板位于 `agent-templates/` 目录，用于配置 AI 工具的项目模板：
 
 - `AGENTS.java.md` - Java 项目配置
 - `AGENTS.kotlin.md` - Kotlin 项目配置
@@ -148,7 +148,10 @@ self-ai-spec/
 - `AGENTS.js.md` - JavaScript 项目配置
 - `AGENTS.shell.md` - Shell/Bash 项目配置
 - `AGENTS.blank.md` - 空白模板
-- `interaction.rules.md` - 通用交互规则
+
+## 交互规则
+
+- `rules/interaction.rules.md` - 通用交互规则
 
 ### 使用方式
 
@@ -257,6 +260,6 @@ updocid
 
 ## 详细文档
 
-- 交互规则与仓库约定：[AGENTS.md](AGENTS.md)、[agent-template/interaction.rules.md](agent-template/interaction.rules.md)
+- 交互规则与仓库约定：[AGENTS.md](AGENTS.md)、[rules/interaction.rules.md](rules/interaction.rules.md)
 - 代码审查框架设计：[docs/code-review-framework.md](docs/code-review-framework.md)
 - 完整更新历史：[CHANGELOG.md](CHANGELOG.md)

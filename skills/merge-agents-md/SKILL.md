@@ -40,9 +40,9 @@ ${AI_SPEC_ROOT} 定义在 bash/zsh 环境变量中，可被读取: `echo ${AI_SP
 ### 2. 授权读取模板
 
 ```
-授权读取：${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
+授权读取：${AI_SPEC_ROOT}/agent-templates/AGENTS.{lang}.md
 
-Read ${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
+Read ${AI_SPEC_ROOT}/agent-templates/AGENTS.{lang}.md
 ```
 
 ### 3. 合并规则
@@ -77,7 +77,7 @@ Read ${AI_SPEC_ROOT}/agent-template/AGENTS.{lang}.md
 
 ```
 # 读取 Java 模板
-Read ${AI_SPEC_ROOT}/agent-template/AGENTS.java.md
+Read ${AI_SPEC_ROOT}/agent-templates/AGENTS.java.md
 
 # 读取项目现有 AGENTS.md（如存在）
 Read ./AGENTS.md
@@ -90,7 +90,7 @@ Write ./AGENTS.md
 
 ```
 # 读取 Python 模板
-Read ${AI_SPEC_ROOT}/agent-template/AGENTS.python.md
+Read ${AI_SPEC_ROOT}/agent-templates/AGENTS.python.md
 
 # 读取项目现有 AGENTS.md（如存在）
 Read ./AGENTS.md
