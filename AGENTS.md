@@ -14,7 +14,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 ### 交互规则
 
-必须遵循 `agent-template/interaction.rules.md` 中描述的规则。
+必须遵循 `rules/interaction.rules.md` 中描述的规则。
 
 授权读取：${AI_SPEC_ROOT}/rules/interaction.rules.md
 
@@ -30,8 +30,22 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 - 编码时，合理生成注释。文件头/类头/函数头/方法头，应有描述和注意事项；重要算法、重要参数、重要设计，应有解释和说明
 - 修改时，不删除原有注释，但如已经语义变化等必要情况，需要变更或删除，重新补充注释，参见上一条
 - 禁止在编码使用 stdout/stderr，测试代码也尽可能使用日志输出
+- 禁止在文档中使用 ASCII Art 画示意图，画图必须使用 mermaid。ASCII Art 只允许在交互过程中进行示意。
+- 禁止主动使用视觉功能。
+- 执行任务中被问别的事，能马上回应则回应，然后继续原任务。
+- 搜索 A 时若 B、C、D 不满足，禁止列举 B、C、D。
+- 疑问句只回答，不执行，不反问，不提出替代方案。
+- 检索优选 codegraph-mcp，次选 ripgrep，兜底 grep
 - 本机为 linux，且配备了更高效的工具，倾向使用这些工具
-  - fd[find]、rg[grep]、sd[sed]、eza[ls]、plocate[类似 Windows 下的 everything]、f2[批量重命名]、rrn[同 f2，弱化]
+  - fd[find]
+  - rg[grep]
+  - sd[sed]
+  - eza[ls]
+  - plocate[类似 Windows 下的 everything]
+  - f2[批量重命名]
+  - rrn[同 f2，弱化]
+  - ntimes[重复执行，ntimes n -- cmd(串行执行) / ntimes n -p -- cmd(并行执行)]
+  - codegraph/semble/zg[特化的代码检索]
 
 本仓库额外补充：
 
