@@ -7,7 +7,7 @@
 
 # 从环境变量推导目录
 SCRIPT_DIR="$AI_SPEC_ROOT/bin"
-AGENT_TEMPLATE_DIR="$AI_SPEC_ROOT/agent-template"
+AGENT_TEMPLATE_DIR="$AI_SPEC_ROOT/agent-templates"
 
 # 检查必要目录是否存在
 if [ ! -d "$AGENT_TEMPLATE_DIR" ]; then
