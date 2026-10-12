@@ -2,6 +2,20 @@
 
 > 返回目录：[README.md](README.md)
 
+## 2026-10-12
+
+### 新增设计规约技能
+
+- **sync-dev-spec 技能**：将 code-deconstruct 的描述性产物提炼为规范性开发规约
+  - 先检查解构产物完整性，缺失或空洞则先执行 code-deconstruct
+  - 规约条目五字段：编号（DS-{seq}）、约束、理由、依据、适用范围
+  - 不一致、未决、缺失三类问题向用户裁决，不套用代码中不存在的通用最佳实践
+  - 完整规约落 `docs/dev-spec/design-charter.md`，约束条目写入项目 `AGENTS.md` 的 `## 设计规约` 章节，可重复执行增量同步
+  - 位置：`skills/sync-dev-spec/SKILL.md`，模板 `templates/design-charter.md`、`templates/agents-section.md`
+- 提交记录：
+  - Commit: `41f7da3` feat: add sync-dev-spec skill turning deconstruct outputs into design charter
+- 背景：dev-balance（七维度问询式基线，标签 `20261012_dropped_dev-balance`）已废弃，固定选项菜单无法覆盖项目多样性；改为从代码事实提炼规约
+
 ## 2026-10-08
 
 ### 新增文档同步技能
