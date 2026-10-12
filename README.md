@@ -55,6 +55,7 @@ self-ai-spec/
 | :--- | :--- |
 | `code-review` | 多语言代码审查（Java/Kotlin/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
 | `code-deconstruct` | 源代码解构为设计文档、ER图（设计层面） |
+| `sync-dev-spec` | 同步设计规约：基于 code-deconstruct 产物提炼开发规约，写入 AGENTS.md 纳入日常开发约束 |
 | `requirement-collect` | 源代码解构为需求文档（需求层面） |
 | `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
 | `code-detect-dup` | 代码重复度检测（Simian + JSCPD） |
