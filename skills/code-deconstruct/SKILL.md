@@ -229,3 +229,8 @@ docs/deconstruct/
 ## 关联技能
 
 需求收集请使用技能：`requirement-collect`
+
+## 特别事项
+
+如前次已经执行过一轮，将前次执行的结果移动到 `docs/deconstruct/deconstruct_{YYYYMMDD}_{seq%000}` 下，然后再重新生成
+
