@@ -236,3 +236,5 @@ MyBenchmark.testMethod           thrpt    5  123456.789 ± 5000  ops/s
 3. **Blackhole 消费** - 防止死代码消除：`bh.consume(result)`
 4. **State 隔离** - 使用 `@State(Scope.Thread)` 避免线程竞争
 5. **单线程对比** - 多框架对比时先用 `-t 1` 消除并发因素
+6. **单方法申明批量** - 对单方法内部执行大量批量操作的，使用 `@OperationsPerInvocation` 注解申明
+
