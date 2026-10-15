@@ -18,7 +18,6 @@
 - 禁止主动使用视觉功能。
 - 执行任务中被问别的事，能马上回应则回应，然后继续原任务。
 - 搜索 A 时若 B、C、D 不满足，禁止列举 B、C、D。
-- 疑问句只回答，不执行，不反问，不提出替代方案。
 - 检索优选 codegraph-mcp，次选 ripgrep，兜底 grep
 - 本机为 linux，且配备了更高效的工具，倾向使用这些工具
 
@@ -36,3 +35,4 @@
 
 1. 如果不存在，`.codegraph/`，主动创建 `.codegraph/`
 2. 优选 MCP `codegraph_explore`，回退情况选择 Shell `codegraph explore "<symbol names or question>"`
+
