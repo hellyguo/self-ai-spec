@@ -1,6 +1,6 @@
 ---
 name: md2pdf
-description: Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染。触发场景：(1)用户需要将 Markdown 转换为 PDF，(2)用户提到 "md2pdf"、"markdown to pdf"，(3)用户需要生成包含图表的 PDF 文档，(4)用户需要导出文档为 PDF 格式。
+description: Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染。触发场景：(1)用户需要将 Markdown 转换为 PDF，(2)用户提到 "md2pdf"、"m2h2pdf"、""markdown to pdf"，(3)用户需要生成包含图表的 PDF 文档，(4)用户需要导出文档为 PDF 格式。
 ---
 
 # Markdown to PDF Converter
@@ -16,14 +16,18 @@ description: Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动�
 - **支持 Mermaid 图表** - 自动转换为 PNG 嵌入 PDF
 - **支持 PlantUML 图表** - 自动转换为 PNG 嵌入 PDF
 
+`md2pdf` 生成黑白pdf; `m2h2pdf` 生成彩色pdf。
+
 ## 依赖
 
 ### 必需
+
 - `pandoc` - Markdown 转换
 - `xelatex` - PDF 引擎
 - `curl` - 图表渲染 (Kroki API)
 
 ### 可选
+
 - `mmdc` (mermaid-cli) - Mermaid 本地渲染
 - `/usr/share/plantuml/plantuml.jar` - PlantUML 本地渲染
 
@@ -37,22 +41,11 @@ description: Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动�
 ```bash
 # 转换单个文件
 md2pdf <markdown_file> [output_pdf]
+m2h2pdf <markdown_file> [output_pdf]
 
 # 批量转换
 md2pdf docs/review/*.md
-```
-
-### 示例
-
-```bash
-# 转换单个文件
-md2pdf docs/review/code-review-20260702-001.md
-
-# 指定输出路径
-md2pdf input.md output.pdf
-
-# 批量转换
-md2pdf docs/*.md
+m2h2pdf docs/review/*.md
 ```
 
 ## 图表支持
@@ -142,10 +135,12 @@ app --> DB
 ## 安装脚本
 
 脚本位置: `LinuxEnv/bin/md2pdf`
+脚本位置: `LinuxEnv/bin/m2h2pdf`
 
 确保脚本有执行权限：
 ```bash
 chmod +x LinuxEnv/bin/md2pdf
+chmod +x LinuxEnv/bin/m2h2pdf
 ```
 
 ## 示例对话
@@ -155,6 +150,7 @@ chmod +x LinuxEnv/bin/md2pdf
 **助手**: 
 ```bash
 md2pdf /path/to/document.md
+m2h2pdf /path/to/document.md
 ```
 
 **用户**: "我的文档里有 mermaid 图，能转 pdf 吗？"
@@ -162,5 +158,7 @@ md2pdf /path/to/document.md
 **助手**: 
 ```bash
 md2pdf document.md
+m2h2pdf document.md
 # 自动检测并渲染 mermaid 图表
 ```
+
