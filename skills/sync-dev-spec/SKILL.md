@@ -177,7 +177,7 @@ flowchart TD
 
 重跑时以现有 `AGENTS.md` 章节与规约文档为基线，只更新变化条目并记录变更历史，不推倒重写。
 
-如前次已经执行过一轮，将前次执行的结果移动到 `docs/dev-spec/dev-spec_{YYYYMMDD}_{seq%000}` 下，然后再重新生成
+如前次已经执行过一轮，将前次执行的结果移动到 `docs/dev-spec/dev-spec_{YYYYMMDD}_{seq%000}` 下，然后再重新生成。其中日期为git记录中上次生成日期，如无git，则使用文件创建日期。
 
 ## 异常处理
 

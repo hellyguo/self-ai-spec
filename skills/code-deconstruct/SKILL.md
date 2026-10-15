@@ -232,5 +232,5 @@ docs/deconstruct/
 
 ## 特别事项
 
-如前次已经执行过一轮，将前次执行的结果移动到 `docs/deconstruct/deconstruct_{YYYYMMDD}_{seq%000}` 下，然后再重新生成
+如前次已经执行过一轮，将前次执行的结果移动到 `docs/deconstruct/deconstruct_{YYYYMMDD}_{seq%000}` 下，然后再重新生成。其中日期为git记录中上次生成日期，如无git，则使用文件创建日期。
 
