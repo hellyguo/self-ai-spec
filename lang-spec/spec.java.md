@@ -1076,6 +1076,13 @@ Map<String, String> map = new HashMap<>(expectedSize);
 - 大对象及时释放
 - 使用性能检测工具分析热点
 
+## 计算与分支规范
+
+- 尽量预计算：在程序初始化、类初始化、模块初始化等阶段完成可提前确定的计算，减少运行时计算
+- 循环内不变量：循环体内每次迭代结果不变的表达式，提取到循环外，仅计算一次
+- 整体循环不变量：贯穿整个循环保持不变的量，尽量提取到循环外部，不在循环内计算
+- 分支以正向（肯定）阅读为主，尽量不反向（否定），反向条件增加阅读难度
+
 ## 数据库与兼容性规范
 
 ### SQL 规范
@@ -1253,8 +1260,8 @@ try (InputStream is = new FileInputStream(tempFile)) {
 ## 签名
 
 ---
-**Java编码规范版本**：1.2.0  
-**最后更新**：2025-01-01  
+**Java编码规范版本**：1.3.0  
+**最后更新**：2026-10-16  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.java.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.java.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
