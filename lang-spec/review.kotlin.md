@@ -380,6 +380,7 @@ data class User(val name: String) {
 3. 安全漏洞：SQL 注入、XSS、敏感数据泄露
 4. 并发：共享状态竞争、线程池滥用
 5. 资源泄漏与内存问题
+6. 变量单行多声明（`val a = 1; val b = 2` 等），见 `spec.kotlin.md` 变量声明规范
 
 ### 建议改进（中优先级）
 

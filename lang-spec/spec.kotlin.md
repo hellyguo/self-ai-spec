@@ -26,6 +26,27 @@
 - 顶层函数/扩展函数聚集时，文件使用驼峰命名，如 `stringExt.kt`
 - 包结构与目录结构保持一致，与 Java 互操作的项目沿用 `xxx.xxx.{模块}.{子包}` 层级
 
+### 变量声明规范（高优先级）
+
+- 禁止单行多声明：不得在同一行用分号写多条 `val` / `var` 声明
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 解构声明（`val (a, b) = pair`、`for ((k, v) in map)`）是一次赋值的模式匹配，不视为单行多声明
+
+```kotlin
+// 禁止：同一行多条声明
+val host = "localhost"; val port = 8080
+var retryCount = 0; var timeoutMs = 3000
+
+// 推荐：每个变量单独一行
+val host = "localhost"
+val port = 8080
+var retryCount = 0
+var timeoutMs = 3000
+
+// 允许：解构声明
+val (width, height) = 1920 to 1080
+```
+
 ### 方法大小限制
 
 - 方法过长时应拆分为多个小方法
@@ -600,8 +621,8 @@ fun String.toSnakeCase(): String = ...
 ## 签名
 
 ---
-**Kotlin编码规范版本**：1.0.0  
-**最后更新**：2026-08-12  
+**Kotlin编码规范版本**：1.1.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.kotlin.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.kotlin.md  
 **构建工具**：${AI_SPEC_ROOT}/lang-spec/ci.kotlin.md  

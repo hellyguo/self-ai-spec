@@ -123,6 +123,29 @@ public:
 };
 ```
 
+### 变量声明（高优先级）
+
+- 禁止单行多声明：不得在同一语句中用逗号并列声明多个变量
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 指针与普通变量混写尤其危险：`int* p, q;` 中只有 `p` 是指针，必须拆开
+- `for` 循环的多个循环变量同样拆开，初始化语句提前到循环外
+
+```cpp
+// 禁止：单行多声明，q 不是指针，极易误读
+int* p, q;
+int a = 1, b = 2;
+for (int i = 0, j = 0; i < n; ++i) { }
+
+// 推荐：每个变量单独一行
+int* p = nullptr;
+int q = 0;
+int a = 1;
+int b = 2;
+int i = 0;
+int j = 0;
+for (; i < n; ++i) { }
+```
+
 ## 并发编程
 
 - 使用 `std::thread` 创建线程
@@ -178,8 +201,8 @@ TEST(UserServiceTest, FindUserById) {
 ## 签名
 
 ---
-**C++编码规范版本**：1.3.0  
-**最后更新**：2026-10-16  
+**C++编码规范版本**：1.4.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.cpp.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.cpp.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

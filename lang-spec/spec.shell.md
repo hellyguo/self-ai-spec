@@ -65,6 +65,27 @@ set -euo pipefail  # 强烈推荐：严格的错误处理模式
 
 ## 变量管理规范
 
+### 变量声明（高优先级）
+
+- 禁止单行多声明：不得在同一语句中声明或赋值多个变量
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 环境变量导出同样逐条书写，禁止 `export A=1 B=2` 形式
+
+```bash
+# 禁止：单行多声明
+local host="localhost" port=8080
+export APP_HOST="localhost" APP_PORT=8080
+readonly CONFIG_FILE="/etc/app.conf" LOG_FILE="/var/log/app.log"
+
+# 推荐：每个变量单独一行
+local host="localhost"
+local port=8080
+export APP_HOST="localhost"
+export APP_PORT=8080
+readonly CONFIG_FILE="/etc/app.conf"
+readonly LOG_FILE="/var/log/app.log"
+```
+
 ### 命名约定
 
 ```bash
@@ -720,8 +741,8 @@ trap 'echo "Line $LINENO: $BASH_COMMAND"' DEBUG
 ## 签名
 
 ---
-**Shell编码规范版本**：1.2.0  
-**最后更新**：2025-01-01  
+**Shell编码规范版本**：1.3.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.shell.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.shell.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

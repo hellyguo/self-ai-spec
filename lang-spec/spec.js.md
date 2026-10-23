@@ -114,6 +114,24 @@ var message = '用户 ' + userName + ' 已登录';
 if (status == 'active') { }
 ```
 
+### 变量声明（高优先级）
+
+- 禁止单行多声明：不得在同一语句中用逗号并列声明多个变量
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 循环中的多个迭代变量同样拆开，无法拆开时应改用普通循环并独立声明
+
+```typescript
+// 禁止：单行多声明
+const host = 'localhost', port = 8080;
+let retryCount, timeoutMs;
+
+// 推荐：每个变量单独一行
+const host = 'localhost';
+const port = 8080;
+let retryCount = 0;
+let timeoutMs = 3000;
+```
+
 ## 错误处理
 
 - 使用自定义错误类区分错误类型
@@ -180,8 +198,8 @@ describe('UserService', () => {
 ## 签名
 
 ---
-**JavaScript/TypeScript编码规范版本**：1.2.0  
-**最后更新**：2025-01-01  
+**JavaScript/TypeScript编码规范版本**：1.3.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.js.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.js.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

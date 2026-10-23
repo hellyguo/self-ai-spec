@@ -19,6 +19,29 @@
 - 因自动生成、强耦合状态共享等结构性原因无法拆分时，须在类头注释与审查报告中说明理由
 - 前端 JS 文件同样适用，避免单文件超 3000 行
 
+### 变量声明规范（高优先级）
+
+- 禁止单行多声明：不得在同一语句中用逗号并列声明多个变量
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- `for` 循环的多个循环变量同样拆开，初始化语句提前到循环外
+- 局部变量、字段、常量一律适用；`final` 修饰的常量也必须逐个声明
+
+```java
+// 禁止：单行多声明
+int a = 1, b = 2;
+String name = "x", code = "y";
+for (int i = 0, j = 0; i < n; ++i) { }
+
+// 推荐：每个变量单独一行
+int a = 1;
+int b = 2;
+String name = "x";
+String code = "y";
+int i = 0;
+int j = 0;
+for (; i < n; ++i) { }
+```
+
 ### 方法大小限制
 
 - 方法字节码长度不应超过 325 字节（JVM JIT 编译分界线）
@@ -1304,8 +1327,8 @@ try (InputStream is = new FileInputStream(tempFile)) {
 ## 签名
 
 ---
-**Java编码规范版本**：1.4.0  
-**最后更新**：2026-10-21  
+**Java编码规范版本**：1.5.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.java.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.java.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

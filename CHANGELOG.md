@@ -2,6 +2,19 @@
 
 > 返回目录：[README.md](README.md)
 
+## 2026-10-23
+
+### 全语言新增变量单行多声明禁止规则
+
+- **八种语言编码规范**：新增「变量声明（高优先级）」规则，禁止单行多声明
+  - 禁止在同一语句中用逗号并列声明多个变量，每个变量独占一行
+  - 指针与普通变量混写（`int* p, q;`）必须拆开，避免误读
+  - `for` 循环的多个循环变量拆开或提前初始化
+  - 模式解构（Rust 元组解构、Kotlin 解构声明、Python 元组解包）属于一次赋值的模式匹配，不视为单行多声明
+  - 涉及文件：`lang-spec/spec.js.md`、`spec.cpp.md`、`spec.ansi_c.md`、`spec.rust.md`、`spec.java.md`、`spec.shell.md`、`spec.kotlin.md`、`spec.python.md`
+- **代码审查框架**：`skills/code-review/SKILL.md` 的代码质量规则新增变量声明检查项，标注高优先级，适用于所有语言
+- **审查规则**：`review.java.md`、`review.cpp.md`、`review.ansi_c.md`、`review.kotlin.md` 的「必须修正（高优先级）」清单同步新增单行多声明检查项
+
 ## 2026-10-21
 
 ### Java 编码规范补充扇入与扇出设计规则

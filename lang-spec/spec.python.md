@@ -108,6 +108,27 @@ except:
 - 使用 `black` 或 `autopep8` 格式化代码
 - 使用 `ruff` 或 `flake8` 进行代码检查
 
+### 变量声明（高优先级）
+
+- 禁止单行多声明：不得在同一行用分号写多条赋值语句，禁止链式赋值 `a = b = 0`
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 元组解包（`a, b = 1, 2`、`for k, v in items`）是一次赋值的解构，不视为单行多声明
+
+```python
+# 禁止：单行多声明
+a = 1; b = 2
+x = y = 0
+
+# 推荐：每个变量单独一行
+a = 1
+b = 2
+x = 0
+y = 0
+
+# 允许：元组解包
+width, height = 1920, 1080
+```
+
 ## 日志记录
 
 - 使用 `logging` 模块而非 `print`
@@ -145,8 +166,8 @@ def test_user_name(sample_user):
 ## 签名
 
 ---
-**Python编码规范版本**：1.2.0  
-**最后更新**：2025-01-01  
+**Python编码规范版本**：1.3.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.python.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.python.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

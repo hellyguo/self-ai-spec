@@ -147,6 +147,29 @@ int process_data(const char* input, char* output, size_t output_size) {
 }
 ```
 
+### 变量声明（高优先级）
+
+- 禁止单行多声明：不得在同一语句中用逗号并列声明多个变量
+- 每个变量独占一行，便于单独注释、调试与版本对比
+- 指针与普通变量混写尤其危险：`char* buf, tmp;` 中只有 `buf` 是指针，必须拆开
+- `for` 循环的多个循环变量同样拆开，初始化语句提前到循环外
+
+```c
+/* 禁止：单行多声明，tmp 不是指针，极易误读 */
+char* buf, tmp;
+int a = 1, b = 2;
+for (int i = 0, j = 0; i < n; ++i) { }
+
+/* 推荐：每个变量单独一行 */
+char* buf = NULL;
+char tmp = '\0';
+int a = 1;
+int b = 2;
+int i = 0;
+int j = 0;
+for (; i < n; ++i) { }
+```
+
 ## 函数指针与回调
 
 - 使用函数指针实现多态和回调
@@ -244,8 +267,8 @@ int main() {
 ## 签名
 
 ---
-**ANSI C编码规范版本**：1.3.0  
-**最后更新**：2026-10-16  
+**ANSI C编码规范版本**：1.4.0  
+**最后更新**：2026-10-23  
 **规则文件**：${AI_SPEC_ROOT}/lang-spec/spec.ansi_c.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.ansi_c.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  
