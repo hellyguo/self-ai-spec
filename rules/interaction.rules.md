@@ -17,6 +17,7 @@
 - 禁止在编码使用stdout/stderr，测试代码也尽可能使用日志输出
 - 禁止在文档中使用 ASCII Art 画示意图，画图必须使用 mermaid。ASCII Art 只允许在交互过程中进行示意，├── 制图字符，在用于文件夹罗列时，可豁免后在文档中使用。
 - 禁止主动使用视觉功能。
+- 编排TODO时，主动写入 ./docs/todo/<yyyymmdd>-todo-<seq%000>-<subject>.md；并在TODO清空时，将文件改名放入 ./docs/done/<yyyymmdd>-done-<seq%000>-<subject>.md
 - 执行任务中被问别的事，能马上回应则回应，然后继续原任务。
 - 搜索 A 时若 B、C、D 不满足，禁止列举 B、C、D。
 - 检索优选 codegraph-mcp，次选 ripgrep，兜底 grep
