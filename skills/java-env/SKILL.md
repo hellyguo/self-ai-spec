@@ -69,7 +69,7 @@ java25='JAVA_HOME=$JAVA_HOME25 PATH=$JAVA_HOME25/bin:$NOJAVA_HOME_PATH java'
 | Arthas | `${HOME}/app/arthas` | 运行时诊断与挂载分析 |
 | async-profiler | `${HOME}/app/async-profiler` | CPU/内存采样与火焰图 |
 | aspfit / aspfitn / aspflist | `${HOME}/bin/` | 按 PID/进程名采样、列出支持的采集模式 |
-| jitwatch / jitwatch-ui | `${HOME}/app/jitwatch` | JIT 编译分析；`jitwatch-ui` 为 FX 界面，可按需使用 |
+| jitwatch | `${HOME}/app/jitwatch` | JIT 编译分析 |
 | jarScanMax325 | `${HOME}/bin/jarScanMax325` | 扫描超过 325 字节、无法被 JIT 内联的方法 |
 | hprof-slurp / jhh | `${HOME}/.cargo/bin/` | 堆转储解析，命令行方式，速度快于 GUI |
 

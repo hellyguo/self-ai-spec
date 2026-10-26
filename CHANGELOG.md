@@ -13,7 +13,7 @@
 - **java-coverage 修复**：移除对不存在的 `131-java-testing-unit-testing`、`spring-boot-test` 的委托，改为内联测试要点；补充「适用范围」，明确固化文件工作流定位；`mvn test` 统一为 `mvnd test`
 - **AST 规则去重**：`code-review` 不再维护具体规则，改为指向 `ast-grep-block` 与 `sql-extract`；5 条常用规则移入 `ast-grep-block/templates/recipes.md` 第 11 节
 - **技能来源标注**：`AGENTS.md` 技能表新增「来源」列，区分本仓库、本地未跟踪与外部软链
-- **模板去重**：本机 Java 工具表由 `AGENTS.java.md` 移入 `java-env`，模板只保留指针
+- **模板去重**：本机 Java 工具表由 `AGENTS.java.md` 移入 `java-env`，模板只保留指针；`java-env` 移除不常用的 `jitwatch-ui`
 - **Python 审查规则**：合并 `review.python.md` 中重叠的「代码质量审查规则」与「代码质量与坏味道」，坏味道表作为第 3 小节（1.3.0 -> 1.3.1）
 - **README 更正**：`sync-repo-doc` 更正为 `sync-repo-docs`
 - **spec.java.md 拆分评估**：暂不拆分。并发章节虽长，但拆分需同步 `review.java.md`、`AGENTS.java.md` 与全部引用锚点，收益低于链接失效风险；待出现按需加载诉求时再评估
