@@ -17,7 +17,7 @@ sub_agents:
       checkpoints: ["security", "performance", "maintainability"]
     
   - tester:
-      skill: "java-gen-unittest"
+      skill: "java-coverage"
       model: "claude-3.5"
       coverage_target: 80
 

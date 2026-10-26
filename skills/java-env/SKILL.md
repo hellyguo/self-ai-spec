@@ -58,6 +58,21 @@ java23='JAVA_HOME=$JAVA_HOME23 PATH=$JAVA_HOME23/bin:$NOJAVA_HOME_PATH java'
 java25='JAVA_HOME=$JAVA_HOME25 PATH=$JAVA_HOME25/bin:$NOJAVA_HOME_PATH java'
 ```
 
+## 诊断与分析工具路径
+
+工具路径为机器事实，迁移到其他环境时以实际探测结果为准。
+
+| 工具 | 路径 | 用途 |
+|------|------|------|
+| SpotBugs | `${HOME}/app/spotbugs` | 字节码缺陷扫描 |
+| PMD | `${HOME}/app/pmd` | 源码规范扫描 |
+| Arthas | `${HOME}/app/arthas` | 运行时诊断与挂载分析 |
+| async-profiler | `${HOME}/app/async-profiler` | CPU/内存采样与火焰图 |
+| aspfit / aspfitn / aspflist | `${HOME}/bin/` | 按 PID/进程名采样、列出支持的采集模式 |
+| jitwatch / jitwatch-ui | `${HOME}/app/jitwatch` | JIT 编译分析；`jitwatch-ui` 为 FX 界面，可按需使用 |
+| jarScanMax325 | `${HOME}/bin/jarScanMax325` | 扫描超过 325 字节、无法被 JIT 内联的方法 |
+| hprof-slurp / jhh | `${HOME}/.cargo/bin/` | 堆转储解析，命令行方式，速度快于 GUI |
+
 ## 验证
 
 - `java -version`、`mvnd -version`、`mvn -version` 均可正常输出。

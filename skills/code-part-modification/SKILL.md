@@ -279,7 +279,7 @@ docs/code-part-modification/
 | ------ | ------ |
 | `code-review` | 修改完成后审查代码 |
 | `code-detect-dup` | 检查是否引入重复代码 |
-| `java-gen-unittest` | 自动生成单元测试 |
+| `java-coverage` | 单元测试生成与覆盖率提升 |
 | `sql-extract` | SQL 相关修改点的 SQL 语句抽取 |
 
 ---

@@ -302,3 +302,88 @@ ast-grep-block 是**语法层**门禁，建议与以下工具配合（互补，�
 | clang-tidy | C++ 风格 | 重叠：部分规则可由 ast-grep 替代（CI 更快） |
 
 典型组合：`ast-grep-block (high 阻断) + cppcheck (warning 提示) + Sonar (整体趋势)`。
+
+## 11. 代码审查常用规则（MCP 模式）
+
+以下规则对应 `code-review` 的通用审查清单，适合用 ast-grep-mcp 的 `find_code_by_rule` 交互式抽查；批量门禁仍使用 `run.sh` 的 code-checklist 规则集。
+
+### 11.1 硬编码敏感信息
+
+```text
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: hardcoded-secret
+    language: java
+    rule:
+      pattern: 'String $VAR = "$VAL";'
+    constraints:
+      VAR:
+        regex: '(?i)(password|secret|key|token|api_key|apikey|access_key|private_key)'
+  '''
+)
+```
+
+### 11.2 JDBC Statement 未关闭
+
+```text
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: jdbc-resource-leak
+    language: java
+    rule:
+      pattern: '$TYPE $VAR = $CONN.createStatement()'
+  '''
+)
+```
+
+### 11.3 System.out.println（生产代码）
+
+```text
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: system-out-print
+    language: java
+    rule:
+      any:
+        - pattern: 'System.out.println($$$ARGS)'
+        - pattern: 'System.out.print($$$ARGS)'
+  '''
+)
+```
+
+### 11.4 e.printStackTrace（生产代码）
+
+```text
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: print-stack-trace
+    language: java
+    rule:
+      pattern: '$E.printStackTrace()'
+  '''
+)
+```
+
+### 11.5 空 catch 块
+
+```text
+find_code_by_rule(
+  project_folder: "<project_root>",
+  yaml: '''
+    id: empty-catch
+    language: java
+    rule:
+      pattern: 'catch ($TYPE $VAR) {}'
+  '''
+)
+```
+
+多行空 catch 块（`{` 与 `}` 不在同一行）需用 `find_code(pattern: 'catch ($TYPE $VAR) {')` 辅助定位。
+
+### 11.6 SQL 注入风险
+
+复用 `sql-extract` 的规则，见 `${AI_SPEC_ROOT}/skills/sql-extract/templates/recipes.md`。

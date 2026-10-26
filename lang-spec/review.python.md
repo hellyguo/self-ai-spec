@@ -340,7 +340,7 @@ def func_b():
     return module_a.func_a()
 ```
 
-## 代码质量与坏味道
+### 3. 坏味道速查
 
 | 坏味道 | 检测信号 | 建议 |
 |--------|----------|------|
@@ -363,7 +363,7 @@ def func_b():
 ## 签名
 
 ---
-**Python代码审查规则版本**：1.3.0  
+**Python代码审查规则版本**：1.3.1  
 **最后更新**：2026-10-26  
 **编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.python.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.python.md  

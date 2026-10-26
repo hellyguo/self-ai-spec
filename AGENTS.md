@@ -84,78 +84,78 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 
 ## 可用技能
 
+技能来源：`仓库` 为本仓库维护；`本地` 为本地维护、不纳入版本控制；`外部` 为指向独立仓库的符号链接。
+
 ### 核心分析技能
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `code-review` | 多语言代码审查（Java/Kotlin/Python/C++/Rust/JS/ANSI C）+ 数据库审查 |
-| `code-deconstruct` | 源代码解构为设计文档、ER图（设计层面） |
-| `sync-dev-spec` | 同步设计规约：基于 code-deconstruct 产物提炼开发规约，写入 AGENTS.md 纳入日常开发约束 |
-| `requirement-collect` | 源代码解构为需求文档（需求层面） |
-| `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 |
-| `code-detect-dup` | 代码重复度检测（Simian + JSCPD） |
-| `code-refactor` | 重构方法论 |
-| `code-part-modification` | 局部代码修改：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证 |
-| `full-analysis` | 完整分析流程：设计解构→代码审查→重复检测→问题侦测→定性评估 |
-| `qualitative-assessment` | 系统定性评估：基于全面分析输出，从设计、开发、运维、非功能等维度总结系统性质 |
-| `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 |
-| `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `code-review` | 多语言代码审查（Java/Kotlin/Python/C++/Rust/JS/ANSI C）+ 数据库审查 | 仓库 |
+| `code-deconstruct` | 源代码解构为设计文档、ER图（设计层面） | 仓库 |
+| `sync-dev-spec` | 同步设计规约：基于 code-deconstruct 产物提炼开发规约，写入 AGENTS.md 纳入日常开发约束 | 仓库 |
+| `requirement-collect` | 源代码解构为需求文档（需求层面） | 仓库 |
+| `code-detect-problem` | 项目问题侦测、评分、重构/重建方案 | 仓库 |
+| `code-detect-dup` | 代码重复度检测（Simian + JSCPD） | 仓库 |
+| `code-refactor` | 重构方法论 | 仓库 |
+| `code-part-modification` | 局部代码修改：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证 | 仓库 |
+| `full-analysis` | 完整分析流程：设计解构→代码审查→重复检测→问题侦测→定性评估 | 仓库 |
+| `qualitative-assessment` | 系统定性评估：基于全面分析输出，从设计、开发、运维、非功能等维度总结系统性质 | 仓库 |
+| `long-term-task` | 长任务执行：理解、澄清、计划、连续执行 | 仓库 |
+| `lets-loop` | 持续循环调度框架：循环调度组合技能的通用框架 | 仓库 |
 
 ### 静态分析工具
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） |
-| `cpp-clang-tidy` | Clang-Tidy 静态分析：C/C++ 代码质量检测（基于 Clang AST，支持自动修复） |
-| `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 |
-| `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） |
-| `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 |
-| `java-check-spotbugs` | SpotBugs 静态分析：Java 代码缺陷和安全漏洞检测 |
-| `java-check-pmd` | PMD 静态分析：Java 代码质量、编码规范和安全问题检测 |
-| `ast-grep-block` | 基于 ast-grep 的代码审查门禁：code-checklist 规则集分级扫描 Java/C++/ANSI C，输出 CI 退出码 |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） | 仓库 |
+| `cpp-clang-tidy` | Clang-Tidy 静态分析：C/C++ 代码质量检测（基于 Clang AST，支持自动修复） | 仓库 |
+| `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 | 仓库 |
+| `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） | 仓库 |
+| `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 | 仓库 |
+| `java-check-spotbugs` | SpotBugs 静态分析：Java 代码缺陷和安全漏洞检测 | 仓库 |
+| `java-check-pmd` | PMD 静态分析：Java 代码质量、编码规范和安全问题检测 | 仓库 |
+| `ast-grep-block` | 基于 ast-grep 的代码审查门禁：code-checklist 规则集分级扫描 Java/C++/ANSI C，输出 CI 退出码 | 仓库 |
 
 ### Java 开发工具
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `java-env` | Java 环境信息 |
-| `java-compile` | Java 编译指引 |
-| `java-g2m` | Gradle 转 Maven |
-| `java-gen-unittest` | Java 单元测试生成 |
-| `java-asprof` | Java 性能分析（async-profiler） |
-| `jmh-bench` | JMH 基准测试 |
-| `java-coverage` | Java 测试覆盖率提升策略：80%+ 行覆盖/60%+ 分支覆盖，支持增量/全量测试 |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `java-env` | Java 环境信息 | 仓库 |
+| `java-g2m` | Gradle 转 Maven | 仓库 |
+| `java-asprof` | Java 性能分析（async-profiler） | 仓库 |
+| `jmh-bench` | JMH 基准测试 | 仓库 |
+| `java-coverage` | Java 测试覆盖率提升策略：80%+ 行覆盖/60%+ 分支覆盖，支持增量/全量测试 | 仓库 |
 
 ### 性能与运行时分析
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析 |
-| `rust-flamegraph` | Rust 火焰图：CPU 热点分析、性能瓶颈定位（cargo flamegraph） |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析 | 仓库 |
+| `rust-flamegraph` | Rust 火焰图：CPU 热点分析、性能瓶颈定位（cargo flamegraph） | 仓库 |
 
 ### 文档与图表生成
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） |
-| `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 |
-| `creating-mermaid-diagrams` | Mermaid 图表生成与导出（PNG/SVG/PDF），支持 11+ 图表类型 |
-| `plantuml-skill` | PlantUML 图表生成与导出（Kroki API，无需本地安装） |
-| `drawio-skill` | draw.io 图表生成与导出（本地桌面 CLI） |
-| `excalidraw-diagram` | Excalidraw 手绘风格图表 JSON 生成 |
-| `html-ppt` | HTML 静态演示文稿生成（多风格、多布局、键盘导航） |
-| `ppt-master` | 专业 PPT 设计制作（PptxGenJS + SVG 图表模板） |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） | 本地 |
+| `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 | 仓库 |
+| `creating-mermaid-diagrams` | Mermaid 图表生成与导出（PNG/SVG/PDF），支持 11+ 图表类型 | 外部 |
+| `plantuml-skill` | PlantUML 图表生成与导出（Kroki API，无需本地安装） | 外部 |
+| `drawio-skill` | draw.io 图表生成与导出（本地桌面 CLI） | 外部 |
+| `excalidraw-diagram` | Excalidraw 手绘风格图表 JSON 生成 | 外部 |
+| `html-ppt` | HTML 静态演示文稿生成（多风格、多布局、键盘导航） | 外部 |
+| `ppt-master` | 专业 PPT 设计制作（PptxGenJS + SVG 图表模板） | 外部 |
 
 ### 工程与记忆
 
-| 技能 | 用途 |
-| :--- | :--- |
-| `merge-agents-md` | 合并语言模板到项目 AGENTS.md |
-| `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 |
-| `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
-| `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） |
-| `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 |
-| `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 |
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `merge-agents-md` | 合并语言模板到项目 AGENTS.md | 仓库 |
+| `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 | 仓库 |
+| `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） | 本地 |
+| `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） | 本地 |
+| `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 | 仓库 |
+| `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 | 仓库 |
 
 ## 文件命名约定
 

@@ -21,7 +21,7 @@ phases:
   - execution:
       concurrency: 3
       isolation: "git_worktree"
-      skills: ["code-refactor", "java-gen-unittest"]
+      skills: ["code-refactor", "java-coverage"]
     
   - validation:
       skills: ["code-review", "jmh-bench"]

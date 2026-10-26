@@ -57,15 +57,4 @@
 
 授权读取：${AI_SPEC_ROOT}/lang-spec/ci.java.md
 
-本机既有工具（迁移到其他环境时按需删除或改写路径）：
-
-| 工具 | 路径 | 用途 |
-|------|------|------|
-| SpotBugs | `${HOME}/app/spotbugs` | 字节码缺陷扫描 |
-| PMD | `${HOME}/app/pmd` | 源码规范扫描 |
-| Arthas | `${HOME}/app/arthas` | 运行时诊断与挂载分析 |
-| async-profiler | `${HOME}/app/async-profiler` | CPU/内存采样与火焰图 |
-| aspfit / aspfitn / aspflist | `${HOME}/bin/` | 按 PID/进程名采样、列出支持的采集模式 |
-| jitwatch / jitwatch-ui | `${HOME}/app/jitwatch` | JIT 编译分析；`jitwatch-ui` 为 FX 界面，可按需使用 |
-| jarScanMax325 | `${HOME}/bin/jarScanMax325` | 扫描超过 325 字节、无法被 JIT 内联的方法 |
-| hprof-slurp / jhh | `${HOME}/.cargo/bin/` | 堆转储解析，命令行方式，速度快于 GUI |
+本机 Java 工具链（SpotBugs、PMD、Arthas、async-profiler、jitwatch、堆转储解析等）的路径与用途见 skill `/java-env`，模板不重复维护机器事实。

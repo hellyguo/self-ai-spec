@@ -84,9 +84,7 @@ self-ai-spec/
 | 技能 | 用途 |
 | :--- | :--- |
 | `java-env` | Java 环境信息 |
-| `java-compile` | Java 编译指引 |
 | `java-g2m` | Gradle 转 Maven |
-| `java-gen-unittest` | Java 单元测试生成 |
 | `java-asprof` | Java 性能分析（async-profiler） |
 | `jmh-bench` | JMH 基准测试 |
 | `java-coverage` | Java 测试覆盖率提升策略：80%+ 行覆盖/60%+ 分支覆盖，支持增量/全量测试 |
@@ -120,7 +118,7 @@ self-ai-spec/
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
 | `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） |
 | `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 |
-| `sync-repo-doc` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 |
+| `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 |
 
 ## 语言规范（lang-spec）
 

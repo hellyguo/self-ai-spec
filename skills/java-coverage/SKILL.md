@@ -7,6 +7,10 @@ description: "提升 Java 测试覆盖率至行覆盖 80% 以上或分支覆盖 
 
 **目标**: 将测试覆盖率提升至行覆盖率>80%或分支覆盖率>60%；增量测试只需将测试内容覆盖率提升至目标值。
 
+## 适用范围
+
+本技能面向采用固化文件工作流的项目：以 `MEMORY.md` 记录测试框架与模块信息，以 `docs/test-*.md` 保存模板与缓存。目标项目没有这些文件时，先按 `templates/init-flow.md` 初始化；仅在临时排查时可跳过固化文件，按通用流程执行并在报告中注明。
+
 ## When to Use This Skill
 
 Use this skill when the user:
@@ -25,28 +29,26 @@ Use this skill when the user:
 
 在应用任何单元测试更改之前，确保项目能够编译。如果编译失败，请立即停止——在问题解决之前不要继续。应用改进后，运行完整验证。
 
-## 技能委托
+## 测试编写要点
 
-### 单元测试质量标准
+本技能不依赖外部测试技能，以下要点直接内联执行。
 
-当编写分类 A/B 的单元测试时，委托 `131-java-testing-unit-testing` 技能：
+### 单元测试
 
-- JUnit 5 注解、AssertJ 断言、Given-When-Then 结构
-- 参数化测试（@ValueSource/@CsvSource/@MethodSource）
-- Mockito 模拟（@Mock/@InjectMocks/when/verify）
-- 边界条件（RIGHT-BICEP/CORRECT）、分支覆盖矩阵、循环边界测试
+- 使用 JUnit 5 注解（`@Test`、`@BeforeEach`、`@ParameterizedTest`）、AssertJ 断言，按 Given-When-Then 组织用例
+- 参数化测试使用 `@ValueSource`、`@CsvSource`、`@MethodSource`
+- Mockito 使用 `@Mock`、`@InjectMocks`、`when`、`verify`，只 mock 外部依赖，不 mock 被测类内部实现
+- 边界条件参考 RIGHT-BICEP 与 CORRECT，覆盖空值、非法输入、循环边界与异常路径
 
 ### Spring Boot 集成测试
 
-当遇到需要 Spring 容器的测试场景时，委托 `spring-boot-test` 技能：
-
-- Controller 测试：@WebMvcTest + MockMvc + 认证/权限
-- Service 集成测试：@SpringBootTest + @MockBean + 事务回滚
-- Repository 测试：@DataJpaTest + TestEntityManager
+- Controller：`@WebMvcTest` + MockMvc，覆盖认证与权限分支
+- Service：`@SpringBootTest` + `@MockBean` + 事务回滚
+- Repository：`@DataJpaTest` + `TestEntityManager`
 
 ## 固化数据优先读取
 
-**在执行任何步骤之前，先读取以下固化文件，避免重复探索：**
+**执行任何步骤前，先读取以下固化文件（存在则读，缺失按「适用范围」的初始化规则处理），避免重复探索：**
 
 | 文件 | 用途 |
 | ------ | ------ |
@@ -121,13 +123,26 @@ Use this skill when the user:
 
 #### 3.5 编译执行与错误知识沉淀
 
-在测试文件编写完成后，进入编译执行阶段（`mvn test`）。此阶段遇到的所有编译错误、运行时异常及其修复方案，**必须**记录到错误知识库中。
+在测试文件编写完成后，进入编译执行阶段（`mvnd test`）。此阶段遇到的所有编译错误、运行时异常及其修复方案，**必须**记录到错误知识库中。
 
 **修复前知识库匹配（强制）**：每次遇到编译错误或测试失败后，在动手修复之前，必须先读取 `references/error-guide.md`，用错误信息匹配已有问题。如果匹配到，直接按知识库中的解决方案修复，不需要重新探索。详见 [templates/error-knowledge-record.md](templates/error-knowledge-record.md)。
 
 #### 3.6 HTML 报告生成
 
 从 `docs/html-report-template.md` 获取报告组件和样式，填充动态数据直接生成 HTML。**不生成 MD 格式报告，不经过 MD→HTML 转换步骤**。
+
+## 测试编写流程
+
+1. 遍历目标包下的源文件，梳理类职责、公开方法与依赖。
+2. 以 public 方法为主要目标，识别正常路径、边界条件与异常路径。
+3. 外部依赖使用 Mockito 隔离，保证测试可独立执行；涉及数据库时优先在 test scope 引入 H2。
+4. 生成测试类，命名 `{被测类}Test`，写入 `src/test/java` 对应 package；需要套件时生成 `AllTests` 或沿用项目既有套件。
+5. 执行 `mvnd test` 或 `mvnd test -Dtest=XxxTest` 验证。
+6. 覆盖率报告输出到 `target/site/jacoco/index.html`（已配置 JaCoCo 时）。
+
+**编写原则**：覆盖正常、边界、异常三类路径，不以行数覆盖代替分支覆盖；测试可重复执行、不依赖执行顺序与外部环境；断言聚焦行为与结果；不修改生产代码迁就测试。
+
+**完成标准**：目标类 public 方法均有测试；三类路径均有覆盖；测试可独立重复执行；`mvnd test` 全部通过；覆盖率数据已生成并记录。
 
 ## 核心策略
 
