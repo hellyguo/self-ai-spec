@@ -1,5 +1,7 @@
 # AI Skills 仓库
 
+> 语言：[中文](README.md) | [English](README_en.md)
+
 AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具提供统一的技能定义。
 
 ## 重要前提
@@ -44,7 +46,9 @@ self-ai-spec/
 ├── pi-extensions/      # pi 扩展（memrec 等，符号链接）
 ├── dsh-plugins/        # dsh 插件（memrec 等，符号链接）
 ├── CHANGELOG.md        # 更新历史
-└── README.md
+├── CHANGELOG_en.md     # 更新历史（英文）
+├── README.md
+└── README_en.md        # 项目说明（英文）
 ```
 
 ## 可用技能
@@ -262,3 +266,4 @@ updocid
 - 交互规则与仓库约定：[AGENTS.md](AGENTS.md)、[rules/interaction.rules.md](rules/interaction.rules.md)
 - 代码审查框架设计：[docs/code-review-framework.md](docs/code-review-framework.md)
 - 完整更新历史：[CHANGELOG.md](CHANGELOG.md)
+- English version：[README_en.md](README_en.md) | [CHANGELOG_en.md](CHANGELOG_en.md)

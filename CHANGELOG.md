@@ -1,8 +1,14 @@
 # 更新历史
 
-> 返回目录：[README.md](README.md)
+> 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
 ## 2026-10-26
+
+### 文档双语化
+
+- **新增英文版文档**：`README_en.md`、`CHANGELOG_en.md`，与中文版语义一致
+- **互链补齐**：`README.md` / `README_en.md` 互链，`CHANGELOG.md` / `CHANGELOG_en.md` 互链，双语 README 各自引用同语言 CHANGELOG
+- **MANUAL 决策**：本仓库不设 `MANUAL.md`，使用手册内容由 `README.md` 与 `skills/` 下的技能文档承担
 
 ### 技能与规范收敛
 
