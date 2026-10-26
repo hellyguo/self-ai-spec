@@ -1,9 +1,11 @@
 ---
 name: rust-clippy
-description: "Rust Clippy 静态分析技能：使用 cargo clippy 进行 Rust 代码质量检测，配合 cargo fix 自动修复"
+description: "使用 cargo clippy 对 Rust 代码做静态分析，并通过 cargo fix 自动修复。适用于 Rust 项目规范检查、缺陷与性能问题发现、CI 质量门禁。"
 ---
 
 # Rust Clippy 静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 ## 执行流程
 

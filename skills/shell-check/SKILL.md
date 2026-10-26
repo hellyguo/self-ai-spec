@@ -1,9 +1,11 @@
 ---
 name: shell-check
-description: "ShellCheck静态分析技能：使用ShellCheck进行Shell脚本代码质量分析，检测语法错误、潜在缺陷、代码风格问题"
+description: "使用 ShellCheck 对 Shell 脚本做静态分析，检测语法错误、潜在缺陷与风格问题。适用于 Shell 脚本质量检查、CI 门禁、脚本移植前排查。"
 ---
 
 # ShellCheck Shell脚本静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 ## 工具位置
 

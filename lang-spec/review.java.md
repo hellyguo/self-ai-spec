@@ -1,5 +1,28 @@
 # Java 代码审查规则
 
+## 严重度口径
+
+与 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 统一为三级：
+
+| 级别 | 别名 | 判定标准 | 处理要求 |
+|------|------|----------|----------|
+| P0 | 必须修正 / 高优先级 | 安全漏洞、数据错误、崩溃、资源泄漏、主流程阻塞 | 本次修改必须修复 |
+| P1 | 应当修正 / 中优先级 | 性能隐患、可维护性问题、边界处理缺失 | 下次迭代修复并登记 |
+| P2 | 建议改进 / 低优先级 | 风格、命名、可读性、可选优化 | 选择性修复 |
+
+## 静态分析工具
+
+审查前先执行自动化检查，人工审查聚焦工具无法覆盖的语义问题：
+
+```bash
+mvnd -q spotbugs:check          # 字节码缺陷与安全
+mvnd -q pmd:check               # 规范与坏味道
+mvnd -q checkstyle:check        # 风格
+mvnd -q test                    # 行为验证
+```
+
+补充工具：Error Prone（编译期缺陷）、SonarQube（综合质量门禁）、JFR / async-profiler（运行时性能）。
+
 以下规则来自 SpotBugs 和 PMD 静态分析工具，用于代码审查时识别常见问题模式。
 
 ## 静态分析规则
@@ -630,11 +653,15 @@ System.out.println("API Key: " + apiKey); // 输出到控制台
 2. 注释质量和文档完整性
 3. 测试覆盖和测试质量
 
+## 审查输出
+
+按 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 的报告模板输出，每条问题必须包含：P 级别、文件与行号、问题描述、影响、修复建议、验证方式。
+
 ## 签名
 
 ---
-**Java代码审查规则版本**：1.2.0  
-**最后更新**：2025-01-01  
+**Java代码审查规则版本**：1.3.0  
+**最后更新**：2026-10-26  
 **编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.java.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.java.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

@@ -1,9 +1,11 @@
 ---
 name: java-check-spotbugs
-description: "SpotBugs静态分析技能：使用SpotBugs、Find Security Bugs、fb-contrib进行Java代码缺陷和安全分析"
+description: "使用 SpotBugs（含 Find Security Bugs、fb-contrib）对 Java 字节码做缺陷与安全分析。适用于 Java 项目缺陷排查、安全审计、CI 集成。"
 ---
 
 # SpotBugs Java静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 ## 版本兼容性
 

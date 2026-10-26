@@ -1,9 +1,11 @@
 ---
 name: cpp-tscancode
-description: "TscanCode静态分析技能：使用TscanCode（腾讯开源）进行C/C++代码质量分析，检测缺陷、安全漏洞和代码风格问题"
+description: "使用 TscanCode（腾讯开源）对 C/C++ 代码做静态分析，检测缺陷、安全漏洞与风格问题。适用于 C/C++ 项目快速缺陷扫描、安全审计、CI 集成。"
 ---
 
 # TscanCode C/C++静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 ## 工具位置
 

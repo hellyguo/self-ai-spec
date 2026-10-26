@@ -6,7 +6,7 @@
 2. 不使用行尾注释
 3. 静态不可变变量名使用大写
 4. 静态可变变量名使用小写
-5. 类设计遵循单一职责原则，一个大类应拆分为多个职责明确的小类
+5. 类型与模块设计遵循单一职责原则，大型结构体或模块应拆分为职责明确的小单元
 6. 优先使用组合而非继承
 
 ## 命名约定
@@ -135,11 +135,11 @@ let data = Arc::new(RwLock::new(vec![]));
 /// assert_eq!(result, 5);
 /// ```
 ///
-/// # Panics
+/// # Errors
 ///
-/// 当结果溢出时会 panic.
-pub fn add(a: i32, b: i32) -> i32 {
-    a.checked_add(b).expect("溢出")
+/// 当结果溢出时返回 `AddOverflow`.
+pub fn add(a: i32, b: i32) -> Result<i32, AddError> {
+    a.checked_add(b).ok_or(AddError::AddOverflow)
 }
 ```
 

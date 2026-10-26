@@ -1,9 +1,11 @@
 ---
 name: sql-extract
-description: "SQL抽取技能：从C++/Java/XML源代码中抽取内嵌SQL语句，优先使用ast-grep-mcp(AST精准匹配+constraints正则约束)，CLI管道为兜底方案，识别SQL拼接点，输出文件清单"
+description: "从 Java/C++/XML 源码中抽取内嵌 SQL，优先使用 ast-grep-mcp 精准匹配，CLI 管道兜底，并识别 SQL 拼接点。适用于 SQL 审计、SQL 注入排查、数据库依赖梳理。"
 ---
 
 # SQL 抽取技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 从源代码中**精准抽取**内嵌 SQL 语句，识别 SQL 拼接点，输出位置清单与统计。
 
@@ -57,7 +59,7 @@ ast-grep --version && jq --version && rg --version | head -1
 
 先识别项目结构，明确：
 
-- 源代码根目录（如 `QES3/src`、`qes3_client/qes-biz`）
+- 源代码根目录（如 `<project_root>/src`、`<project_root>/<module>/src`）
 - 构建产物目录（`build/`、`target/`、`out/`）→ **必须排除**
 - 测试目录（`gtest/`、`src/test/`）→ 按需排除
 - 第三方/二方库（`third_party/`、`lib/`）→ 按需排除

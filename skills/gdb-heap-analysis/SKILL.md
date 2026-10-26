@@ -1,10 +1,9 @@
 ---
 name: gdb-heap-analysis
-description: GDB heap/arena memory analysis for core dump debugging. Use when analyzing glibc ptmalloc memory leaks, high memory usage, or arena corruption in core dumps.
-Triggers: (1) user asks about memory leak analysis, (2) core dump memory investigation, (3) arena/subheap/malloc_state analysis, (4) glibc heap debugging, (5) questions about malloc internals, (6) "heap分析", "内存泄漏", "arena分析", "core dump分析".
+description: "使用 GDB 分析 core dump 中的 glibc ptmalloc 堆与 arena，定位内存泄漏、内存占用异常与堆损坏。触发场景：内存泄漏分析、core dump 排查、arena 与 malloc_state 分析、glibc 堆调试、malloc 内部结构问题。"
 ---
 
-# GDB Heap Memory Analysis
+# GDB 堆内存分析（glibc ptmalloc）
 
 Analyze glibc ptmalloc heap structures in core dumps. Human judgment required at each decision point.
 

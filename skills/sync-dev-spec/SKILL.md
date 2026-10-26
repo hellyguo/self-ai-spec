@@ -1,9 +1,11 @@
 ---
 name: sync-dev-spec
-description: "同步设计规约技能：检查 code-deconstruct 产物完整性（缺失则先执行 code-deconstruct），将描述性设计文档提炼为规范性开发规约，对不一致与未决点向用户裁决，写入 AGENTS.md 纳入日常开发约束"
+description: "基于 code-deconstruct 产物提炼规范性开发规约，对不一致与未决点向用户裁决，写入 AGENTS.md 与设计章程。适用于把设计文档沉淀为可执行开发约束、规约增量同步。"
 ---
 
 # sync-dev-spec - 设计规约同步
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 <HARD-GATE>
 **强制约束：规约必须源于代码事实**

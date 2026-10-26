@@ -63,3 +63,12 @@ dependencies {
 
 - 依赖版本统一集中在 `gradle/libs.versions.toml`（Version Catalog）管理
 - 避免散落硬编码版本号
+
+## 签名
+
+---
+**Kotlin构建工具说明版本**：1.1.0  
+**最后更新**：2026-10-26  
+**编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.kotlin.md  
+**审查规则**：${AI_SPEC_ROOT}/lang-spec/review.kotlin.md  
+**关联环境**：${AI_SPEC_ROOT}/skills/java-env/SKILL.md

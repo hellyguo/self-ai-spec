@@ -1,9 +1,9 @@
 ---
 name: md2pdf
-description: Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染。触发场景：(1)用户需要将 Markdown 转换为 PDF，(2)用户提到 "md2pdf"、"m2h2pdf"、""markdown to pdf"，(3)用户需要生成包含图表的 PDF 文档，(4)用户需要导出文档为 PDF 格式。
+description: "将 Markdown 转换为 PDF，自动渲染 Mermaid 与 PlantUML 图表。触发场景：Markdown 转 PDF、导出带图表的 PDF 文档、md2pdf、m2h2pdf、markdown to pdf。"
 ---
 
-# Markdown to PDF Converter
+# Markdown 转 PDF
 
 将 Markdown 文件转换为 PDF，支持 Mermaid 和 PlantUML 图表自动渲染。
 
@@ -161,4 +161,3 @@ md2pdf document.md
 m2h2pdf document.md
 # 自动检测并渲染 mermaid 图表
 ```
-

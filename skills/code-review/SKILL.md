@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "代码审查框架：通用审查流程 + 语言特定规则引用，支持多语言代码审查"
+description: "多语言代码审查框架：通用审查流程加语言特定规则，输出分级问题清单与报告。适用于代码审查、提交前自检、质量评估、安全与性能专项检查。"
 ---
 
 # 代码审查框架
@@ -21,17 +21,17 @@ description: "代码审查框架：通用审查流程 + 语言特定规则引用
 
 ### 直接源码文件
 
-| 语言       | 文件类型                      | 规范文件          |
-|------------|-------------------------------|-------------------|
-| Java       | `*.java`                      | `spec.java.md`    |
-| Python     | `*.py`                        | `spec.python.md`  |
-| C++        | `*.cpp *.hpp *.cxx *.hxx *.h` | `spec.cpp.md`     |
-| Rust       | `*.rs`                        | `spec.rust.md`    |
-| Kotlin     | `*.kt *.kts`                  | `spec.kotlin.md`  |
-| ANSI C     | `*.c *.h`                     | `spec.ansi_c.md`  |
-| JavaScript | `*.js *.mjs *.cjs`            | `spec.js.md`      |
-| TypeScript | `*.ts *.tsx *.mts *.cts`      | `spec.js.md`      |
-| Shell      | `*.sh *.bash *.zsh`           | `spec.shell.md`   |
+| 语言       | 文件类型                      | 编码规范          | 审查规则             |
+|------------|-------------------------------|-------------------|----------------------|
+| Java       | `*.java`                      | `spec.java.md`    | `review.java.md`     |
+| Python     | `*.py`                        | `spec.python.md`  | `review.python.md`   |
+| C++        | `*.cpp *.hpp *.cxx *.hxx *.h` | `spec.cpp.md`     | `review.cpp.md`      |
+| Rust       | `*.rs`                        | `spec.rust.md`    | `review.rust.md`     |
+| Kotlin     | `*.kt *.kts`                  | `spec.kotlin.md`  | `review.kotlin.md`   |
+| ANSI C     | `*.c *.h`                     | `spec.ansi_c.md`  | `review.ansi_c.md`   |
+| JavaScript | `*.js *.mjs *.cjs`            | `spec.js.md`      | `review.js.md`       |
+| TypeScript | `*.ts *.tsx *.mts *.cts`      | `spec.js.md`      | `review.js.md`       |
+| Shell      | `*.sh *.bash *.zsh`           | `spec.shell.md`   | `review.shell.md`    |
 
 **加载指令**：
 
@@ -69,6 +69,22 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 3. **代码遍历**：遍历所有源代码文件，理解代码结构和意图
 4. **执行审查**：应用通用规则 + 语言特定规则，记录问题和建议
 5. **生成报告**：汇总结果，输出审查报告
+
+## 严重度分级
+
+所有语言审查规则、报告模板统一使用以下三级口径，语言文件中的等价表述按此映射：
+
+| 级别 | 别名 | 判定标准 | 处理要求 |
+|------|------|----------|----------|
+| P0 | 严重 / 必须修正 / 高优先级 | 安全漏洞、数据错误、崩溃、资源泄漏、主流程阻塞 | 本次修改必须修复 |
+| P1 | 警告 / 应当修正 / 中优先级 | 性能隐患、可维护性问题、边界处理缺失 | 下次迭代修复并登记 |
+| P2 | 建议 / 建议改进 / 低优先级 | 风格、命名、可读性、可选优化 | 选择性修复 |
+
+判定原则：
+
+1. 同一问题命中多个级别时取最高级。
+2. 严重度只由问题影响决定，不由修复难度决定。
+3. 报告必须给出级别，模糊表述（如"建议关注"）不允许作为级别。
 
 ## 通用审查规则
 
@@ -122,6 +138,8 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 ## 审查输出
 
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
+
 ### 文件命名规范
 
 ```text
@@ -140,7 +158,7 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 
 ### 单语言项目
 
-1. 加载语言规则：`Read ${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md`
+1. 加载语言规则：`Read ${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md` 与 `Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md`
 2. 应用通用框架（安全/性能/代码质量审查）
 3. 应用语言特定规则（语法/最佳实践/并发模式）
 4. 生成报告：`docs/review/code-review-{yyyymmdd}-{seq%000}.md`
@@ -191,7 +209,7 @@ find_code_by_rule(
 )
 ```
 
-**SQL 注入风险**：复用 `sql-extract` 技能的 rule，参见 `sql-extract/templates/recipes.md`。
+**SQL 注入风险**：复用 `sql-extract` 技能的 rule，参见 `${AI_SPEC_ROOT}/skills/sql-extract/templates/recipes.md`。
 
 ### 性能规则
 

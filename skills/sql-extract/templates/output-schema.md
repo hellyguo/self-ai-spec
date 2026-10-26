@@ -109,8 +109,8 @@ String sql = "SELECT * FROM user WHERE id = " + userId;
 唯一文件数: 226
 
 ===== 文件分布 Top 10 =====
-    107 QES3/src/pos/checkiosvr/MainAction.cpp
-     96 QES3/src/pos/psmansvr/DealAction.cpp
+    107 src/pos/checkiosvr/MainAction.cpp
+     96 src/pos/psmansvr/DealAction.cpp
      ...
 ```
 

@@ -1,9 +1,11 @@
 ---
 name: java-check-pmd
-description: "PMD静态分析技能：使用PMD进行Java代码质量分析，检测代码坏味道、编码规范和安全问题"
+description: "使用 PMD 对 Java 代码做静态分析，检测代码坏味道、编码规范与安全问题。适用于 Java 项目规范检查、CI 质量门禁、代码评审辅助。"
 ---
 
 # PMD Java静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 PMD（Programming Mistake Detector）检测Java代码中的编码规范违规、代码坏味道、潜在缺陷和安全漏洞。
 

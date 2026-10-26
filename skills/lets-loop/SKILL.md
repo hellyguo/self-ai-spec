@@ -1,9 +1,11 @@
 ---
 name: lets-loop
-description: "Loop Engineering 循环调度框架：企业Agent落地的第四层工程进化，支持20种循环设计模式、四层工程治理、自主持续改进"
+description: "Loop Engineering 循环调度框架：以循环设计模式、四层工程治理和自主改进机制编排持续型 Agent 任务。适用于需要反复迭代、持续监控或长期自治执行的工程任务。"
 ---
 
 # Let's Loop - Loop Engineering 循环调度框架
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 > 企业Agent落地的第四层工程进化：从提示词工程到循环工程，构建部署后每天都变得更好的系统
 
@@ -16,7 +18,7 @@ description: "Loop Engineering 循环调度框架：企业Agent落地的第四�
 | L1 | Prompt Engineering | 说清楚任务 | CoT、Few-shot、结构化模板 | 信息孤岛、无记忆、人肉触发 |
 | L2 | Context Engineering | 提供背景信息 | RAG、MCP协议、Message History | 模型手不受控、错误不自愈 |
 | L3 | Harness Engineering | 验证正确性 | AGENTS.md、Sensors、Enforcement | 依赖人触发收尾、无跨session记忆 |
-| L4 | Loop Engineering ⭐ | 持续迭代改进 | Automations、Worktrees、Skills、Sub-agents、State | — |
+| L4 | Loop Engineering | 持续迭代改进 | Automations、Worktrees、Skills、Sub-agents、State | — |
 
 嵌套关系：L4 ⊃ L3 ⊃ L2 ⊃ L1
 
@@ -31,7 +33,9 @@ description: "Loop Engineering 循环调度框架：企业Agent落地的第四�
 | Sub-agents | 子Agent制衡 | Maker-Checker分离 |
 | State | 外部状态存储 | 迭代计数、错误/成功记忆、模式库 |
 
-## 20种循环设计模式
+## 循环设计模式
+
+以下为常用模式，按类别编号；项目可按实际需要扩展，新增模式须说明触发条件、终止条件与成本上限。
 
 ### 类别1：质量改进
 
@@ -71,7 +75,7 @@ description: "Loop Engineering 循环调度框架：企业Agent落地的第四�
 
 ## 企业级Loop模板
 
-详见 `templates/` 子目录：
+> 本文件中的 `templates/` 指本技能目录下的 `templates/` 子目录。
 
 - `code-review-loop.yaml` — 代码审查自动化Loop
 - `tech-debt-loop.yaml` — 技术债务管理Loop
@@ -92,8 +96,8 @@ description: "Loop Engineering 循环调度框架：企业Agent落地的第四�
 
 两个人可以搭建完全相同的Loop，得到完全相反的结果。一个人用它加速自己深刻理解的工作，另一个人用它逃避理解工作本身。
 
-- ✅ 工程师：用Loop处理理解深刻的重复性工作，保持code walkthroughs，审查重大决策，把Loop当放大器
-- ❌ 逃避者：用Loop处理不理解的新领域，停止审查输出，盲目信任决策，把Loop当外包团队
+- 工程师：用Loop处理理解深刻的重复性工作，保持code walkthroughs，审查重大决策，把Loop当放大器
+- 逃避者：用Loop处理不理解的新领域，停止审查输出，盲目信任决策，把Loop当外包团队
 
 ---
 

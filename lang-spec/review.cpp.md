@@ -1,5 +1,26 @@
 # C++ 代码审查规则
 
+## 严重度口径
+
+与 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 统一为三级：
+
+| 级别 | 别名 | 判定标准 | 处理要求 |
+|------|------|----------|----------|
+| P0 | 必须修正 / 高优先级 | 安全漏洞、数据错误、崩溃、资源泄漏、主流程阻塞 | 本次修改必须修复 |
+| P1 | 应当修正 / 中优先级 | 性能隐患、可维护性问题、边界处理缺失 | 下次迭代修复并登记 |
+| P2 | 建议改进 / 低优先级 | 风格、命名、可读性、可选优化 | 选择性修复 |
+
+## 静态分析工具
+
+审查前先执行自动化检查，人工审查聚焦工具无法覆盖的语义问题：
+
+```bash
+cppcheck --enable=warning,style,performance,portability --inconclusive --std=c++17 src/
+clang-tidy -checks='clang-analyzer-*,bugprone-*,cert-*,modernize-*' src/*.cpp -- -std=c++17
+```
+
+补充工具：TscanCode（快速缺陷扫描）、编译器 `-Wall -Wextra -Werror`、`valgrind` / `AddressSanitizer`（运行时内存问题）。
+
 ## 企业级项目专项审查
 
 基于企业级C++项目常见问题，扩展以下专项检查点，适用于代码审查和设计文档生成：
@@ -485,11 +506,15 @@ C++代码审查还应参考以下通用规则：
 2. 代码格式优化
 3. 注释补充完善
 
+## 审查输出
+
+按 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 的报告模板输出，每条问题必须包含：P 级别、文件与行号、问题描述、影响、修复建议、验证方式。C/C++ 项目额外附上静态分析命令与退出码。
+
 ## 签名
 
 ---
-**C++代码审查规则版本**：1.2.0  
-**最后更新**：2025-01-01  
+**C++代码审查规则版本**：1.3.0  
+**最后更新**：2026-10-26  
 **编码规范**：${AI_SPEC_ROOT}/lang-spec/spec.cpp.md  
 **审查规则**：${AI_SPEC_ROOT}/lang-spec/review.cpp.md  
 **关联通用规则**：${AI_SPEC_ROOT}/skills/code-review/SKILL.md  

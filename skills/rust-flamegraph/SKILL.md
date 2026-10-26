@@ -1,6 +1,6 @@
 ---
 name: rust-flamegraph
-description: Rust 性能分析技能：通过 cargo flamegraph 生成火焰图(SVG)，定位 CPU 热点函数并量化占比。适用于 Rust 项目性能瓶颈定位、热点分析、优化验证。触发场景：(1)分析 Rust 代码性能瓶颈，(2)定位 CPU 热点函数，(3)量化函数调用占比，(4)优化前后对比验证，(5)bench/unittest 性能不达预期时根因分析。
+description: "使用 cargo flamegraph 生成火焰图并定位 Rust 程序 CPU 热点。触发场景：Rust 性能瓶颈定位、CPU 热点分析、函数耗时占比量化、优化前后对比、基准或测试性能不达预期。"
 ---
 
 # Rust Flamegraph 性能分析

@@ -1,6 +1,6 @@
 ---
 name: jmh-bench
-description: "该skill没有执行文件，为操作指引：运行JMH基准测试的标准流程"
+description: "使用 JMH 编写并运行 Java 基准测试，输出可信的性能数据。适用于微基准测试、性能回归对比、优化效果验证。"
 ---
 
 # JMH 基准测试执行指南
@@ -237,4 +237,3 @@ MyBenchmark.testMethod           thrpt    5  123456.789 ± 5000  ops/s
 4. **State 隔离** - 使用 `@State(Scope.Thread)` 避免线程竞争
 5. **单线程对比** - 多框架对比时先用 `-t 1` 消除并发因素
 6. **单方法申明批量** - 对单方法内部执行大量批量操作的，使用 `@OperationsPerInvocation` 注解申明
-

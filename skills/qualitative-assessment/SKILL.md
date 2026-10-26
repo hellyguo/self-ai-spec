@@ -1,6 +1,6 @@
 ---
 name: qualitative-assessment
-description: "系统定性评估：基于全面分析输出，从设计、开发、运维、非功能等维度总结系统性质，识别系统作用领域，提供尖锐深刻总结"
+description: "基于全面分析结果，从设计、开发、运维、非功能等维度对系统做定性评估，识别系统作用领域并给出结论性判断。适用于项目终评、技术方案评审、系统性质总结。"
 ---
 
 # 系统定性评估技能
@@ -88,11 +88,20 @@ find docs/ -name "*.md" -type f | grep -E "(deconstruct|review|dup|problem)" | s
 ### 步骤1：收集分析结果
 
 ```bash
+# 设计解构：docs/deconstruct/ 下的设计文档与图
+deconstruct_file=$(find docs/deconstruct -name "global_design.md" | sort -r | head -1)
+
+# 代码审查：docs/review/code-review-{yyyymmdd}-{seq}-{lang}.md
 review_file=$(find docs/review -name "code-review-*.md" | sort -r | head -1)
-deconstruct_file=$(find docs/deconstruct -name "deconstruct-*.md" | sort -r | head -1)
-dup_file=$(find docs/dup -name "dup-*.md" | sort -r | head -1)
-problem_file=$(find docs/problem -name "problem-*.md" | sort -r | head -1)
+
+# 重复检测：docs/dup/dup-{yyyymmdd}-{seq}.txt 或 jscpd HTML 报告目录
+dup_file=$(find docs/dup -maxdepth 2 -type f | sort -r | head -1)
+
+# 问题侦测：docs/detect/detect-{yyyymmdd}-{seq}.md
+problem_file=$(find docs/detect -name "detect-*.md" | sort -r | head -1)
 ```
+
+四个输入缺一不可；缺失时先执行对应技能，不得凭印象补写结论。
 
 ### 步骤2：维度评分（1-5分）
 
@@ -102,7 +111,13 @@ problem_file=$(find docs/problem -name "problem-*.md" | sort -r | head -1)
 | 开发 | 高度可扩展，完整插件体系 | 部分模块化，部分硬编码 | 完全拷贝再开发，高度重复 |
 | 运维 | 全自动化，完整CI/CD/监控 | 半自动化，关键步骤自动化 | 全人工，无自动化 |
 
-非功能属性分别评分：健壮性、可维护性、性能。
+非功能属性分别按 1-5 分评估：
+
+| 维度 | 5分 | 3分 | 1分 |
+| --- | --- | --- | --- |
+| 健壮性 | 异常处理完整，有降级与恢复策略 | 关键路径有异常处理，边界覆盖不全 | 异常吞没或未处理，故障即中断 |
+| 可维护性 | 模块清晰、文档完整、测试充分 | 结构基本清晰，文档或测试有缺口 | 结构混乱、无文档、几乎无测试 |
+| 性能 | 有容量规划与基准数据，无明显热点 | 满足当前负载，缺少量化数据 | 存在明显瓶颈或资源泄漏 |
 
 ### 步骤3：领域识别和匹配度判断
 
@@ -116,6 +131,8 @@ problem_file=$(find docs/problem -name "problem-*.md" | sort -r | head -1)
 **语言风格**：客观（基于事实）、如实（不回避问题）、深刻（看到本质）、尖锐（直指要害但建设性）
 
 ## 输出格式
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 - **文件命名**：`docs/assessment/qualitative-assessment-{yyyymmdd}-{seq%000}.md`
 - **报告模板**：`templates/assessment-report.md`

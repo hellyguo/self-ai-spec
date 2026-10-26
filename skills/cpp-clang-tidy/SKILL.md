@@ -1,9 +1,11 @@
 ---
 name: cpp-clang-tidy
-description: "Clang-Tidy 静态分析技能：使用 clang-tidy 进行 C/C++ 代码质量检测，支持自定义检查规则和自动修复"
+description: "使用 clang-tidy 基于 Clang AST 对 C/C++ 代码做静态分析，支持规则筛选与自动修复。适用于 C/C++ 项目规范检查、现代化改造、编译期缺陷发现。"
 ---
 
 # Clang-Tidy C/C++ 静态分析技能
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 ## 工具位置
 

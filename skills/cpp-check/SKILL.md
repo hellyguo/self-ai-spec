@@ -1,6 +1,6 @@
 ---
 name: cpp-check
-description: "Cppcheck静态分析技能：使用Cppcheck进行C/C++代码质量分析，检测缺陷、未定义行为、安全漏洞和代码风格问题"
+description: "使用 Cppcheck 对 C/C++ 代码做静态分析，检测缺陷、未定义行为、安全漏洞与风格问题。适用于 C/C++ 项目静态检查、CI 质量门禁、缺陷排查。"
 ---
 
 # Cppcheck C/C++静态分析技能

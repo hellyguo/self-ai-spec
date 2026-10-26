@@ -1,13 +1,16 @@
 ---
 name: ast-grep-block
-description: "基于 ast-grep 的代码审查门禁：使用 code-checklist 规则集对 Java/C++/ANSI C 项目分级扫描（high/medium/low），输出命中清单与 CI 退出码。仅使用 CLI 模式（run.sh），适用于交互式审查、CI 质量门禁、批量检测"
+description: "基于 ast-grep 与 code-checklist 规则库，对 Java/C++/ANSI C 项目执行分级（high/medium/low）AST 静态审查，输出命中清单与 CI 退出码。适用于提交/合并前质量门禁、CI 流水线静态检查、审查前自动化预检、存量问题盘点。"
 ---
 
 # ast-grep-block 代码审查门禁技能
 
-用 [code-checklist](https://github.com/) 规则集对源代码项目进行**分级 AST 静态审查**，输出命中清单与 CI 退出码。
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
-适用场景：
+用 `code-checklist` 规则集对源代码项目进行**分级 AST 静态审查**，输出命中清单与 CI 退出码。
+
+## 适用场景
+
 - 提交/合并前的质量门禁（high 命中则阻断）
 - 代码审查前的自动化预检（全级别扫描登记问题）
 - 重构前的存量问题盘点（按级别/类别统计）
@@ -71,7 +74,7 @@ done
 
 先识别项目结构，明确：
 
-- 源代码根目录（如 `src/main/java`、`src/`、`QES3/src`）
+- 源代码根目录（如 `src/main/java`、`src/`、`<module>/src`）
 - 构建产物目录（`build/`、`target/`、`out/`、`cmake-build-*/`）→ **必须排除**
 - 第三方/二方库（`third_party/`、`vendor/`、`lib/`）→ 按需排除
 - 测试目录（`src/test/`、`gtest/`）→ 按需排除
@@ -229,7 +232,7 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 | JSON 报告 | `run.sh --lang java --all --path . --json > r.json` |
 | 仅看 high 命中文件 | `jq -r 'select(.level=="high")\|.file' r.json \| sort -u` |
 | 规则分布 Top N | `jq -r '.ruleId' r.json \| sort \| uniq -c \| sort -rn \| head` |
-| 校验规则库 | `"$CODE_CHECKLIST_ROOT/scripts/validate-meta.sh && "$CODE_CHECKLIST_ROOT/scripts/validate-examples.sh"` |
+| 校验规则库 | `"$CODE_CHECKLIST_ROOT/scripts/validate-meta.sh" && "$CODE_CHECKLIST_ROOT/scripts/validate-examples.sh"` |
 
 ## 输出位置
 

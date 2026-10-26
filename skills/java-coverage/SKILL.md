@@ -1,10 +1,9 @@
 ---
 name: java-coverage
-description: Strategies and patterns to boost test coverage to 80%+ line or 60%+ branch coverage. Includes integration testing, MockMvc, and coverage optimization techniques.
-origin: Custom
+description: "提升 Java 测试覆盖率至行覆盖 80% 以上或分支覆盖 60% 以上，包含集成测试、MockMvc 与覆盖率优化策略。适用于覆盖率不达标、补充测试、生成覆盖率报告的场景。"
 ---
 
-# Coverage Booster Skill
+# Java 测试覆盖率提升
 
 **目标**: 将测试覆盖率提升至行覆盖率>80%或分支覆盖率>60%；增量测试只需将测试内容覆盖率提升至目标值。
 

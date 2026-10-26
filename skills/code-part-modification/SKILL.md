@@ -1,11 +1,13 @@
 ---
 name: code-part-modification
-description: "局部代码修改技能：最小化修改完成功能，确保无蝴蝶效应，支持独立测试验证和全量关联检查"
+description: "以最小改动完成缺陷修复或功能变更，通过影响分析、自愈验证与全量关联检查避免蝴蝶效应。适用于局部代码修改、Bug 修复、小功能增量等需要控制影响面的场景。"
 ---
 
 # 局部代码修改技能（code-part-modification）
 
 ## 核心原则
+
+> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
 
 - **最小化修改**：只修改完成目标功能所需的最小代码范围，避免"顺手优化"
 - **无蝴蝶效应**：确保修改不影响其他功能，不引入隐性依赖，不破坏现有契约
@@ -57,7 +59,7 @@ digraph code_part {
 - **功能修改**：修改前行为、修改后行为、兼容性要求
 - **功能封闭**：关闭范围、保留功能、清理范围
 
-输出：`templates/requirement.md`
+使用模板 `templates/requirement.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/requirement.md`。
 
 ### 1.2 定位修改点
 
@@ -102,7 +104,7 @@ find_code(pattern: '$OBJ.fieldName', language: java, project_folder: "<dir>")
 | UI界面 | 界面显示哪些字段？ | 前端代码分析 |
 | 配置 | 依赖哪些配置项？ | 配置文件分析 |
 
-输出：`templates/impact-analysis.md`
+使用模板 `templates/impact-analysis.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/impact-analysis.md`。
 
 ---
 
@@ -116,7 +118,7 @@ find_code(pattern: '$OBJ.fieldName', language: java, project_folder: "<dir>")
 | 合适   | 有明确的验证器       | "修改订单状态字段校验逻辑"   |
 | 太小   | 验证成本高于修改成本 | "修改变量名"                 |
 
-输出：`templates/tasks.md`
+使用模板 `templates/tasks.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/tasks.md`。
 
 ---
 
@@ -147,7 +149,7 @@ digraph test_strategy {
 | 提取类   | 依赖复杂无法直接测试   | 提取纯逻辑类，无外部依赖       |
 | 复制修改 | 无法隔离的代码         | 复制一份修改，原代码保持不变   |
 
-输出：`templates/test-cases.md`
+使用模板 `templates/test-cases.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/test-cases.md`。
 
 ---
 
@@ -160,7 +162,7 @@ digraph test_strategy {
 | 保持兼容 | 不破坏现有接口 | 修改返回值结构 |
 | 可回滚 | 修改可独立回滚 | 多功能耦合修改 |
 
-输出：`templates/changes.md`
+使用模板 `templates/changes.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/changes.md`。
 
 ---
 
@@ -184,7 +186,7 @@ digraph test_strategy {
 | 4-5次 | 重新评估方案，可能需要人工介入 |
 | >5次 | 停止，记录问题，请求人工帮助 |
 
-输出：`templates/verification.log.md`
+使用模板 `templates/verification.log.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/verification.log`。
 
 ---
 
@@ -235,13 +237,13 @@ find_code_by_rule(
 )
 ```
 
-输出：`templates/association-checklist.md`、`templates/butterfly-check.md`
+使用模板 `templates/association-checklist.md` 与 `templates/butterfly-check.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/`。
 
 ---
 
 ## Phase 7: 输出文档
 
-输出：`templates/report.md`
+使用模板 `templates/report.md`，产物写入 `docs/code-part-modification/task-{yyyymmdd}-{seq}/report.md`。
 
 ### 文件结构
 

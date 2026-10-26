@@ -115,7 +115,7 @@ constraints:
 
 ### 陷阱 1：结果为 0 行（.gitignore 排除子目录）
 
-**现象**：项目根的 `.gitignore` 排除了所有子模块目录（`QES3`、`qes3_client` 等），fd/rg 默认返回 0 文件，ast-grep 默认也尊重 `.gitignore`。
+**现象**：项目根的 `.gitignore` 排除了所有子模块目录（如 `service-a`、`service-b`），fd/rg 默认返回 0 文件，ast-grep 默认也尊重 `.gitignore`。
 
 **复现**：
 ```bash
