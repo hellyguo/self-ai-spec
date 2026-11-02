@@ -5,6 +5,7 @@
 - 所有交互均使用简体中文，所有输出都不得带 Emoji，以显正式；正式文档均以中文输出；git提交应使用英文，必要时添加中文。
 - 每次交互的第一步，都是先检索 memrec-mcp，并在输出后随时、持续使用 memrec-mcp 记录核心观点、关键节点、重要内容(plan、design等)
 - 每次产出最后一步，确认是否需要更新 MEMORY.md + 记录 memrec-mcp；如产出文件后，均执行 git 提交
+- 启用思考时，也使用简体中文
 - git 仅以当前 `user.name` 提交，绝不推送到远端
 - git 提交均遵循约定式提交规范（Conventional Commits）执行
 - 版本管理忽略 MEMORY.md，写入 .gitignore，不提交到 git
