@@ -2,6 +2,17 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-04
+
+### 技能边界融通
+
+- **`lets-loop` 与 `long-term-task` 分工明确**：前者负责循环系统设计（L1-L4 模型、循环模式、配置模板），后者负责单次长任务执行协议（澄清、计划确认、连续执行、完成总结）
+  - `lets-loop` 新增「适用边界：框架设计 vs 任务执行」一节，给出场景路由表，并指定执行期可选用模式 4（Reflexion）与模式 7（计划→执行→重新规划）
+  - `long-term-task` 新增「与 lets-loop 的关系」一节，声明两者边界与模式借用方式，明确不改变 HARD-GATE、计划确认门与 TODO 记录要求
+  - 两个技能的 `description` 互指，便于技能路由时区分触发场景
+- **索引同步**：`AGENTS.md`、`README.md`、`README_en.md` 的技能表描述改为边界化表述
+- **错误引用修正**：`skills/code-review/SKILL.md` 的「与其他技能集成」表删除错误的 `lets-loop` 行；`lang-spec/review.java.md` 的 AI 生成代码性能陷阱不再指向 `lets-loop`，改为内联审查要求
+
 ## 2026-10-26
 
 ### 文档双语化

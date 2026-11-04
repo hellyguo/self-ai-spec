@@ -1,6 +1,6 @@
 ---
 name: lets-loop
-description: "Loop Engineering 循环调度框架：以循环设计模式、四层工程治理和自主改进机制编排持续型 Agent 任务。适用于需要反复迭代、持续监控或长期自治执行的工程任务。"
+description: "Loop Engineering 循环调度框架：以循环设计模式、四层工程治理和自主改进机制编排持续型 Agent 任务。适用于设计自动化触发、多 Agent 制衡、预算控制的循环系统；单次长任务的澄清与连续执行协议见 long-term-task。"
 ---
 
 # Let's Loop - Loop Engineering 循环调度框架
@@ -32,6 +32,18 @@ description: "Loop Engineering 循环调度框架：以循环设计模式、四�
 | Plugins/Connectors | 插件连接器 | Jira、Slack等MCP集成 |
 | Sub-agents | 子Agent制衡 | Maker-Checker分离 |
 | State | 外部状态存储 | 迭代计数、错误/成功记忆、模式库 |
+
+## 适用边界：框架设计 vs 任务执行
+
+`lets-loop` 只回答"循环系统如何设计"，不负责"一个任务如何从头做到尾"。后者由 `long-term-task` 承载，两者互补而非替代，不得互相顶替。
+
+| 场景 | 使用技能 | 原因 |
+| :--- | :--- | :--- |
+| 设计自动化心跳、多 Agent 制衡、预算与状态存储 | `lets-loop` | 提供 L1-L4 模型、循环模式与配置模板 |
+| 执行一次跨多步骤的分析、重构或迁移任务 | `long-term-task` | 提供澄清、计划确认、连续执行与完成总结协议 |
+| 两者同时需要 | 先由 `long-term-task` 立项，再用本框架设计外循环 | 执行协议保证单次任务跑完，框架保证跨任务持续改进 |
+
+`long-term-task` 在执行期可择用的本框架模式：模式 4（Reflexion，失败后分析假设并存储教训）、模式 7（计划→执行→重新规划）。模式 11（元循环）属于跨任务优化，需在多次长任务运行后由本框架评估，不在单次执行中启用。
 
 ## 循环设计模式
 

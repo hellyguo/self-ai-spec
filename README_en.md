@@ -69,8 +69,8 @@ self-ai-spec/
 | `code-part-modification` | Local code modification: complete features with minimal changes, avoid butterfly effects, support standalone test verification |
 | `full-analysis` | Full analysis pipeline: design deconstruction → code review → duplication detection → problem detection → qualitative assessment |
 | `qualitative-assessment` | System qualitative assessment: summarize system properties across design, development, operations, and non-functional dimensions based on full analysis output |
-| `long-term-task` | Long-running tasks: understand, clarify, plan, and execute continuously |
-| `lets-loop` | Continuous loop scheduling framework: a general framework for composing skills in loops |
+| `long-term-task` | Single long-task execution protocol: understand, clarify, confirm plan, execute continuously, summarize (for loop-system design see `lets-loop`) |
+| `lets-loop` | Loop-system design framework: L1-L4 model, loop patterns, and configuration templates (for single-task execution see `long-term-task`) |
 
 ### Static Analysis Tools
 

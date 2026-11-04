@@ -2,6 +2,24 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-04
+
+### Skill Boundary Alignment
+
+- **Clear division between `lets-loop` and `long-term-task`**: the former designs loop systems (L1-L4 model, loop
+  patterns, configuration templates), while the latter defines the execution protocol for a single long task
+  (clarification, plan confirmation, continuous execution, completion summary)
+  - `lets-loop` gained a "Scope: framework design vs task execution" section with a scenario routing table, and
+    designates patterns 4 (Reflexion) and 7 (plan → execute → replan) for use during execution
+  - `long-term-task` gained a "Relationship with lets-loop" section defining the boundary and how patterns are borrowed,
+    without changing the HARD-GATE, plan confirmation gate, or TODO recording requirements
+  - Both skill `description` fields now cross-reference each other so skill routing can distinguish their triggers
+- **Index synchronization**: skill table descriptions in `AGENTS.md`, `README.md`, and `README_en.md` updated to the
+  boundary-aware wording
+- **Wrong reference fixes**: removed the incorrect `lets-loop` row from the "Integration with other skills" table in
+  `skills/code-review/SKILL.md`; the AI-generated-code performance pitfall in `lang-spec/review.java.md` no longer
+  points to `lets-loop` and now states the review requirement inline
+
 ## 2026-10-26
 
 ### Documentation Bilingualization

@@ -205,7 +205,6 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 
 | 技能                 | 用途             |
 |----------------------|------------------|
-| `lets-loop`          | 循环性能专项审查 |
 | `code-detect-dup`    | 重复代码专项检测 |
 | `code-detect-problem`| 项目层面问题检测 |
 | `sql-extract`        | SQL 注入风险点抽取（ast-grep-mcp 联动） |
