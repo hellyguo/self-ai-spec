@@ -163,5 +163,5 @@ digraph detect_problem {
 
 ```bash
 git add docs/
-git commit -m "docs: 项目侦测报告 {yyyymmdd}-{seq}"
+git commit -m "docs: project detection report {yyyymmdd}-{seq}"
 ```

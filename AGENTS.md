@@ -18,7 +18,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 授权读取：${AI_SPEC_ROOT}/rules/interaction.rules.md
 
-- 所有交互均使用简体中文，所有输出都不得带 Emoji，以显正式
+- 所有LLM交互均使用简体中文，所有LLM输出都不得带 Emoji，以显正式；正式文档均以中文输出，除非明确要求英文文档；git 提交应使用英文，必要时添加中文
 - 每次交互的第一步，都是先检索 memrec-mcp，并在输出后随时、持续使用 memrec-mcp 记录核心观点、关键节点、重要内容（plan、design 等）
 - 每次产出最后一步，确认是否需要更新 MEMORY.md + 记录 memrec-mcp；如产出文件后，均执行 git 提交
 - git 仅以当前 `user.name` 提交，不推送到远端

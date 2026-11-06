@@ -146,7 +146,7 @@ digraph long_task {
 
 ```bash
 git add .
-git commit -m "feat: 完成xxx任务"
+git commit -m "feat: complete <task summary>"
 ```
 
 ## 异常处理

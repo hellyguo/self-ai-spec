@@ -126,5 +126,5 @@ Write ./AGENTS.md
 
 ```bash
 git add AGENTS.md
-git commit -m "docs: 更新 AGENTS.md 合并 {lang} 模板"
+git commit -m "docs: update AGENTS.md merged from {lang} template"
 ```
