@@ -11,6 +11,7 @@ preflight:
   build_command: "<项目构建命令>"
   test_command: "<项目测试命令>"
   baseline_scan: "python3 scripts/dup_clusters.py --root . --min-lines 80"
+  pattern_scan: "python3 scripts/pattern_scan.py --root . --min-cases 8"
 
 budget:
   max_rounds: 5
@@ -26,8 +27,10 @@ phases:
   - select:
       scoring: "lines * copies * safety * testability"
       allowed_classes: ["A", "B", "F"]
+      structural_classes: ["S", "P"]
       blocked_classes: ["C", "D", "E", "G", "H"]
       one_target_per_round: true
+      structural_requires_equivalence: true
 
   - execute:
       skills: ["code-part-modification", "code-refactor", "java-coverage"]
@@ -45,6 +48,7 @@ phases:
         - "tests_pass"
         - "no_api_break"
         - "no_semantic_change"
+        - "equivalence_pass_if_structural"
       on_failure: "revert_and_record"
 
   - review:
