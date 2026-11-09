@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "project": "",
+  "cycleId": "",
+  "branch": "quality-loop/<cycle-id>",
+  "startedAt": "",
+  "baseline": {
+    "head": "",
+    "duplicateClusters": 0,
+    "duplicateRate": 0.0,
+    "testClasses": 0,
+    "buildSeconds": 0
+  },
+  "budget": {
+    "maxRounds": 5,
+    "maxFilesPerRound": 80,
+    "maxMinutesPerRound": 30,
+    "maxTokensPerCycle": 0
+  },
+  "current": {
+    "round": 0,
+    "status": "idle",
+    "target": "",
+    "targetClass": "",
+    "commit": ""
+  },
+  "metrics": {
+    "roundsCompleted": 0,
+    "roundsFailed": 0,
+    "clustersRemoved": 0,
+    "netLinesRemoved": 0,
+    "testsAdded": 0,
+    "regressions": 0
+  },
+  "stopLine": {
+    "consecutiveBuildFailures": 0,
+    "consecutiveTestFailures": 0,
+    "blocked": false,
+    "blockedReason": ""
+  }
+}

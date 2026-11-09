@@ -62,6 +62,18 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 对于多语言项目，按文件类型加载不同规则。
 
+### 4. 结构视角审查（可选，按需加载）
+
+用于"新增一个模式/分支之后、接手存量代码、重构前评估"这类场景，按
+`templates/structure-lens.md` 执行，关注两件事：
+
+- **高内聚低耦合**：职责枚举、规模阈值、单例穿透、依赖方向、分支散落；
+- **少动态判断、多提前固化**：模式分支、路由/枚举匹配、反射查找、字符串键、
+  默认值、每请求重算——凡是启动后不再变化的输入，都应前移到装配期。
+
+默认不全量启用：它比通用审查更费上下文，也更容易滑向过度抽象；
+边界与反模式见该模板第四节。
+
 ## 审查流程
 
 1. **项目分析**：识别技术栈、主要语言、项目结构
@@ -161,7 +173,8 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 1. 加载语言规则：`Read ${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md` 与 `Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md`
 2. 应用通用框架（安全/性能/代码质量审查）
 3. 应用语言特定规则（语法/最佳实践/并发模式）
-4. 生成报告：`docs/review/code-review-{yyyymmdd}-{seq%000}.md`
+4. 如采用结构视角：追加 `Read ${AI_SPEC_ROOT}/skills/code-review/templates/structure-lens.md`
+5. 生成报告：`docs/review/code-review-{yyyymmdd}-{seq%000}.md`
 
 ### 多语言项目
 
@@ -186,6 +199,7 @@ docs/review/code-review-{yyyymmdd}-{seq%000}-{lang}.md
 - **规则设计**：语言规则聚焦特有内容，通用规则放框架
 - **审查效率**：优先严重问题，批量处理相同模式
 - **报告质量**：问题定位到文件路径:行号，区分严重等级
+- **结构视角**：按需加载，报告需给出"改前/改后在何处判断"，只有建议没有定位视为无效结论
 
 ## AST 自动审查
 
