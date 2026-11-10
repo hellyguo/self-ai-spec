@@ -25,6 +25,7 @@
 - 搜索 A 时若 B、C、D 不满足，禁止列举 B、C、D。
 - 检索优选 codegraph-mcp，次选 ripgrep，兜底 grep
 - 本机为 linux，且配备了更高效的工具，倾向使用这些工具
+- 不允许访问 ~/.ssh 文件夹
 
     - fd[find]
     - rg[grep]
