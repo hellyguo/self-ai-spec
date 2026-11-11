@@ -2,6 +2,17 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-11
+
+### 技能来源更正与文档同步
+
+- **自维护技能标注**：`memrec`、`multype2txt` 的 `SKILL.md` 实为软链接，指向本人独立维护的仓库，此前在 `AGENTS.md` 中误标为「本地」
+  - `AGENTS.md` 技能来源新增 `外部（自维护）` 分类，并列出两个技能的 GitHub / Gitee 仓库地址
+  - `README.md`、`README_en.md` 的「技能目录的来源形态」拆分为四类：本仓库维护、软链到自维护仓库、
+    软链到第三方仓库、本地未发布；新增「自维护技能仓库」地址表
+  - `semble-search` 仍归类为本地维护、不发布
+- **文档同步**：按 `sync-repo-docs` 规划复核三份文档的命名与互链，MANUAL 维持既有「不设」决策
+
 ## 2026-11-04
 
 ### 技能边界融通

@@ -2,6 +2,20 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-11
+
+### Skill Origin Correction and Documentation Sync
+
+- **Self-maintained skill labeling**: the `SKILL.md` files of `memrec` and `multype2txt` are symbolic links to
+  repositories maintained independently by the author; `AGENTS.md` previously labeled them as "local"
+  - `AGENTS.md` adds an `External (self-maintained)` origin category and lists the GitHub / Gitee URLs of both skills
+  - The "Origins of Skills" sections of `README.md` and `README_en.md` are split into four forms: maintained in this
+    repository, symlinked to self-maintained repositories, symlinked to third-party repositories, and local-only; a
+    "Self-maintained Skill Repositories" table is added
+  - `semble-search` is still classified as locally maintained and unpublished
+- **Documentation sync**: reviewed the naming and cross-links of the three document types per the `sync-repo-docs`
+  plan; the existing decision to omit MANUAL stands
+
 ## 2026-11-04
 
 ### Skill Boundary Alignment

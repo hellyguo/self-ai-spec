@@ -242,13 +242,24 @@ updocid
 
 ### 技能目录的来源形态
 
-`skills/` 下的技能并非全部纳入本仓库版本管理，存在三种形态：
+`skills/` 下的技能并非全部纳入本仓库版本管理，存在四种形态：
 
 - **本仓库维护**：目录与 `SKILL.md` 直接跟踪（如 `code-review`、`java-env`、`vbox-test-env`）。
-- **符号链接到外部仓库**：图表与演示类技能指向独立仓库
+- **符号链接到自维护仓库**：`memrec`、`multype2txt` 的 `SKILL.md` 软链接到本人独立维护的仓库（地址见下表），
+  本仓库只保留软链接入口与索引说明，软链接已在 `skills/.gitignore` 中忽略。
+- **符号链接到第三方仓库**：图表与演示类技能指向独立仓库
   （`creating-mermaid-diagrams`、`drawio-skill`、`excalidraw-diagram`、`html-ppt`、`plantuml-skill`、`ppt-master`），
   已在 `skills/.gitignore` 中忽略。
-- **本地维护、不纳入版本控制**：`memrec`、`multype2txt`、`semble-search` 等，本仓库仅保留占位与说明，实现由本地或外部来源提供。
+- **本地维护、不纳入版本控制**：`semble-search` 等，仅存在于本机，不发布到公共仓库。
+
+### 自维护技能仓库
+
+以下技能的实现在独立仓库中维护，本仓库通过软链接引入 `SKILL.md`：
+
+| 技能 | GitHub | Gitee |
+| :--- | :--- | :--- |
+| `memrec` | [itcraft-cn/memrec](https://github.com/itcraft-cn/memrec) | [itcraft-cn/memrec](https://gitee.com/itcraft-cn/memrec) |
+| `multype2txt` | [itcraft-cn/multype2txt](https://github.com/itcraft-cn/multype2txt) | [itcraft-cn/multype2txt](https://gitee.com/itcraft-cn/multype2txt) |
 
 > 注：`.system` 为工具生成的运行态目录，同样被忽略。
 

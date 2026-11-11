@@ -84,7 +84,14 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 
 ## 可用技能
 
-技能来源：`仓库` 为本仓库维护；`本地` 为本地维护、不纳入版本控制；`外部` 为指向独立仓库的符号链接。
+技能来源：`仓库` 为本仓库维护；`本地` 为本地维护、不纳入版本控制；`外部` 为指向第三方独立仓库的符号链接；`外部（自维护）` 为指向本人独立维护仓库的符号链接，仓库地址见下表。
+
+自维护技能仓库（`SKILL.md` 以软链接方式引入，不纳入本仓库版本控制）：
+
+| 技能 | GitHub | Gitee |
+| :--- | :--- | :--- |
+| `memrec` | [itcraft-cn/memrec](https://github.com/itcraft-cn/memrec) | [itcraft-cn/memrec](https://gitee.com/itcraft-cn/memrec) |
+| `multype2txt` | [itcraft-cn/multype2txt](https://github.com/itcraft-cn/multype2txt) | [itcraft-cn/multype2txt](https://gitee.com/itcraft-cn/multype2txt) |
 
 ### 核心分析技能
 
@@ -137,7 +144,7 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 
 | 技能 | 用途 | 来源 |
 | :--- | :--- | :--- |
-| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） | 本地 |
+| `multype2txt` | Office/PDF 文档转纯文本：本地二进制转换，零 token 消耗（doc/docx/ppt/pptx/xls/xlsx/pdf） | 外部（自维护） |
 | `md2pdf` | Markdown 转 PDF 工具，支持 Mermaid 和 PlantUML 图表自动渲染 | 仓库 |
 | `creating-mermaid-diagrams` | Mermaid 图表生成与导出（PNG/SVG/PDF），支持 11+ 图表类型 | 外部 |
 | `plantuml-skill` | PlantUML 图表生成与导出（Kroki API，无需本地安装） | 外部 |
@@ -152,7 +159,7 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 | :--- | :--- | :--- |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md | 仓库 |
 | `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 | 仓库 |
-| `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） | 本地 |
+| `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） | 外部（自维护） |
 | `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） | 本地 |
 | `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 | 仓库 |
 | `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 | 仓库 |
