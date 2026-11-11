@@ -132,12 +132,13 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 | `java-asprof` | Java 性能分析（async-profiler） | 仓库 |
 | `jmh-bench` | JMH 基准测试 | 仓库 |
 | `java-coverage` | Java 测试覆盖率提升策略：80%+ 行覆盖/60%+ 分支覆盖，支持增量/全量测试 | 仓库 |
+| `java-quality-loop` | Java 质量防腐循环：扫描→排序→选靶→重构→验证→审查→单轮提交，周期性治理存量技术债 | 仓库 |
 
 ### 性能与运行时分析
 
 | 技能 | 用途 | 来源 |
 | :--- | :--- | :--- |
-| `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析 | 仓库 |
+| `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析，含 mmap 统计与大 core 扫描 | 仓库 |
 | `rust-flamegraph` | Rust 火焰图：CPU 热点分析、性能瓶颈定位（cargo flamegraph） | 仓库 |
 
 ### 文档与图表生成

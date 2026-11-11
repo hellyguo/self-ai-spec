@@ -4,6 +4,24 @@
 
 ## 2026-11-11
 
+### gdb-heap-analysis 扩展：大 core 取证与 mmap 统计
+
+- **新增 mmap 统计（Step 4.5）**：`IS_MMAPPED` 分配独立于 arena、不计入 `system_mem`，此前属于统计盲区；
+  新增 `scripts/mmap_scan.c`，解析 `PT_LOAD` 与 `NT_FILE`，输出文件/匿名映射计数、匿名映射大小分桶、
+  疑似 `IS_MMAPPED` chunk 与非 chunk 大块 ANON，`min_size` 默认 128KB
+- **新增大 core 直接扫描（Step 6）**：`references/large-core-chunk-scan.md` 给出 >4GB / 百万级 chunk 的
+  文件级扫描方法论，含 `p_offset` 与 `p_vaddr` 不同余、chunk 链遍历、尺寸指纹分桶、内容聚类、
+  可达性判定、零页与 RSS 对照
+- **新增脚本**：`heap_scan.c`（arena 链统计，含最后一块越界保护、`bad>0` 告警、`memcpy` 未对齐读）、
+  `scan_zero_pages.c`（零页统计）、`arena_walk.py`（按 glibc 版本遍历 arena）
+- **跨架构页大小修正**：页大小优先读 core 的 `NT_AUXV`（`AT_PAGESZ`），不再使用宿主 `sysconf`；
+  修复 x86 宿主分析 aarch64 64KB 页 core 时页数与 MiB 全错的问题
+- **可移植性与边界**：修正 glibc 2.28 aarch64 偏移（`top=0x60`、`next=0x870`、`system_mem=0x888`）；
+  新增 `references/scope-and-limits.md`，界定 glibc ptmalloc、非 glibc 分配器、JVM 堆/Metaspace 与
+  Netty 各分配路径的可见性；新增 `templates/leak-profile-output.md`
+- **清洗**：移除技能内的项目特征（产品名、core 文件名、具体地址、业务字段与实测数字），改为占位符；
+  删除无用的 `agents/openai.yaml`
+
 ### 技能来源更正与文档同步
 
 - **自维护技能标注**：`memrec`、`multype2txt` 的 `SKILL.md` 实为软链接，指向本人独立维护的仓库，此前在 `AGENTS.md` 中误标为「本地」
@@ -11,7 +29,54 @@
   - `README.md`、`README_en.md` 的「技能目录的来源形态」拆分为四类：本仓库维护、软链到自维护仓库、
     软链到第三方仓库、本地未发布；新增「自维护技能仓库」地址表
   - `semble-search` 仍归类为本地维护、不发布
-- **文档同步**：按 `sync-repo-docs` 规划复核三份文档的命名与互链，MANUAL 维持既有「不设」决策
+- **索引补齐**：`AGENTS.md`、`README.md`、`README_en.md` 补入 `java-quality-loop`，并把 `gdb-heap-analysis`
+  描述扩展为「含 IS_MMAPPED/mmap 统计与大 core 扫描」
+- **文档同步**：按 `sync-repo-docs` 规划复核三份文档的命名与互链，MANUAL 维持既有「不设」决策；
+  补记 2026-11-05 至 2026-11-11 期间遗漏的技能与规则变更
+
+## 2026-11-10
+
+### 交互规则补充
+
+- **禁止访问 `~/.ssh`**：`rules/interaction.rules.md` 明确代理不得访问 `~/.ssh` 目录
+
+## 2026-11-09
+
+### java-quality-loop 技能新增
+
+- **新增 `java-quality-loop`**：面向 Maven/Gradle 多模块 Java 项目的执行型循环 SOP，基本轮次为
+  `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`，强调可回滚、可验证
+- **治理边界**：显式声明本技能是持续减压环节，不能替代测试体系、CI 门禁、架构治理、可观测性与安全治理；
+  成功标准是持续降低腐化增量，而非重复率或复杂度归零
+- **重构参考与脚本**：新增重复、复杂度、结构分派三类重构指南，以及 `dup_clusters.py`、`pattern_scan.py`、
+  `complexity_scan.py` 三个扫描脚本；配套 backlog、round-report、metrics、decision-record、
+  cycle-summary、state.json、loop-config.yaml 等模板
+- **`code-review` 结构透镜**：新增 `templates/structure-lens.md`，把结构分派、相似范式与复杂度信号
+  纳入审查视角
+
+## 2026-11-06
+
+### 交互规则语言口径收敛
+
+- **按输出类型分口径**：LLM 交互与输出统一简体中文且不带 Emoji；正式文档用中文，除非明确要求英文；
+  git 提交用英文，必要时附中文
+- **删除 thinking 语言条款**：隐藏推理语言不可强制执行也无法验证，条款只增加噪音，予以移除
+- **同步位置**：`AGENTS.md` 内联副本与 `code-detect-problem`、`long-term-task`、`merge-agents-md`
+  三个技能的提交示例同步为新口径
+
+## 2026-11-05
+
+### requirement-collect 强化根本需求提炼
+
+- **根本需求优先（强制）**：技术实现只是参考实现，不是需求本身；每条需求先写根本需求，再写参考技术实现，
+  最后给代码证据，禁止用「系统做了 X」代替「系统必须保证 Y」
+- **模板与检查清单**：模块、业务规则、全局需求三个模板同步增加根本需求与参考实现说明，
+  完整性检查清单新增「根本需求」产出项
+- **中性表达**：清洗模板中的行业业务词汇（如价源、报价、定价），改为通用中性表述
+
+### 交互规则新增嵌套深度上限
+
+- **最大嵌套深度**：从行首算起等效 Tab 长度达到 6 个 Tab 时，该处代码必须优化或重构，不允许继续加深嵌套
 
 ## 2026-11-04
 

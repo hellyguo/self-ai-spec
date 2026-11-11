@@ -4,6 +4,26 @@
 
 ## 2026-11-11
 
+### gdb-heap-analysis: Large-Core Forensics and Mmap Accounting
+
+- **Mmap accounting (Step 4.5)**: `IS_MMAPPED` allocations sit outside the arena chain and are not counted in
+  `system_mem`, so they were previously a blind spot. New `scripts/mmap_scan.c` parses `PT_LOAD` and `NT_FILE` and
+  reports file/anonymous mapping counts, anonymous size buckets, suspected `IS_MMAPPED` chunks, and large non-chunk
+  ANON mappings; `min_size` defaults to 128KB
+- **Large-core direct scanning (Step 6)**: `references/large-core-chunk-scan.md` documents file-level scanning for
+  cores over 4GB or with millions of chunks, covering the `p_offset` vs `p_vaddr` mismatch, chunk-chain traversal,
+  size-fingerprint bucketing, content clustering, reachability judgement, and zero-page/RSS comparison
+- **New scripts**: `heap_scan.c` (arena chain statistics with last-chunk bounds protection, `bad>0` warnings, and
+  `memcpy` unaligned reads), `scan_zero_pages.c` (zero-page statistics), `arena_walk.py` (arena traversal by glibc
+  version)
+- **Cross-architecture page size fix**: page size is now read from the core's `NT_AUXV` (`AT_PAGESZ`) instead of the
+  host `sysconf`; this fixes wrong page counts and MiB totals when an x86 host analyses an aarch64 core with 64KB pages
+- **Portability and scope**: corrected glibc 2.28 aarch64 offsets (`top=0x60`, `next=0x870`, `system_mem=0x888`);
+  added `references/scope-and-limits.md` defining visibility across glibc ptmalloc, non-glibc allocators, JVM
+  heap/Metaspace, and Netty allocation paths; added `templates/leak-profile-output.md`
+- **Sanitization**: removed project-specific traits from the skill (product names, core file names, concrete
+  addresses, business fields, measured numbers) in favour of placeholders; deleted the unused `agents/openai.yaml`
+
 ### Skill Origin Correction and Documentation Sync
 
 - **Self-maintained skill labeling**: the `SKILL.md` files of `memrec` and `multype2txt` are symbolic links to
@@ -13,8 +33,61 @@
     repository, symlinked to self-maintained repositories, symlinked to third-party repositories, and local-only; a
     "Self-maintained Skill Repositories" table is added
   - `semble-search` is still classified as locally maintained and unpublished
+- **Index completion**: `AGENTS.md`, `README.md`, and `README_en.md` now list `java-quality-loop`, and the
+  `gdb-heap-analysis` description now covers IS_MMAPPED/mmap accounting and large-core scanning
 - **Documentation sync**: reviewed the naming and cross-links of the three document types per the `sync-repo-docs`
-  plan; the existing decision to omit MANUAL stands
+  plan; the existing decision to omit MANUAL stands; changes between 2026-11-05 and 2026-11-11 that were missing from
+  the changelog are recorded here
+
+## 2026-11-10
+
+### Interaction Rule Addition
+
+- **No access to `~/.ssh`**: `rules/interaction.rules.md` now states that agents must not access the `~/.ssh` directory
+
+## 2026-11-09
+
+### New java-quality-loop Skill
+
+- **New `java-quality-loop`**: an execution-oriented loop SOP for multi-module Maven/Gradle Java projects; each round
+  runs `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`, with rollback and
+  verification as hard requirements
+- **Governance boundary**: states explicitly that the skill is a continuous pressure-relief stage and cannot replace
+  testing, CI gates, architecture governance, observability, or security governance; success means continuously
+  reducing decay increment, not driving duplication or complexity to zero
+- **Refactoring references and scripts**: adds duplication, complexity, and structural-dispatch refactoring guides plus
+  three scanners (`dup_clusters.py`, `pattern_scan.py`, `complexity_scan.py`), with backlog, round-report, metrics,
+  decision-record, cycle-summary, state.json, and loop-config.yaml templates
+- **`code-review` structure lens**: adds `templates/structure-lens.md` so structural dispatch, similar paradigms, and
+  complexity signals become review viewpoints
+
+## 2026-11-06
+
+### Interaction Language Rules Scoped by Output Type
+
+- **Rules scoped per output type**: LLM interaction and output use Simplified Chinese without Emoji; formal documents
+  use Chinese unless English is explicitly requested; git commits use English with Chinese when necessary
+- **Thinking-language clause removed**: the language of hidden reasoning cannot be enforced or verified, so the clause
+  only added noise
+- **Synchronized locations**: the inline copy in `AGENTS.md` and the commit examples of `code-detect-problem`,
+  `long-term-task`, and `merge-agents-md` now follow the clarified rule
+
+## 2026-11-05
+
+### requirement-collect: Root Requirements First
+
+- **Root requirements first (mandatory)**: technical implementation is a reference implementation, not the
+  requirement itself; each requirement states the root requirement, then the reference implementation, then the code
+  evidence, and "the system does X" may not replace "the system must guarantee Y"
+- **Templates and checklist**: the module, business-rule, and global-requirement templates now explain root
+  requirements and reference implementations, and the completeness checklist gains a "root requirement" output
+- **Neutral wording**: industry-specific terms in templates (such as price source, quote, pricing) were replaced with
+  neutral wording
+
+### Interaction Rule: Maximum Nesting Depth
+
+- **Maximum nesting depth**: from the start of a line, code reaching the equivalent of 6 tabs must be optimized or
+  refactored, and nesting may not deepen further
 
 ## 2026-11-04
 

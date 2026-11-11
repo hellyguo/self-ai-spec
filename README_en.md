@@ -94,12 +94,13 @@ self-ai-spec/
 | `java-asprof` | Java performance analysis (async-profiler) |
 | `jmh-bench` | JMH benchmarks |
 | `java-coverage` | Java test coverage improvement strategy: 80%+ line coverage / 60%+ branch coverage, supports incremental and full test runs |
+| `java-quality-loop` | Java quality anti-decay loop: scan → rank → select target → refactor → verify → review → single-round commit, periodically paying down legacy technical debt |
 
 ### Performance and Runtime Analysis
 
 | Skill | Purpose |
 | :--- | :--- |
-| `gdb-heap-analysis` | GDB heap analysis: glibc ptmalloc memory leak/arena analysis in core dumps |
+| `gdb-heap-analysis` | GDB heap analysis: glibc ptmalloc memory leak/arena analysis in core dumps, including mmap accounting and large-core scanning |
 | `rust-flamegraph` | Rust flame graphs: CPU hotspot analysis and bottleneck localization (cargo flamegraph) |
 
 ### Document and Diagram Generation
