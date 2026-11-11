@@ -64,8 +64,8 @@ struct heap_info {
     struct malloc_state *ar_ptr;  // Arena this subheap belongs to
     struct heap_info *prev;       // Previous subheap in chain
     size_t size;                  // Size of this subheap
-    size_t mstate;                // Reserved
-    // Padding to 32 bytes...
+    size_t mprotect_size;         // mprotect'd size (glibc 2.30+ adds pagesize)
+    // Padding to 32 bytes (pre-2.30)...
 };
 ```
 
