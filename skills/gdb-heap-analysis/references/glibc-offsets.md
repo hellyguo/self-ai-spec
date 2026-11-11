@@ -86,7 +86,7 @@ p &((struct malloc_state *)0)->top
 1. 以上均为 **64-bit LP64**；aarch64 与 x86_64 相同（指针 8B、int 4B）。32 位系统偏移不同。
 2. `bins` 是 254 个 `mchunkptr`（`bins[0]` 为 unsorted bin 的 fd/bk 头），不是 128 个。
 3. `next` 把各 arena 串成**环形**链表，回到 `main_arena` 即结束。
-4. `system_mem` 统计该 arena 从 subheap 与 direct mmap 获得的全部内存。
+4. `system_mem` 统计该 arena 的 brk 堆与 subheap 总内存；**不包含 `IS_MMAPPED` 块**。
 5. 2.28 的 `heap_info` 没有 `pagesize` 字段——网上不少“2.28 偏移表”把它算进去，导致 +8 错位。
 
 ## Verification Without Symbols（可直接执行）

@@ -5,9 +5,12 @@
  *
  * 用法：
  *   gcc -O2 -o scan_zero_pages scan_zero_pages.c
- *   ./scan_zero_pages <core> <va_start> <size> <file_off_at_va_start>
+ *   ./scan_zero_pages <core> <va_start> <size> <file_off_at_va_start> [page_size]
  * 例：
  *   ./scan_zero_pages ./core <va_start> <size> <file_off>
+ *
+ * 页大小：默认从 core 的 NT_AUXV(AT_PAGESZ) 读取；跨架构分析必须用它，
+ *         不能用宿主 sysconf。可显式传 page_size 覆盖。
  *
  * 输出：总页数、非零页数（MB）、连续非零段数、首个/最后一个非零页 VA。
  *
@@ -18,13 +21,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <elf.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
+/* 从 core 的 NT_AUXV 读取 AT_PAGESZ；跨架构分析时不能依赖宿主页大小。 */
+static unsigned long long core_page_size(unsigned char *base, size_t fsize) {
+    if (fsize < sizeof(Elf64_Ehdr) || memcmp(base, ELFMAG, SELFMAG) != 0 ||
+        base[EI_CLASS] != ELFCLASS64) {
+        return 0;
+    }
+    Elf64_Ehdr *eh = (Elf64_Ehdr *)base;
+    if (eh->e_phoff + (uint64_t)eh->e_phnum * eh->e_phentsize > fsize) return 0;
+
+    for (int i = 0; i < eh->e_phnum; i++) {
+        Elf64_Phdr *ph = (Elf64_Phdr *)(base + eh->e_phoff + (uint64_t)i * eh->e_phentsize);
+        if (ph->p_type != PT_NOTE || ph->p_offset + ph->p_filesz > fsize) continue;
+        unsigned char *p = base + ph->p_offset;
+        unsigned char *end = p + ph->p_filesz;
+        while (p + 12 <= end) {
+            uint32_t namesz, descsz, type;
+            memcpy(&namesz, p, 4);
+            memcpy(&descsz, p + 4, 4);
+            memcpy(&type, p + 8, 4);
+            p += 12;
+            size_t na = (namesz + 3u) & ~3u;
+            size_t da = (descsz + 3u) & ~3u;
+            if (p + na + da > end) break;
+            if (type == NT_AUXV) {
+                unsigned char *desc = p + na;
+                for (uint32_t k = 0; k + 16 <= descsz; k += 16) {
+                    uint64_t a_type, a_val;
+                    memcpy(&a_type, desc + k, 8);
+                    memcpy(&a_val, desc + k + 8, 8);
+                    if (a_type == AT_PAGESZ && a_val >= 4096 &&
+                        (a_val & (a_val - 1)) == 0) {
+                        return a_val;
+                    }
+                }
+            }
+            p += na + da;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     if (argc < 5) {
-        fprintf(stderr, "usage: %s <core> <va_start> <size> <file_off_at_va_start>\n", argv[0]);
+        fprintf(stderr, "usage: %s <core> <va_start> <size> <file_off_at_va_start> [page_size]\n"
+                        "       page_size omitted = read AT_PAGESZ from core (fallback: host)\n", argv[0]);
         return 2;
     }
     const char *fn = argv[1];
@@ -44,26 +92,35 @@ int main(int argc, char **argv) {
     unsigned char *m = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (m == MAP_FAILED) { perror("mmap"); return 2; }
 
-    const unsigned long long pg = 4096;
-    unsigned long long npg = sz / pg;
+    long pg = (argc > 5) ? (long)strtoull(argv[5], 0, 0) : 0;
+    const char *pg_src = "arg";
+    if (pg <= 0) {
+        pg = (long)core_page_size(m, (size_t)st.st_size);
+        pg_src = "core";
+    }
+    if (pg <= 0) {
+        pg = sysconf(_SC_PAGESIZE);
+        pg_src = "host fallback";
+    }
+    if (pg <= 0) { pg = 4096; pg_src = "default"; }
+    unsigned char *zero = (unsigned char *)calloc(1, (size_t)pg);
+    if (!zero) { perror("calloc"); return 2; }
+    unsigned long long npg = sz / (unsigned long long)pg;
     unsigned long long nz = 0, runs = 0, prev = ~0ULL, first = 0, last = 0;
 
     for (unsigned long long i = 0; i < npg; i++) {
-        uint64_t *q = (uint64_t *)(m + off0 + i * pg);
-        int nzpage = 0;
-        for (int j = 0; j < 512; j++) {
-            if (q[j]) { nzpage = 1; break; }
-        }
-        if (!nzpage) continue;
+        unsigned char *q = m + off0 + i * (unsigned long long)pg;
+        if (memcmp(q, zero, (size_t)pg) == 0) continue;
         nz++;
-        unsigned long long va = va0 + i * pg;
+        unsigned long long va = va0 + i * (unsigned long long)pg;
         if (!first) first = va;
         last = va;
         if (i != prev + 1) runs++;
         prev = i;
     }
 
-    printf("va=[0x%llx,0x%llx) pages=%llu nonzero_pages=%llu (%.1f MiB) runs=%llu first=0x%llx last=0x%llx\n",
-           va0, va0 + sz, npg, nz, (double)nz * 4.0 / 1024.0, runs, first, last);
+    printf("va=[0x%llx,0x%llx) pagesize=%ld (%s) pages=%llu nonzero_pages=%llu (%.1f MiB) runs=%llu first=0x%llx last=0x%llx\n",
+           va0, va0 + sz, pg, pg_src, npg, nz,
+           (double)nz * (double)pg / 1048576.0, runs, first, last);
     return 0;
 }

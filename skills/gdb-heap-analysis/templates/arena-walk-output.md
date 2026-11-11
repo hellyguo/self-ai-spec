@@ -28,7 +28,17 @@ Subheap @ 0x{addr}, size={size} MB
 Subheap @ 0x{addr}, size={size} MB
 ...
 Total subheap: {total} MB
-Gap (system_mem - subheap): {gap} MB → {direct mmap|none}
+Gap (system_mem - subheap): {gap} MB → {normal|walk incomplete|n/a (main_arena)}
+```
+
+> main_arena 使用 brk，没有 `heap_info`；gap 大时先怀疑 subheap 链未走全或偏移错误，
+> 不要据此推断 mmap 分配。
+
+## Mmap Allocations（arena 链盲区）
+
+```
+IS_MMAPPED chunks: {count}, total {size} MB, sizes: {size -> count}
+Large ANON mappings: {count}, total {size} MB, nonzero pages: {pages}
 ```
 
 ## Chunk Analysis

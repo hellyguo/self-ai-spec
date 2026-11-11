@@ -54,7 +54,8 @@ while (p + 16 <= heap_end) {
     size = *(uint64_t *)(va2p(p) + 8) & ~7ULL;   /* size 在 chunk+8 */
     if (size < 16 || size > (heap_end - p) || (size & 0xf)) { bad++; break; }
     next = p + size;
-    in_use = *(uint64_t *)(va2p(next) + 8) & PREV_INUSE;
+    if (next + 16 > heap_end) in_use = 0;   /* 最后一块：下一块头部在堆外 */
+    else in_use = *(uint64_t *)(va2p(next) + 8) & PREV_INUSE;
     /* 统计 in_use / free、按 size 分桶、对目标 size 抽样 */
     p = next;
 }
@@ -66,7 +67,8 @@ while (p + 16 <= heap_end) {
 |---|---|
 | chunk 指针 | 指向 `prev_size` 字段（malloc 返回值 = chunk + 0x10） |
 | size 位置 | `chunk + 8`，低 3 位是标志（PREV_INUSE/IS_MMAPPED/NON_MAIN_ARENA） |
-| in-use 判定 | **下一块**的 `size & PREV_INUSE`，不是本块 |
+| in-use 判定 | **下一块**的 `size & PREV_INUSE`，不是本块；最后一块的 next 头部在堆外，直接按 free/top |
+| 未对齐读 | core 的 `p_offset` 与 VA 不保证 8 字节对齐，u64 读取用 `memcpy` 或逐字节 |
 | top | 最后一块，free 且 `p + size == heap_end`（允许 brk 尾差几页） |
 | 破坏判定 | 只有出现 `size<16 / 超界 / 非 16 对齐` 才怀疑破坏；`bad=0` 说明链完整 |
 | 迭代上限 | 加一个 `n > 4e8` 的保护，防止异常 core 卡死 |
@@ -94,6 +96,34 @@ request2size(n) = (n + 8 + 15) & ~15      // 64-bit glibc
 
 估算时注意：`request2size` 会向上取整到 16 字节并加 chunk 头，因此相邻请求大小可能落到同一档。
 再结合对象内容（vtable、自指字段、业务字段）确认类型。
+
+### 4.1 IS_MMAPPED 不在 chunk 链里
+
+`heap_scan` 只走 arena 的 chunk 链。请求 `>= mmap_threshold`（默认 128KB，动态可升到
+约 32MB）时 glibc 直接 `mmap`，这类 chunk：
+
+- 不在 arena 链里，`heap_scan` 完全看不到；
+- 不计入 `malloc_state.system_mem`；
+- chunk 头在映射起始处，`size` 带 `IS_MMAPPED`（bit 1）。
+
+```bash
+gcc -O2 -o /tmp/mmap_scan ../scripts/mmap_scan.c
+/tmp/mmap_scan <core> [min_size]
+```
+
+`mmap_scan` 解析 core 的 `PT_LOAD` 与 `NT_FILE` note，区分文件映射与匿名映射，
+输出匿名映射大小分桶、疑似 `IS_MMAPPED` chunk、以及非 chunk 大块 ANON 的头部样本。
+
+判读要点：
+
+- `MMAPPED`：映射起始处 chunk size 与映射长度接近、16 字节对齐；
+- 映射长度可能大于 chunk size（相邻匿名 VMA 被内核合并），用上界容忍；
+- `ANON` 且非零页很少 → 保留/未触碰，不是泄漏；
+- `ANON` 且有内容 → 可能是池化缓冲/自定义分配器，也可能是 `[heap]`、线程栈、vdso；
+  必须结合应用统计或 NMT，不能只凭 core 判类型。
+
+> Linux core 的 note 按 4 字节对齐，`NT_FILE` descriptor 在 name 之后；解析错位会得到
+> 0 个文件映射，把可执行文件/libc 段误当匿名段，导致分桶失真。
 
 ## 5. 内容聚类
 
@@ -138,13 +168,22 @@ for (align = 0; align < 8; align++)
 - `hits > 1`：还有引用，需定位引用者（可能是缓存/队列，不能直接判泄漏）；
 - 用 3 个抽样（首/中/尾）即可，无需全量。
 
+**边界（必须写进结论）**：
+
+- 自定义分配器（slab、对象池、tcmalloc/jemalloc）用 freelist 或位图管理空闲对象，
+  指针不在对象内，`hits==1` 也可能是“池中待复用”，不是泄漏；
+- TLS/线程缓存只存一个指针时，`hits>1` 仍可能是逻辑已释放、延迟归还；
+- 判断要结合分配器元数据与引用者生命周期，不能只看 hit 数。
+
 > 对齐很重要：core 的某个 LOAD `p_offset` 可能不是 8 的倍数，
 > 只扫一种对齐会漏掉一半指针。
 
 ## 7. 零页、保留区与 RSS
 
 - core 会把“未触碰的匿名页”也写成全零；**文件大小 ≠ 实际占用**。
-- 对可疑大段做页扫描（每 4KB 判断是否全零），统计 `nonzero_pages`。
+- 对可疑大段做页扫描（按目标进程页大小判断整页是否全零），统计 `nonzero_pages`。
+- 页大小从 core 的 `NT_AUXV`（`AT_PAGESZ`）读取；**不要用宿主 `sysconf`**：x86 4KB 宿主分析 aarch64 64KB core 时，页数与 MiB 会差 16 倍。
+- 工具已自动检测；手工计算时同样以 `AT_PAGESZ` 为准。
 - 若某段整齐的 R/RW 映射全零，通常是保留/未触碰；真实占用应看非零页。
 
 ## 8. 与 gdb 的分工
@@ -164,6 +203,15 @@ gcc -O2 -o /tmp/heap_scan ../scripts/heap_scan.c
 ```
 
 输出：`chunks/inuse_chunks/inuse_bytes/free_bytes/bad/last`、按 log2 分桶、目标尺寸样本。
+`bad>0` 时统计在首个坏块处截断，不能用于结论。
+
+```bash
+gcc -O2 -o /tmp/mmap_scan ../scripts/mmap_scan.c
+/tmp/mmap_scan <core> [min_size]
+```
+
+输出：`PT_LOAD`/文件映射/匿名映射计数、匿名映射分桶、`IS_MMAPPED` chunk 列表与非 chunk
+大块 ANON 样本。用于补齐 arena 链的盲区。
 
 ## 10. 检查清单
 
@@ -171,8 +219,9 @@ gcc -O2 -o /tmp/heap_scan ../scripts/heap_scan.c
 - [ ] 用 build-id 确认 exec/libc 是否匹配；`info line` 对照现场版本
 - [ ] `readelf -lW core` 取堆的 PT_LOAD 与 `p_offset`
 - [ ] gdb 读一段 + `dd/od` 读同一段，md5 校验 VA→offset
-- [ ] 线性扫 chunk，`bad=0` 后再相信统计
+- [ ] 线性扫 chunk，`bad=0` 后再相信统计；`bad>0` 时只当下界
+- [ ] 用 `mmap_scan` 统计 `IS_MMAPPED` 与大块 ANON，补齐 arena 链盲区
 - [ ] 对最大尺寸档做 `sizeof/request2size` 指纹 + 内容聚类
-- [ ] 抽样做可达性扫描（8 种对齐）
-- [ ] 用页扫描排除全零保留区
+- [ ] 抽样做可达性扫描（8 种对齐），并说明自定义分配器/TLS 的边界
+- [ ] 用页扫描排除全零保留区（页大小取自 core 的 `AT_PAGESZ`，不是宿主）
 - [ ] 结论用“堆统计 + 内存内容 + 运行时结构（配置/路由/日志）”三方互证

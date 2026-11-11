@@ -39,6 +39,13 @@ static inline unsigned char *va2p(unsigned long long va) {
     return M + FSTART + (va - HEAP_START);
 }
 
+/* core 的文件偏移与 VA 不保证 8 字节对齐，用 memcpy 避免未对齐读。 */
+static inline unsigned long long rd64(const void *p) {
+    unsigned long long v;
+    memcpy(&v, p, sizeof(v));
+    return v;
+}
+
 typedef struct { unsigned long long cnt, bytes; unsigned long long sample[6]; } BUCKET;
 static BUCKET b_in[64], b_free[64];
 static int s_in[64];
@@ -73,14 +80,20 @@ int main(int argc, char **argv) {
 
     while (p + 16 <= HEAP_END) {
         unsigned char *q = va2p(p);
-        unsigned long long sz = *(uint64_t *)(q + 8) & ~7ULL;
+        unsigned long long sz = rd64(q + 8) & ~7ULL;
         if (sz < 16 || sz > (HEAP_END - p) || (sz & 0xf)) {
             bad++;
-            printf("BAD at 0x%llx size=0x%llx prev_size=0x%llx\n", p, sz, (unsigned long long)*(uint64_t *)q);
+            printf("BAD at 0x%llx size=0x%llx prev_size=0x%llx\n", p, sz, rd64(q));
             break;
         }
         unsigned long long next = p + sz;
-        int in_use = (*(uint64_t *)(va2p(next) + 8)) & 1ULL;
+        int in_use;
+        if (next + 16 > HEAP_END) {
+            /* 最后一块：下一块头部已在堆外，不能读 PREV_INUSE，按 top/free 处理 */
+            in_use = 0;
+        } else {
+            in_use = rd64(va2p(next) + 8) & 1ULL;
+        }
 
         int lg = 0;
         unsigned long long t = sz;
@@ -113,6 +126,12 @@ int main(int argc, char **argv) {
            "free_bytes=%llu (%.2f GiB) bad=%llu last=0x%llx\n",
            n, in_chunks, in_bytes, (double)in_bytes / 1073741824.0,
            free_bytes, (double)free_bytes / 1073741824.0, bad, last);
+    if (bad) {
+        printf("WARNING: statistics truncated at first bad chunk; "
+               "inuse_bytes/inuse_chunks are NOT reliable\n");
+    }
+    printf("NOTE: arena chunk chain only; IS_MMAPPED allocations are not included "
+           "(use mmap_scan.c)\n");
     printf("max_free_chunk=0x%llx at 0x%llx\n", max_free, max_free_va);
 
     printf("\n%-4s %-14s %-16s %-14s %-16s\n", "lg", "inuse_cnt", "inuse_MiB", "free_cnt", "free_MiB");
