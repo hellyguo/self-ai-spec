@@ -39,11 +39,19 @@
 
 通过 `rustc --version`、`cargo --version` 确认工具链，必要时检查 `rust-toolchain.toml`。
 
-另，提供：relax 编译提速工具，~/bin/relax
+另，提供：relax 实验性 JIT 运行/检查工具，~/bin/relax
 
 - relax run
 - relax test
 - relax check
+
+注意：relax 并非万应良方，存在解析器缺口与 bug，不能替代 cargo。
+
+- 仅用于开发内环（快速试跑、测试热重跑、运行期探查）；CI、发布与产物构建仍以 cargo 为准。
+- 解析器不支持 Rust 2015 裸 trait object，例如 `unsafe impl Trait for Send + Sync`，会报 `expected OpenBrace (found Plus '+')`；改为 `dyn Send + Sync` 可通过。此类语法常见于老依赖，失败时应回退 cargo，不要为适配 relax 修改业务代码或第三方依赖。
+- 依赖含 C/C++ 构建脚本时需 `--allow-c`，会额外引入构建开销并降低可移植性。
+- 即使可运行，JIT 启动与按需编译在小项目上也常慢于 cargo，且 CPU/RSS 占用更高；不得以 relax 的结果代替 cargo 的构建或性能数据。
+- 结论：relax 适合小步快速反馈，不适合作为构建、验收或性能基准的可信来源；以 cargo 的结果为准。
 
 ### 环境变量
 
