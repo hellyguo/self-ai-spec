@@ -2,6 +2,20 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-13
+
+### sync-repo-docs Chains into merge-agents-md
+
+- **New chained step in the workflow**: `skills/sync-repo-docs/SKILL.md` now runs `merge-agents-md` as step 5 after
+  cross-links are completed, synchronizing `AGENTS.md`; the former "output change list" step moves to step 6 and the
+  list must include the AGENTS.md merge result
+- **New "Chaining into AGENTS.md" section**: defines the template reference anchor, language resolution order
+  (user-specified > extension inference > ask the user), inherits the merge hard gate of the called skill (project
+  facts first, incremental merge without full overwrite), and specifies skip conditions plus recording requirements
+- **Conflict handling and checklist**: adds rules for asking the user and skipping when `AGENTS.md` is missing and the
+  language cannot be determined; the checklist gains an item confirming the AGENTS.md merge or the skip reason
+- **Index sync**: the skill tables in `README.md` and `README_en.md` update the `sync-repo-docs` description
+
 ## 2026-11-11
 
 ### gdb-heap-analysis: Large-Core Forensics and Mmap Accounting

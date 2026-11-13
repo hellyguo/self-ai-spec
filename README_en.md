@@ -125,7 +125,7 @@ self-ai-spec/
 | `memrec` | AI memory persistence: cross-session memory storage and retrieval, project isolation, hybrid retrieval (KNN+BM25) |
 | `semble-search` | Code search sub-agent: find implementations by intent, understand code, discover related code (semantic search) |
 | `vbox-test-env` | VirtualBox three-machine test environment with mutual trust and sudo configured, suitable for cluster/distributed system testing |
-| `sync-repo-docs` | Repository document synchronization: sync README/CHANGELOG/MANUAL based on git commits and standardize bilingual naming and cross-links |
+| `sync-repo-docs` | Repository document synchronization: sync README/CHANGELOG/MANUAL based on git commits, standardize bilingual naming and cross-links, and chain into `merge-agents-md` to synchronize AGENTS.md |
 
 ## Language Specifications (lang-spec)
 

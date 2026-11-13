@@ -2,6 +2,18 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-13
+
+### sync-repo-docs 联动 merge-agents-md
+
+- **执行流程新增联动步骤**：`skills/sync-repo-docs/SKILL.md` 在补齐互链后增加第 5 步，调用 `merge-agents-md`
+  同步 `AGENTS.md`，原「输出变更清单」顺延为第 6 步，清单需包含 AGENTS.md 的合并结果
+- **新增「联动 AGENTS.md」章节**：明确模板引用锚点、语言判定顺序（用户指定 > 扩展名推断 > 询问用户）、
+  沿用被调用技能的合并硬门禁（项目事实优先、增量合并不整篇覆盖），并规定跳过条件与记录要求
+- **冲突处理与检查清单**：补充 `AGENTS.md` 缺失且语言无法判定时的询问与跳过规则；检查清单新增
+  AGENTS.md 合并或跳过原因的确认项
+- **索引同步**：`README.md`、`README_en.md` 技能表更新 `sync-repo-docs` 的描述
+
 ## 2026-11-11
 
 ### gdb-heap-analysis 扩展：大 core 取证与 mmap 统计

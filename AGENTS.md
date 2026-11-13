@@ -163,7 +163,7 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） | 外部（自维护） |
 | `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） | 本地 |
 | `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 | 仓库 |
-| `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链 | 仓库 |
+| `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链，并联动 `merge-agents-md` 同步 AGENTS.md | 仓库 |
 
 ## 文件命名约定
 
