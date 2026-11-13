@@ -39,11 +39,11 @@
 
 通过 `rustc --version`、`cargo --version` 确认工具链，必要时检查 `rust-toolchain.toml`。
 
-另，提供：relex 编译提速工具，~/bin/relex
+另，提供：relax 编译提速工具，~/bin/relax
 
-- relex run
-- relex test
-- relex check
+- relax run
+- relax test
+- relax check
 
 ### 环境变量
 
