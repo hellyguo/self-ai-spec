@@ -76,13 +76,10 @@ self-ai-spec/
 
 | Skill | Purpose |
 | :--- | :--- |
-| `cpp-check` | Cppcheck static analysis: C/C++ code quality checks (defects, undefined behavior, security vulnerabilities) |
-| `cpp-clang-tidy` | Clang-Tidy static analysis: C/C++ code quality checks (based on the Clang AST, supports auto-fix) |
-| `cpp-tscancode` | TscanCode static analysis: Tencent's open-source C/C++ code checker |
+| `cpp-static-analysis` | Unified C/C++ static analysis entry: Cppcheck compile-free triage / clang-tidy AST refinement with auto-fix / TscanCode rule set, emitting a graded issue list |
 | `shell-check` | ShellCheck static analysis: Shell script quality checks (syntax errors, potential defects, code style) |
 | `rust-clippy` | Clippy static analysis: Rust code quality checks (errors, style, performance, security), supports `cargo fix` auto-fix |
-| `java-check-spotbugs` | SpotBugs static analysis: Java defect and security vulnerability detection |
-| `java-check-pmd` | PMD static analysis: Java code quality, coding standard, and security issue detection |
+| `java-static-analysis` | Unified Java static analysis entry: PMD source-level standards and code smells / SpotBugs bytecode defects and security, chainable with merged grading |
 | `ast-grep-block` | ast-grep based review gate: graded scanning of Java/C++/ANSI C with the code-checklist rule set |
 
 ### Java Development Tools

@@ -1,11 +1,8 @@
----
-name: cpp-clang-tidy
-description: "使用 clang-tidy 基于 Clang AST 对 C/C++ 代码做静态分析，支持规则筛选与自动修复。适用于 C/C++ 项目规范检查、现代化改造、编译期缺陷发现。"
----
+# clang-tidy（Clang AST 分析，可自动修复）
 
-# Clang-Tidy C/C++ 静态分析技能
+clang-tidy 基于 Clang AST 分析 C/C++，规则规模大，支持 `--fix` 自动修复，适合精修、PR 级检查与现代化改造。精度依赖 `compile_commands.json`。
 
-> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
+> 本页中的 `templates/...` 相对技能根目录。严重度归并见 `SKILL.md` 的“严重度归并”。
 
 ## 工具位置
 
@@ -81,10 +78,10 @@ clang-tidy --checks='*,-readability-*,-llvm-*' src/main.cpp   # 排除特定规�
 
 ## 配置与集成
 
-- 项目配置：`templates/dot-clang-tidy.yaml` → 复制到项目根目录为 `.clang-tidy`
-- CI 集成：`templates/ci-github-actions.yaml`
-- CMake 集成：`templates/cmake-integration.cmake`
-- Makefile 集成：`templates/Makefile-tidy`
+- 项目配置：`templates/clang-tidy-dot-clang-tidy.yaml` → 复制到项目根目录为 `.clang-tidy`
+- CI 集成：`templates/clang-tidy-ci-github-actions.yaml`
+- CMake 集成：`templates/clang-tidy-cmake-integration.cmake`
+- Makefile 集成：`templates/clang-tidy-Makefile`
 
 ## 分析结果处理
 
@@ -97,17 +94,11 @@ clang-tidy --format-style=json src/main.cpp -- -Iinclude | \
 clang-tidy src/main.cpp -- -Iinclude 2>&1 | grep -E '(error|warning):'
 ```
 
-输出报告模板：`templates/report.md`
+输出报告模板：`templates/clang-tidy-report.md`
 
-## 与 Cppcheck 对比
+## 与其它引擎对比
 
-| 特性 | Clang-Tidy | Cppcheck |
-| --- | --- | --- |
-| 分析引擎 | Clang AST | 自定义解析器 |
-| 编译数据库 | 必需 | 可选 |
-| 自动修复 | 支持 | 不支持 |
-| 检查规则数 | 500+ | 200+ |
-| 分析速度 | 较慢 | 快 |
+参见 `SKILL.md` 的“三引擎差异”表。要点：精度最高、可自动修复、但最慢且强依赖编译数据库。
 
 ## 最佳实践
 
@@ -119,10 +110,14 @@ clang-tidy src/main.cpp -- -Iinclude 2>&1 | grep -E '(error|warning):'
 
 ## 注意事项
 
-- 无编译数据库时需手动指定 `-I` 参数
+- 无编译数据库时需手动指定 `-I` 参数，误报会显著增加，报告中必须标注该前提
 - 大型项目用 `run-clang-tidy -j N` 并行
 - 误报用 `// NOLINT` 或 `.clang-tidy` 抑制
 - `--fix` 可能不完整，修复后需编译验证
 
 ---
-**技能版本**: 1.0.0 | **工具版本**: Clang-Tidy 19.1.7 | **适用**: C/C++ (需 compile_commands.json)
+
+**工具页面版本**: 1.1.0（自 `cpp-clang-tidy` 1.0.0 迁入）
+**工具版本**: Clang-Tidy 19.1.7
+**适用项目**: C/C++（需 compile_commands.json）
+**输出位置**: 当前目录下的诊断输出 / `tidy-fixes.yaml`

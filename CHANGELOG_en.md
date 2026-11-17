@@ -2,6 +2,25 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-17
+
+### Static Analysis Skills Merged by Capability (5 → 2)
+
+- **Merge criterion**: skills are split along *capability*, not language prefix. Same-language, same-capability
+  analyzers that differ only by engine are true duplicates, so they become router-style skills (`SKILL.md` selection
+  plus on-demand `references/`); any skill beyond 300 lines must be layered
+- **`java-static-analysis`**: merges `java-check-pmd` and `java-check-spotbugs`, adds
+  `references/combined-workflow.md` for chained runs and de-duplication, unifies three-level severity
+  (PMD priority 1-2 / SpotBugs high → P0), and prefixes templates with `pmd-` / `spotbugs-`
+- **`cpp-static-analysis`**: merges `cpp-check`, `cpp-clang-tidy`, and `cpp-tscancode`, adds an engine comparison
+  table and a triage-then-refine strategy, and requires reports to flag the missing-`compile_commands.json` false
+  positive risk
+- **Not merged**: `rust-clippy` (static analysis) vs `rust-flamegraph` (CPU sampling) are unrelated capabilities;
+  `java-asprof` and `jmh-bench` cover runtime sampling versus microbenchmarks. Merging by language prefix would blur
+  descriptions and degrade triggering
+- **Index sync**: the skill tables in `AGENTS.md`, `README.md`, and `README_en.md` shrink from 5 rows to 2, taking
+  the skill entry count from 42 to 39
+
 ## 2026-11-13
 
 ### sync-repo-docs Chains into merge-agents-md

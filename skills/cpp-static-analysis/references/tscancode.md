@@ -1,11 +1,8 @@
----
-name: cpp-tscancode
-description: "使用 TscanCode（腾讯开源）对 C/C++ 代码做静态分析，检测缺陷、安全漏洞与风格问题。适用于 C/C++ 项目快速缺陷扫描、安全审计、CI 集成。"
----
+# TscanCode（腾讯开源，规则集口径）
 
-# TscanCode C/C++静态分析技能
+TscanCode 命令形态与 Cppcheck 接近（`--enable`、stderr 输出），但不支持编译数据库与自动修复。主要用于与既有 TscanCode 流水线或历史基线保持可比。
 
-> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
+> 本页中的 `templates/...` 相对技能根目录。严重度归并见 `SKILL.md` 的“严重度归并”。
 
 ## 工具位置
 
@@ -94,8 +91,8 @@ grep -E '(error|warning):' tscancode.txt
 
 - `tscancode-check.sh` - Shell脚本封装
 - `tscancode-summary.sh` - 摘要报告生成
-- `CMakeLists-tscancode.txt` - CMake集成目标
-- `Makefile-tscancode` - Makefile集成
+- `tscancode-CMakeLists.txt` - CMake集成目标
+- `tscancode-Makefile` - Makefile集成
 
 ## 最佳实践
 
@@ -110,7 +107,10 @@ grep -E '(error|warning):' tscancode.txt
 1. TscanCode 默认输出到 stderr，需重定向 `2>` 捕获
 2. `--enable=all` 会启用 unusedFunction，建议全项目扫描
 3. 确保 `-I` 路径正确，否则可能误报缺少包含
+4. 与 Cppcheck 并用时不要出两份主表，同源告警按 `SKILL.md` 的“组合策略”第 2 条合并。
 
 ---
 
-**技能版本**: 1.0.0 | **适用项目**: C/C++ | **输出位置**: 当前目录 tscancode-*.txt
+**工具页面版本**: 1.1.0（自 `cpp-tscancode` 1.0.0 迁入）
+**适用项目**: C/C++
+**输出位置**: 当前目录下的 `tscancode-*.txt`

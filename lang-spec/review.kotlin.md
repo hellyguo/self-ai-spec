@@ -18,7 +18,7 @@
 | :--- | :--- | :--- |
 | **detekt** | Kotlin 代码质量/坏味道检测（复杂度、风格、潜在缺陷） | `./gradlew detekt` |
 | **ktlint** | Kotlin 代码风格检查（官方风格指南） | `./gradlew ktlintCheck` |
-| **SpotBugs** | JVM 字节码级缺陷检测（对 Kotlin 编译产物同样适用） | 参考 java-check-spotbugs |
+| **SpotBugs** | JVM 字节码级缺陷检测（对 Kotlin 编译产物同样适用） | 参考 java-static-analysis |
 | **kover** | Kotlin 测试覆盖率统计 | `./gradlew koverReport` |
 
 审查时结合 detekt 规则集与 Kotlin 语言特性专项审查。

@@ -114,13 +114,10 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 
 | 技能 | 用途 | 来源 |
 | :--- | :--- | :--- |
-| `cpp-check` | Cppcheck 静态分析：C/C++ 代码质量检测（缺陷、未定义行为、安全漏洞） | 仓库 |
-| `cpp-clang-tidy` | Clang-Tidy 静态分析：C/C++ 代码质量检测（基于 Clang AST，支持自动修复） | 仓库 |
-| `cpp-tscancode` | TscanCode 静态分析：腾讯开源 C/C++ 代码检测工具 | 仓库 |
+| `cpp-static-analysis` | C/C++ 静态分析统一入口：Cppcheck 免编译快筛 / clang-tidy AST 精修与自动修复 / TscanCode 规则集，输出分级问题清单 | 仓库 |
 | `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） | 仓库 |
 | `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 | 仓库 |
-| `java-check-spotbugs` | SpotBugs 静态分析：Java 代码缺陷和安全漏洞检测 | 仓库 |
-| `java-check-pmd` | PMD 静态分析：Java 代码质量、编码规范和安全问题检测 | 仓库 |
+| `java-static-analysis` | Java 静态分析统一入口：PMD 源码规范与坏味道 / SpotBugs 字节码缺陷与安全，可串联归并，输出分级问题清单 | 仓库 |
 | `ast-grep-block` | 基于 ast-grep 的代码审查门禁：code-checklist 规则集分级扫描 Java/C++/ANSI C，输出 CI 退出码 | 仓库 |
 
 ### Java 开发工具

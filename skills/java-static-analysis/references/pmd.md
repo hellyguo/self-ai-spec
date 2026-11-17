@@ -1,13 +1,8 @@
----
-name: java-check-pmd
-description: "使用 PMD 对 Java 代码做静态分析，检测代码坏味道、编码规范与安全问题。适用于 Java 项目规范检查、CI 质量门禁、代码评审辅助。"
----
+# PMD（源码分析）
 
-# PMD Java静态分析技能
+PMD（Programming Mistake Detector）检测 Java 源码中的编码规范违规、代码坏味道、潜在缺陷和安全漏洞，并内置 CPD 做源码级重复检测。无需编译。
 
-> 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。
-
-PMD（Programming Mistake Detector）检测Java代码中的编码规范违规、代码坏味道、潜在缺陷和安全漏洞。
+> 本页中的 `templates/...` 相对技能根目录。严重度归并见 `SKILL.md` 的“严重度归并”。
 
 ## 工具位置
 
@@ -46,6 +41,8 @@ $PMD_CLI pmd -d $SRC_DIR -R custom-ruleset.xml -f text -r pmd-custom.txt
 $PMD_CLI pmd -d $SRC_DIR -R rulesets/java/basic.xml -R rulesets/java/codeestyle.xml -f text -r pmd-combined.txt
 ```
 
+规则集模板见 `templates/pmd-custom-ruleset.md`。
+
 ### 步骤4：重复代码检测（CPD）
 
 ```bash
@@ -56,7 +53,7 @@ $PMD_CLI cpd --minimum-tokens 50 --files $SRC_DIR --language java \
 
 ### 步骤5：分析结果处理
 
-Read `templates/result-processing.md`
+Read `templates/pmd-result-processing.md`
 
 ### 步骤6：增量分析
 
@@ -114,15 +111,15 @@ $PMD_CLI pmd -d $SRC_DIR -R rulesets/java/quickstart.xml -f text -debug    # 调
 
 | 模板文件 | 用途 |
 |----------|------|
-| `templates/output-formats.md` | 输出格式（text/xml/csv/html） |
-| `templates/custom-ruleset.md` | 自定义规则集XML模板 |
-| `templates/build-integration.md` | Maven/Gradle集成配置 |
-| `templates/rulesets-reference.md` | 规则集速查表（basic/codeestyle/design/security/performance） |
-| `templates/result-processing.md` | 结果解析与趋势报告脚本 |
+| `templates/pmd-output-formats.md` | 输出格式（text/xml/csv/html） |
+| `templates/pmd-custom-ruleset.md` | 自定义规则集XML模板 |
+| `templates/pmd-build-integration.md` | Maven/Gradle集成配置 |
+| `templates/pmd-rulesets-reference.md` | 规则集速查表（basic/codeestyle/design/security/performance） |
+| `templates/pmd-result-processing.md` | 结果解析与趋势报告脚本 |
 
 ---
 
-**技能版本**: 1.0.0  
-**工具版本**: PMD 6.19.0  
-**适用项目**: Java 8+ 企业级项目  
-**输出位置**: 当前目录下的pmd-*.txt文件
+**工具页面版本**: 1.1.0（自 `java-check-pmd` 1.0.0 迁入）
+**工具版本**: PMD 6.19.0
+**适用项目**: Java 8+ 企业级项目
+**输出位置**: 当前目录下的 `pmd-*.txt`

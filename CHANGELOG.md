@@ -2,6 +2,20 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-17
+
+### 静态分析技能按能力合并（5 → 2）
+
+- **合并判据**：技能的拆分轴是“能力”而非语言前缀。同语言同能力、仅引擎不同的静态分析器属于真重复，
+  改为 router 型技能（`SKILL.md` 选型 + `references/` 按需读取），单技能超过 300 行必须分层
+- **`java-static-analysis`**：由 `java-check-pmd`、`java-check-spotbugs` 合并，新增 `references/combined-workflow.md`
+  双引擎串联与去重规则，统一三级严重度（PMD priority 1-2 / SpotBugs high → P0），模板加 `pmd-`、`spotbugs-` 前缀
+- **`cpp-static-analysis`**：由 `cpp-check`、`cpp-clang-tidy`、`cpp-tscancode` 合并，新增三引擎差异表与
+  “快筛 → 精修”组合策略，明确 `compile_commands.json` 缺失时的误报风险与报告标注要求
+- **未合并**：`rust-clippy`（静态分析）与 `rust-flamegraph`（CPU 采样）能力不相干；`java-asprof` 与 `jmh-bench`
+  分属运行时采样与微基准。按语言前缀合并会让 description 失焦、触发不准
+- **索引同步**：`AGENTS.md`、`README.md`、`README_en.md` 技能表由 5 行收敛为 2 行，技能入口 42 → 39
+
 ## 2026-11-13
 
 ### sync-repo-docs 联动 merge-agents-md

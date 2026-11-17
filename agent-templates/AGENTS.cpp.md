@@ -64,4 +64,4 @@ cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-静态分析优先使用 Cppcheck 与 clang-tidy，具体见 skill `cpp-check`、`cpp-clang-tidy`。
+静态分析优先使用 Cppcheck 与 clang-tidy，具体见 skill `cpp-static-analysis`。
