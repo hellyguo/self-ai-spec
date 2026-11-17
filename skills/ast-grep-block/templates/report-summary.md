@@ -69,7 +69,7 @@ src/util/Util.java:15:5:unnecessary-import: import java.util.*;
 | `range.start.column` | int | 起始列（0-based） |
 | `range.end.line` | int | 结束行（0-based） |
 | `range.end.column` | int | 结束列（0-based） |
-| `language` | string | ast-grep 语言名（Java/CPP/C） |
+| `language` | string | ast-grep 语言名（Java/CPP/C/Rust/JavaScript/TypeScript） |
 | `ruleId` | string | 规则 ID |
 | `level` | string | 级别（high/medium/low），由 run.sh 注入 |
 

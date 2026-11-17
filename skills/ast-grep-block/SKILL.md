@@ -51,14 +51,33 @@ ast-grep --version && python3 -c 'import yaml' && jq --version
 [[ -n "$CODE_CHECKLIST_ROOT" ]] || CODE_CHECKLIST_ROOT=/disk2/helly_data/code/ast-grep-rules/code-checklist
 [[ -x "$CODE_CHECKLIST_ROOT/scripts/run.sh" ]] || { echo "规则库未就绪: $CODE_CHECKLIST_ROOT" >&2; exit 2; }
 
-# 查看当前覆盖（规则数）
-for lang in java cpp ansi_c; do
+# 查看当前覆盖（规则数，六种语言）
+for lang in java cpp ansi_c rust js ts; do
     echo -n "$lang: "
     find "$CODE_CHECKLIST_ROOT/rules/$lang" -name '*.yml' | wc -l
 done
 ```
 
 > 如需切换规则库版本或位置，请在 shell 环境变量中配置 `CODE_CHECKLIST_ROOT`，本 skill 不在仓库内复制规则。
+
+## 语言与规则体系
+
+| `--lang` | ast-grep 语言标识 | 规则目录 | 说明 |
+|----------|-------------------|----------|------|
+| `java` | java | `rules/java/**` | 含 1 条配置类规则，由 `check-java-config.sh` 执行，`run.sh` 会跳过 |
+| `cpp` | cpp | `rules/cpp/**` | AST 规则 |
+| `ansi_c` | c | `rules/ansi_c/**` | AST 规则 |
+| `rust` | rust | `rules/rust/**` | AST 规则 |
+| `js` | javascript | `rules/js/**` | JavaScript（含 JSX 语法可解析，规则以 ES 为主） |
+| `ts` | typescript | `rules/ts/**` | TypeScript；与 `js` 有 8 条同名规则，含义一致 |
+
+注意：
+
+1. `js` 与 `ts` 是两套独立规则集，**不要**用 `--lang js` 扫 TypeScript 文件，反之亦然；
+   ast-grep 按扩展名选择解析器，语言参数与文件扩展名不匹配时不会命中。
+2. 规则数为动态值，用上文"查看当前覆盖"的命令读取，不要在文档里写死。
+3. 规则来源包括阿里巴巴 Java 开发手册与 Google 官方风格指南（Java/C++/Rust/JS/TS），
+   条目取舍与冲突裁定记录在规则库 `docs/analysis/` 与 `docs/plans/` 下。
 
 ## 分级语义（用户口径）
 
@@ -99,13 +118,16 @@ eza <project_root>
 fd --no-ignore -e java -t f <project_root> | wc -l   # Java
 fd --no-ignore -e cpp -e h -e hpp -t f <project_root> | wc -l  # C++
 fd --no-ignore -e c -e h -t f <project_root> | wc -l  # ANSI C
+fd --no-ignore -e rs -t f <project_root> | wc -l  # Rust
+fd --no-ignore -e js -e jsx -t f <project_root> | wc -l  # JavaScript
+fd --no-ignore -e ts -e tsx -t f <project_root> | wc -l  # TypeScript
 ```
 
 ### 步骤 2：选语言与级别
 
 | 参数 | 取值 | 默认 |
 |------|------|------|
-| `--lang` | `java` / `cpp` / `ansi_c` | 必填 |
+| `--lang` | `java` / `cpp` / `ansi_c` / `rust` / `js` / `ts` | 必填 |
 | `--level` | `high` / `medium` / `low` | 任选其一 |
 | `--all` | 扫描所有级别 | 替代 `--level` |
 
@@ -241,6 +263,9 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 | Java high 扫描 | `run.sh --lang java --level high --path .` |
 | C++ 全级别盘点 | `run.sh --lang cpp --all --path .` |
 | ANSI C 仅缺陷 | `run.sh --lang ansi_c --level high --path .` |
+| Rust 全级别盘点 | `run.sh --lang rust --all --path .` |
+| JavaScript 仅缺陷 | `run.sh --lang js --level high --path .` |
+| TypeScript 全级别 | `run.sh --lang ts --all --path .` |
 | JSON 报告 | `run.sh --lang java --all --path . --json > r.json` |
 | 仅看 high 命中文件 | `jq -r 'select(.level=="high")\|.file' r.json \| sort -u` |
 | 规则分布 Top N | `jq -r '.ruleId' r.json \| sort \| uniq -c \| sort -rn \| head` |

@@ -27,7 +27,7 @@ if [[ $# -lt 3 ]]; then
     cat <<EOF
 用法: $0 <lang> <level|all> <path> [--json] [--out <file>]
 参数:
-  lang    java | cpp | ansi_c
+  lang    java | cpp | ansi_c | rust | js | ts
   level   high | medium | low | all
   path    被扫描的项目根（绝对或相对路径）
 选项:
@@ -58,8 +58,8 @@ done
 
 # 校验 lang
 case "$LANG_ARG" in
-    java|cpp|ansi_c) ;;
-    *) echo "[run-cli] 不支持的语言: $LANG_ARG（仅 java/cpp/ansi_c）" >&2; exit 2 ;;
+    java|cpp|ansi_c|rust|js|ts) ;;
+    *) echo "[run-cli] 不支持的语言: $LANG_ARG（java/cpp/ansi_c/rust/js/ts）" >&2; exit 2 ;;
 esac
 
 # 校验 level

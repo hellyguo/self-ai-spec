@@ -50,6 +50,27 @@ mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD 
 # 后续同 1b，--lang 改为 cpp
 ```
 
+### 1d. Rust 变更扫描
+
+```bash
+mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD -- '*.rs')
+# 后续同 1b，--lang 改为 rust
+```
+
+### 1e. JavaScript 变更扫描
+
+```bash
+mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD -- '*.js' '*.jsx')
+# 后续同 1b，--lang 改为 js（js 规则不覆盖 .ts/.tsx）
+```
+
+### 1f. TypeScript 变更扫描
+
+```bash
+mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD -- '*.ts' '*.tsx')
+# 后续同 1b，--lang 改为 ts（ts 规则不覆盖 .js/.jsx）
+```
+
 ## 2. 多语言批量扫描
 
 ### 2a. 单项目多语言
@@ -58,12 +79,15 @@ mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD 
 PROJECT=/path/to/project
 mkdir -p reports/
 
-for lang in java cpp ansi_c; do
-    # 检测该语言是否有源文件
+for lang in java cpp ansi_c rust js ts; do
+    # 检测该语言是否有源文件（js 与 ts 是两套独立规则集，扩展名不可混用）
     case "$lang" in
         java)   fd --no-ignore -e java -t f "$PROJECT" | head -1 ;;
-        cpp)    fd --no-ignore -e cpp -e h -t f "$PROJECT" | head -1 ;;
+        cpp)    fd --no-ignore -e cpp -e h -e hpp -t f "$PROJECT" | head -1 ;;
         ansi_c) fd --no-ignore -e c -t f "$PROJECT" | head -1 ;;
+        rust)   fd --no-ignore -e rs -t f "$PROJECT" | head -1 ;;
+        js)     fd --no-ignore -e js -e jsx -t f "$PROJECT" | head -1 ;;
+        ts)     fd --no-ignore -e ts -e tsx -t f "$PROJECT" | head -1 ;;
     esac | grep -q . || { echo "$lang: 无源文件，跳过"; continue; }
 
     # 退出码 1（有 high 命中）与 3（规则解析失败）都是正常业务返回值，
