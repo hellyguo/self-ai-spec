@@ -4,6 +4,21 @@
 
 ## 2026-11-17
 
+### MR-JAR Chapter Added to AGENTS.java.md
+
+- Documents the multi-release jar source layout: `src/main/java` holds only JDK-version-neutral code, `java8`
+  compiles into the jar root, and `java{N}` compiles into `META-INF/versions/{N}`; MR-JAR has no `versions/8`
+- Fixes the Maven wiring: `build-helper-maven-plugin:add-source` for `src/main/java8`, a dedicated compiler
+  execution with `compileSourceRoots` override for versioned sources, a JDK-range activated profile, and
+  `Multi-Release: true`
+- Distills seven hard constraints: base classes cannot be built with `--release 8` when using Unsafe, versioned
+  classes only apply when loaded from the jar, same name and signature plus no old-JDK API in versioned code,
+  a single backend switch shared by access and bridge layers, restricted methods need native-access, bridge hot
+  paths rely on constant folding and must avoid `layout.varHandle()`, and codegen must not emit version-specific
+  instructions
+- Adds an acceptance checklist: JDK8 clean test, jar structure verification, probes on both JDKs, benchmark
+  comparison, and complete source jars
+
 ### Static Analysis Skills Merged by Capability (5 → 2)
 
 - **Merge criterion**: skills are split along *capability*, not language prefix. Same-language, same-capability

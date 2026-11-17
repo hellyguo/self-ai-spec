@@ -4,6 +4,17 @@
 
 ## 2026-11-17
 
+### AGENTS.java.md 新增 MR-JAR 章节
+
+- 记录 multi-release jar 的源码分层：`src/main/java` 只放与 JDK 版本无关的代码、`java8` 编进
+  jar 根目录、`java{N}` 编进 `META-INF/versions/{N}`；明确 MR-JAR 没有 `versions/8`
+- 固化 Maven 接线方式：`build-helper-maven-plugin:add-source` 并入 `src/main/java8`、版本目录用
+  独立 compiler execution + `compileSourceRoots` 覆盖、按 JDK 区间激活 profile、`Multi-Release: true`
+- 提炼七条硬约束：基础类不能用 `--release 8` 编 Unsafe、版本化类只在从 jar 加载时生效、
+  版本化类同名同签名且不触碰旧 JDK API、后端开关单一且访问层与桥接层一致、restricted method
+  需 native-access、桥接层热路径常量折叠且不用 `layout.varHandle()`、codegen 不发射版本相关指令
+- 给出验收清单：JDK8 clean test、成品 jar 结构校验、双端探针、基准对照、source jar 完整性
+
 ### 静态分析技能按能力合并（5 → 2）
 
 - **合并判据**：技能的拆分轴是“能力”而非语言前缀。同语言同能力、仅引擎不同的静态分析器属于真重复，
