@@ -9,7 +9,7 @@
 # 设计原则:
 #   - 不重新实现 run.sh，仅做参数包装 + 报告归档
 #   - 自动定位 $CODE_CHECKLIST_ROOT
-#   - 退出码透传 run.sh（0 通过 / 1 high 命中 / 2 参数错误）
+#   - 退出码透传 run.sh（0 通过 / 1 high 命中 / 2 参数错误 / 3 规则解析失败）
 set -euo pipefail
 
 # ---- 锚定规则库 ----
@@ -86,14 +86,24 @@ fi
 # ---- 执行 + 输出归档 ----
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 if [[ -n "$OUT_FILE" ]]; then
-    # 保存到文件，stdout 静默
-    "$CODE_CHECKLIST_ROOT/scripts/run.sh" "${RUN_ARGS[@]}" > "$OUT_FILE" 2>/tmp/run-cli-$TIMESTAMP.err
+    # 保存到文件，stdout 静默。
+    # 注意：run.sh 的 1/3 退出码是正常业务语义，必须用 set +e 包裹后再取 rc，
+    # 否则 set -e 会直接终止，stderr（含解析失败明细）与归档提示都不会打印。
+    ERR_FILE=$(mktemp)
+    trap 'rm -f "$ERR_FILE"' EXIT
+    set +e
+    "$CODE_CHECKLIST_ROOT/scripts/run.sh" "${RUN_ARGS[@]}" > "$OUT_FILE" 2>"$ERR_FILE"
     rc=$?
-    [[ -s /tmp/run-cli-$TIMESTAMP.err ]] && cat /tmp/run-cli-$TIMESTAMP.err >&2
-    rm -f /tmp/run-cli-$TIMESTAMP.err
-    echo "[run-cli] 报告已保存: $OUT_FILE (退出码=$rc)"
+    set -e
+    [[ -s "$ERR_FILE" ]] && cat "$ERR_FILE" >&2
+    case "$rc" in
+        0) echo "[run-cli] 报告已保存: $OUT_FILE (退出码=0，无 high 命中)" ;;
+        1) echo "[run-cli] 报告已保存: $OUT_FILE (退出码=1，有 high 命中)" ;;
+        3) echo "[run-cli] 报告已保存: $OUT_FILE (退出码=3，规则解析失败，结果不可信)" ;;
+        *) echo "[run-cli] 报告已保存: $OUT_FILE (退出码=$rc)" ;;
+    esac
     exit $rc
 else
-    # 直接输出到 stdout
+    # 直接输出到 stdout（stderr 与退出码天然透传）
     exec "$CODE_CHECKLIST_ROOT/scripts/run.sh" "${RUN_ARGS[@]}"
 fi

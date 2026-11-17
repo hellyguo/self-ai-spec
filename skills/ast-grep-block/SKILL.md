@@ -28,7 +28,7 @@ description: "基于 ast-grep 与 code-checklist 规则库，对 Java/C++/ANSI C
 
 | 工具 | 版本 | 用途 |
 |------|------|------|
-| ast-grep | >= 0.45.0 | AST 匹配引擎 |
+| ast-grep | >= 0.51.0 | AST 匹配引擎（0.5x 起规则顶层严格校验，扩展字段须在 metadata 下） |
 | bash | >= 4 | run.sh 运行环境 |
 | python3 + pyyaml | - | 元数据读取 / ignore 解析 |
 | jq | >= 1.6 | JSON 输出处理 |
@@ -68,6 +68,18 @@ done
 | **medium** | 必须修改，但并非本次修改 | 登记跟踪，下次迭代 | 0 |
 | **low** | 可接受不改 | 提示性建议 | 0 |
 
+`run.sh` 完整退出码：
+
+| 退出码 | 含义 | 处理 |
+|--------|------|------|
+| 0 | 无 high 命中 | 通过 |
+| 1 | 有 high 命中 | 按步骤 5 复核修复 |
+| 2 | 参数错误 / 工具缺失 / ast-grep 版本过低 | 修正调用或升级 ast-grep |
+| 3 | 规则解析失败或扫描出错 | **结果不可信，先修规则**（详见步骤 3 的说明） |
+
+> 退出码 3 是"规则坏了"而非"代码干净"。历史上脚本用 `2>/dev/null || echo '[]'` 吞掉
+> 解析错误，会输出假 0 命中；现在必须显式失败，不得把它当通过处理。
+
 ## 执行流程
 
 ### 步骤 1：确定目标范围
@@ -106,7 +118,7 @@ fd --no-ignore -e c -e h -t f <project_root> | wc -l  # ANSI C
 "$CODE_CHECKLIST_ROOT/scripts/run.sh" \
     --lang java --level high \
     --path <project_root>
-echo "退出码: $?  # 0 通过 / 1 high 命中 / 2 参数错误"
+echo "退出码: $?  # 0 通过 / 1 high 命中 / 2 参数错误 / 3 规则解析失败（结果不可信）"
 
 # 3b. 全级别扫描（盘点场景）
 "$CODE_CHECKLIST_ROOT/scripts/run.sh" \
@@ -246,8 +258,9 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 |------|------|------|
 | `未找到 ast-grep` | 未安装或不在 PATH | `cargo install ast-grep` 或包管理器安装 |
 | `规则库未就绪` | `CODE_CHECKLIST_ROOT` 配错或仓库缺失 | 检查环境变量、clone 仓库 |
-| 扫描结果为 0 命中但明显有问题 | 构建产物目录被误排（`build/`）或语言判断错 | 确认 `--lang` 与文件扩展名一致 |
+| 扫描结果为 0 命中但明显有问题 | 构建产物目录被误排（`build/`）或语言判断错 | 确认 `--lang` 与文件扩展名一致；同时看报告头的"已扫描规则 N 条"，为 0 则是规则侧问题 |
 | high 退出码总是 1 | 有 high 命中（正常） | 按步骤 5 修复或登记 `.astgrepignore` |
+| 退出码 3 / `规则解析失败` | 规则 YAML 顶层含 ast-grep 不接受的字段（如 `level`），或 ast-grep 版本与规则格式不匹配 | 修规则（扩展字段放 `metadata:`）或对齐 ast-grep 版本，**此时 0 命中不算通过** |
 | `.astgrepignore` 不生效 | 放错位置 | 必须放在被扫描项目根，不是规则库根 |
 | 误报泛滥 | 规则太宽 | 优先优化 constraints，次选 ignore |
 | 极慢（万级文件） | ast-grep 串行扫描 | 按目录分批跑（见 `templates/recipes.md`） |

@@ -66,10 +66,19 @@ for lang in java cpp ansi_c; do
         ansi_c) fd --no-ignore -e c -t f "$PROJECT" | head -1 ;;
     esac | grep -q . || { echo "$lang: 无源文件，跳过"; continue; }
 
+    # 退出码 1（有 high 命中）与 3（规则解析失败）都是正常业务返回值，
+    # 必须 set +e 包裹后再取 rc，否则 set -e 会中断且拿不到 3。
+    set +e
     "$CODE_CHECKLIST_ROOT/scripts/run.sh" \
         --lang "$lang" --level high \
         --path "$PROJECT" --json > "reports/$lang-high.json"
-    echo "$lang high 退出码: $?"
+    rc=$?
+    set -e
+    echo "$lang high 退出码: $rc"
+    if [[ "$rc" -eq 3 ]]; then
+        echo "[$lang] 规则解析失败，结果不可信，先修规则" >&2
+        exit 3
+    fi
 done
 ```
 
