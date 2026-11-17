@@ -45,13 +45,14 @@
 - relax test
 - relax check
 
-注意：relax 并非万应良方，存在解析器缺口与 bug，不能替代 cargo。
+relax 可显著提升开发内环效率：跳过完整 cargo 构建，按需 JIT 编译，热缓存启动通常在亚秒级，适合快速试跑、测试热重跑与运行期探查。
 
-- 仅用于开发内环（快速试跑、测试热重跑、运行期探查）；CI、发布与产物构建仍以 cargo 为准。
-- 解析器不支持 Rust 2015 裸 trait object，例如 `unsafe impl Trait for Send + Sync`，会报 `expected OpenBrace (found Plus '+')`；改为 `dyn Send + Sync` 可通过。此类语法常见于老依赖，失败时应回退 cargo，不要为适配 relax 修改业务代码或第三方依赖。
-- 依赖含 C/C++ 构建脚本时需 `--allow-c`，会额外引入构建开销并降低可移植性。
-- 即使可运行，JIT 启动与按需编译在小项目上也常慢于 cargo，且 CPU/RSS 占用更高；不得以 relax 的结果代替 cargo 的构建或性能数据。
-- 结论：relax 适合小步快速反馈，不适合作为构建、验收或性能基准的可信来源；以 cargo 的结果为准。
+使用注意：
+
+- 仍为 experimental；CI、发布与产物构建以 cargo 为准，relax 的结果不作为验收或性能基准。
+- 依赖含 C/C++ 构建脚本时需 `--allow-c`。
+- 缓存冷时首次运行包含依赖构建，耗时会明显高于热缓存。
+- 若仍遇到加载失败，先确认 relax 版本，再回退 cargo；不要为适配 relax 修改业务代码或第三方依赖。
 
 ### 环境变量
 
