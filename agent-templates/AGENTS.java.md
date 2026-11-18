@@ -90,10 +90,32 @@ MR-JAR 没有 `versions/8`：JDK8 到 N-1 运行的就是根目录类。因此 J
 6. 桥接层保持叶子形态：热路径用 `static final` 常量折叠后端分支；`MemorySegment` 用 `segment.get(layout, offset)`，不要用 `layout.varHandle()`（实测无法内联，慢一个数量级）。
 7. 代码生成不得直接发射版本相关指令：统一走一个与后端无关的静态桥接类，由 MR-JAR 替换其实现。
 
+#### 第三方依赖版本随 JDK 变化
+
+MR-JAR 的版本目录只能覆盖**本 artifact 自己的类**，无法覆盖依赖版本：POM 里声明的是唯一版本，版本层不会切换依赖树。若某依赖在不同 JDK 上必须使用不同版本，典型如 MVEL2：
+
+- `2.2.5.Final`：major 49，兼容 JDK8，但引用 JDK21 已移除的 `java.lang.Compiler`；
+- `2.6.0.Final`：major 55，不再引用 `Compiler`，但无法在 JDK8 加载。
+
+一个 MR-JAR 无法同时满足两端。按以下顺序决策：
+
+1. **优先统一版本**：寻找同时兼容基线与最高 JDK 的版本，这是唯一能保持依赖闭包简单的方案。
+2. **降为 `provided` / `optional`**：无法统一时，把该依赖移出 compile 依赖，由使用方按运行 JDK 提供。编译与基线测试使用最低兼容版本，高版本 JDK 用新版本单独验证。`provided` 表示运行期必须由外部提供；`optional` 表示不传递给下游但仍参与本模块构建，按语义选择。
+3. **禁止用 profile 切换 compile 依赖版本来“模拟”版本层**：同一个 jar 的 POM 只能声明一个版本，profile 只影响构建机，发布物无法表达这种差异，最终会在使用方爆炸。
+4. **多 artifact / shade 是最后手段**：按 JDK 发布不同 artifact 会退回多产物；把两个版本 shade 并重定位到不同包可以共存，但会放大体积、反射与资源路径问题，必须有独立验证。
+
+落地要求：
+
+- 在 README / MANUAL / AGENTS 中列出“依赖 + JDK 版本”矩阵。
+- 验证脚本在基线 JDK 使用低版本、在目标 JDK 使用高版本，分别运行**真实调用该依赖**的探针。
+- 单元测试固定在基线 JDK 时只覆盖低版本依赖，不能把它的通过当成高版本依赖的验证。
+
 #### 验收清单
 
 - JDK8 `clean test` 全绿；高版本 JDK `clean package` 全绿。
 - 成品 jar 校验：根目录含基础实现、`versions/{N}` 含版本化实现、manifest 含 `Multi-Release: true`。
 - 同一 jar 在基线与高版本 JDK 上运行探针，各自报告预期后端且功能自检通过。
+- `provided` 依赖的“依赖 + JDK 版本”矩阵已写入文档，高/低 JDK 探针各自使用正确版本通过。
+- 构建 POM 中不存在按 profile 切换的 compile 依赖版本。
 - 基线版本与新后端的基准对比无可感知回退，对照数字写入设计文档。
 - `source` jar 可追溯到全部源码（含 `java8`、`java{N}` 目录）。
