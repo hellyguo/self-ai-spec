@@ -54,6 +54,7 @@ AI 编码代理技能和语言规范的文档仓库，为多个 AI 编码工具�
 
 ```bash
 grep -r "^---$" skills/ | head  # 验证 YAML 前置数据
+bin/check-md-wrap.sh            # 检查 markdown 逻辑成行（默认变更集，--all 全仓）
 ```
 
 ## 技能文件格式

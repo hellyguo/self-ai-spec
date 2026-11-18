@@ -2,74 +2,61 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-18
+
+### markdown 排版规则收紧：逻辑成行 + 唯一检查脚本
+
+- **规则改写**：`rules/interaction.rules.md` 把原“不按行宽硬换行”一条扩写为“一个段落、一个列表项、一个引用块写成一个逻辑行”，明确“一句一换行”同样违规，并补齐中英文同口径、代码块与表格不重排不折断、表格前保留空行、强制换行仅限签名/元数据区
+- **判据调整**：改为“同一逻辑块内出现第二行连续文本”，不再以“上一行是否以句末标点收尾”判定。标点判据可判定但可被绕过——按句号逐句拆行同样能通过，因此判定必须落在逻辑块上；作者仍负责逻辑归类，脚本只保证“一个逻辑块占一行”
+- **新增检查**：`bin/check-md-wrap.sh` 输出 WRAP（段内换行）与 TABLE（表格前缺空行）两类问题，默认检查变更集、`--all` 检查全仓、自动跳过符号链接以免改写外部技能仓库，退出码 0/1/2
+- **关闭 markdownlint**：删除 `.markdownlint.json`，仓库不再以 MD013 等按行宽计算的检查验收；`docs/code-review-framework.md` 的规则验证命令改为调用新脚本
+- **存量归一**：`CHANGELOG.md`、`CHANGELOG_en.md`、`README.md`、`README_en.md` 共 160 处按列宽折行的续行合并为逻辑行，非空白字符数前后一致；其余约 187 处分布在技能文档，按“改动即修”节奏收敛
+
 ## 2026-11-17
 
 ### AGENTS.java.md 新增 MR-JAR 章节
 
-- 记录 multi-release jar 的源码分层：`src/main/java` 只放与 JDK 版本无关的代码、`java8` 编进
-  jar 根目录、`java{N}` 编进 `META-INF/versions/{N}`；明确 MR-JAR 没有 `versions/8`
-- 固化 Maven 接线方式：`build-helper-maven-plugin:add-source` 并入 `src/main/java8`、版本目录用
-  独立 compiler execution + `compileSourceRoots` 覆盖、按 JDK 区间激活 profile、`Multi-Release: true`
-- 提炼七条硬约束：基础类不能用 `--release 8` 编 Unsafe、版本化类只在从 jar 加载时生效、
-  版本化类同名同签名且不触碰旧 JDK API、后端开关单一且访问层与桥接层一致、restricted method
-  需 native-access、桥接层热路径常量折叠且不用 `layout.varHandle()`、codegen 不发射版本相关指令
+- 记录 multi-release jar 的源码分层：`src/main/java` 只放与 JDK 版本无关的代码、`java8` 编进 jar 根目录、`java{N}` 编进 `META-INF/versions/{N}`；明确 MR-JAR 没有 `versions/8`
+- 固化 Maven 接线方式：`build-helper-maven-plugin:add-source` 并入 `src/main/java8`、版本目录用独立 compiler execution + `compileSourceRoots` 覆盖、按 JDK 区间激活 profile、`Multi-Release: true`
+- 提炼七条硬约束：基础类不能用 `--release 8` 编 Unsafe、版本化类只在从 jar 加载时生效、版本化类同名同签名且不触碰旧 JDK API、后端开关单一且访问层与桥接层一致、restricted method 需 native-access、桥接层热路径常量折叠且不用 `layout.varHandle()`、codegen 不发射版本相关指令
 - 给出验收清单：JDK8 clean test、成品 jar 结构校验、双端探针、基准对照、source jar 完整性
 
 ### 静态分析技能按能力合并（5 → 2）
 
-- **合并判据**：技能的拆分轴是“能力”而非语言前缀。同语言同能力、仅引擎不同的静态分析器属于真重复，
-  改为 router 型技能（`SKILL.md` 选型 + `references/` 按需读取），单技能超过 300 行必须分层
-- **`java-static-analysis`**：由 `java-check-pmd`、`java-check-spotbugs` 合并，新增 `references/combined-workflow.md`
-  双引擎串联与去重规则，统一三级严重度（PMD priority 1-2 / SpotBugs high → P0），模板加 `pmd-`、`spotbugs-` 前缀
-- **`cpp-static-analysis`**：由 `cpp-check`、`cpp-clang-tidy`、`cpp-tscancode` 合并，新增三引擎差异表与
-  “快筛 → 精修”组合策略，明确 `compile_commands.json` 缺失时的误报风险与报告标注要求
-- **未合并**：`rust-clippy`（静态分析）与 `rust-flamegraph`（CPU 采样）能力不相干；`java-asprof` 与 `jmh-bench`
-  分属运行时采样与微基准。按语言前缀合并会让 description 失焦、触发不准
+- **合并判据**：技能的拆分轴是“能力”而非语言前缀。同语言同能力、仅引擎不同的静态分析器属于真重复，改为 router 型技能（`SKILL.md` 选型 + `references/` 按需读取），单技能超过 300 行必须分层
+- **`java-static-analysis`**：由 `java-check-pmd`、`java-check-spotbugs` 合并，新增 `references/combined-workflow.md` 双引擎串联与去重规则，统一三级严重度（PMD priority 1-2 / SpotBugs high → P0），模板加 `pmd-`、`spotbugs-` 前缀
+- **`cpp-static-analysis`**：由 `cpp-check`、`cpp-clang-tidy`、`cpp-tscancode` 合并，新增三引擎差异表与 “快筛 → 精修”组合策略，明确 `compile_commands.json` 缺失时的误报风险与报告标注要求
+- **未合并**：`rust-clippy`（静态分析）与 `rust-flamegraph`（CPU 采样）能力不相干；`java-asprof` 与 `jmh-bench` 分属运行时采样与微基准。按语言前缀合并会让 description 失焦、触发不准
 - **索引同步**：`AGENTS.md`、`README.md`、`README_en.md` 技能表由 5 行收敛为 2 行，技能入口 42 → 39
 
 ## 2026-11-13
 
 ### sync-repo-docs 联动 merge-agents-md
 
-- **执行流程新增联动步骤**：`skills/sync-repo-docs/SKILL.md` 在补齐互链后增加第 5 步，调用 `merge-agents-md`
-  同步 `AGENTS.md`，原「输出变更清单」顺延为第 6 步，清单需包含 AGENTS.md 的合并结果
-- **新增「联动 AGENTS.md」章节**：明确模板引用锚点、语言判定顺序（用户指定 > 扩展名推断 > 询问用户）、
-  沿用被调用技能的合并硬门禁（项目事实优先、增量合并不整篇覆盖），并规定跳过条件与记录要求
-- **冲突处理与检查清单**：补充 `AGENTS.md` 缺失且语言无法判定时的询问与跳过规则；检查清单新增
-  AGENTS.md 合并或跳过原因的确认项
+- **执行流程新增联动步骤**：`skills/sync-repo-docs/SKILL.md` 在补齐互链后增加第 5 步，调用 `merge-agents-md` 同步 `AGENTS.md`，原「输出变更清单」顺延为第 6 步，清单需包含 AGENTS.md 的合并结果
+- **新增「联动 AGENTS.md」章节**：明确模板引用锚点、语言判定顺序（用户指定 > 扩展名推断 > 询问用户）、沿用被调用技能的合并硬门禁（项目事实优先、增量合并不整篇覆盖），并规定跳过条件与记录要求
+- **冲突处理与检查清单**：补充 `AGENTS.md` 缺失且语言无法判定时的询问与跳过规则；检查清单新增 AGENTS.md 合并或跳过原因的确认项
 - **索引同步**：`README.md`、`README_en.md` 技能表更新 `sync-repo-docs` 的描述
 
 ## 2026-11-11
 
 ### gdb-heap-analysis 扩展：大 core 取证与 mmap 统计
 
-- **新增 mmap 统计（Step 4.5）**：`IS_MMAPPED` 分配独立于 arena、不计入 `system_mem`，此前属于统计盲区；
-  新增 `scripts/mmap_scan.c`，解析 `PT_LOAD` 与 `NT_FILE`，输出文件/匿名映射计数、匿名映射大小分桶、
-  疑似 `IS_MMAPPED` chunk 与非 chunk 大块 ANON，`min_size` 默认 128KB
-- **新增大 core 直接扫描（Step 6）**：`references/large-core-chunk-scan.md` 给出 >4GB / 百万级 chunk 的
-  文件级扫描方法论，含 `p_offset` 与 `p_vaddr` 不同余、chunk 链遍历、尺寸指纹分桶、内容聚类、
-  可达性判定、零页与 RSS 对照
-- **新增脚本**：`heap_scan.c`（arena 链统计，含最后一块越界保护、`bad>0` 告警、`memcpy` 未对齐读）、
-  `scan_zero_pages.c`（零页统计）、`arena_walk.py`（按 glibc 版本遍历 arena）
-- **跨架构页大小修正**：页大小优先读 core 的 `NT_AUXV`（`AT_PAGESZ`），不再使用宿主 `sysconf`；
-  修复 x86 宿主分析 aarch64 64KB 页 core 时页数与 MiB 全错的问题
-- **可移植性与边界**：修正 glibc 2.28 aarch64 偏移（`top=0x60`、`next=0x870`、`system_mem=0x888`）；
-  新增 `references/scope-and-limits.md`，界定 glibc ptmalloc、非 glibc 分配器、JVM 堆/Metaspace 与
-  Netty 各分配路径的可见性；新增 `templates/leak-profile-output.md`
-- **清洗**：移除技能内的项目特征（产品名、core 文件名、具体地址、业务字段与实测数字），改为占位符；
-  删除无用的 `agents/openai.yaml`
+- **新增 mmap 统计（Step 4.5）**：`IS_MMAPPED` 分配独立于 arena、不计入 `system_mem`，此前属于统计盲区；新增 `scripts/mmap_scan.c`，解析 `PT_LOAD` 与 `NT_FILE`，输出文件/匿名映射计数、匿名映射大小分桶、疑似 `IS_MMAPPED` chunk 与非 chunk 大块 ANON，`min_size` 默认 128KB
+- **新增大 core 直接扫描（Step 6）**：`references/large-core-chunk-scan.md` 给出 >4GB / 百万级 chunk 的文件级扫描方法论，含 `p_offset` 与 `p_vaddr` 不同余、chunk 链遍历、尺寸指纹分桶、内容聚类、可达性判定、零页与 RSS 对照
+- **新增脚本**：`heap_scan.c`（arena 链统计，含最后一块越界保护、`bad>0` 告警、`memcpy` 未对齐读）、 `scan_zero_pages.c`（零页统计）、`arena_walk.py`（按 glibc 版本遍历 arena）
+- **跨架构页大小修正**：页大小优先读 core 的 `NT_AUXV`（`AT_PAGESZ`），不再使用宿主 `sysconf`；修复 x86 宿主分析 aarch64 64KB 页 core 时页数与 MiB 全错的问题
+- **可移植性与边界**：修正 glibc 2.28 aarch64 偏移（`top=0x60`、`next=0x870`、`system_mem=0x888`）；新增 `references/scope-and-limits.md`，界定 glibc ptmalloc、非 glibc 分配器、JVM 堆/Metaspace 与 Netty 各分配路径的可见性；新增 `templates/leak-profile-output.md`
+- **清洗**：移除技能内的项目特征（产品名、core 文件名、具体地址、业务字段与实测数字），改为占位符；删除无用的 `agents/openai.yaml`
 
 ### 技能来源更正与文档同步
 
 - **自维护技能标注**：`memrec`、`multype2txt` 的 `SKILL.md` 实为软链接，指向本人独立维护的仓库，此前在 `AGENTS.md` 中误标为「本地」
   - `AGENTS.md` 技能来源新增 `外部（自维护）` 分类，并列出两个技能的 GitHub / Gitee 仓库地址
-  - `README.md`、`README_en.md` 的「技能目录的来源形态」拆分为四类：本仓库维护、软链到自维护仓库、
-    软链到第三方仓库、本地未发布；新增「自维护技能仓库」地址表
+  - `README.md`、`README_en.md` 的「技能目录的来源形态」拆分为四类：本仓库维护、软链到自维护仓库、软链到第三方仓库、本地未发布；新增「自维护技能仓库」地址表
   - `semble-search` 仍归类为本地维护、不发布
-- **索引补齐**：`AGENTS.md`、`README.md`、`README_en.md` 补入 `java-quality-loop`，并把 `gdb-heap-analysis`
-  描述扩展为「含 IS_MMAPPED/mmap 统计与大 core 扫描」
-- **文档同步**：按 `sync-repo-docs` 规划复核三份文档的命名与互链，MANUAL 维持既有「不设」决策；
-  补记 2026-11-05 至 2026-11-11 期间遗漏的技能与规则变更
+- **索引补齐**：`AGENTS.md`、`README.md`、`README_en.md` 补入 `java-quality-loop`，并把 `gdb-heap-analysis` 描述扩展为「含 IS_MMAPPED/mmap 统计与大 core 扫描」
+- **文档同步**：按 `sync-repo-docs` 规划复核三份文档的命名与互链，MANUAL 维持既有「不设」决策；补记 2026-11-05 至 2026-11-11 期间遗漏的技能与规则变更
 
 ## 2026-11-10
 
@@ -81,34 +68,25 @@
 
 ### java-quality-loop 技能新增
 
-- **新增 `java-quality-loop`**：面向 Maven/Gradle 多模块 Java 项目的执行型循环 SOP，基本轮次为
-  `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`，强调可回滚、可验证
-- **治理边界**：显式声明本技能是持续减压环节，不能替代测试体系、CI 门禁、架构治理、可观测性与安全治理；
-  成功标准是持续降低腐化增量，而非重复率或复杂度归零
-- **重构参考与脚本**：新增重复、复杂度、结构分派三类重构指南，以及 `dup_clusters.py`、`pattern_scan.py`、
-  `complexity_scan.py` 三个扫描脚本；配套 backlog、round-report、metrics、decision-record、
-  cycle-summary、state.json、loop-config.yaml 等模板
-- **`code-review` 结构透镜**：新增 `templates/structure-lens.md`，把结构分派、相似范式与复杂度信号
-  纳入审查视角
+- **新增 `java-quality-loop`**：面向 Maven/Gradle 多模块 Java 项目的执行型循环 SOP，基本轮次为 `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`，强调可回滚、可验证
+- **治理边界**：显式声明本技能是持续减压环节，不能替代测试体系、CI 门禁、架构治理、可观测性与安全治理；成功标准是持续降低腐化增量，而非重复率或复杂度归零
+- **重构参考与脚本**：新增重复、复杂度、结构分派三类重构指南，以及 `dup_clusters.py`、`pattern_scan.py`、 `complexity_scan.py` 三个扫描脚本；配套 backlog、round-report、metrics、decision-record、 cycle-summary、state.json、loop-config.yaml 等模板
+- **`code-review` 结构透镜**：新增 `templates/structure-lens.md`，把结构分派、相似范式与复杂度信号纳入审查视角
 
 ## 2026-11-06
 
 ### 交互规则语言口径收敛
 
-- **按输出类型分口径**：LLM 交互与输出统一简体中文且不带 Emoji；正式文档用中文，除非明确要求英文；
-  git 提交用英文，必要时附中文
+- **按输出类型分口径**：LLM 交互与输出统一简体中文且不带 Emoji；正式文档用中文，除非明确要求英文； git 提交用英文，必要时附中文
 - **删除 thinking 语言条款**：隐藏推理语言不可强制执行也无法验证，条款只增加噪音，予以移除
-- **同步位置**：`AGENTS.md` 内联副本与 `code-detect-problem`、`long-term-task`、`merge-agents-md`
-  三个技能的提交示例同步为新口径
+- **同步位置**：`AGENTS.md` 内联副本与 `code-detect-problem`、`long-term-task`、`merge-agents-md` 三个技能的提交示例同步为新口径
 
 ## 2026-11-05
 
 ### requirement-collect 强化根本需求提炼
 
-- **根本需求优先（强制）**：技术实现只是参考实现，不是需求本身；每条需求先写根本需求，再写参考技术实现，
-  最后给代码证据，禁止用「系统做了 X」代替「系统必须保证 Y」
-- **模板与检查清单**：模块、业务规则、全局需求三个模板同步增加根本需求与参考实现说明，
-  完整性检查清单新增「根本需求」产出项
+- **根本需求优先（强制）**：技术实现只是参考实现，不是需求本身；每条需求先写根本需求，再写参考技术实现，最后给代码证据，禁止用「系统做了 X」代替「系统必须保证 Y」
+- **模板与检查清单**：模块、业务规则、全局需求三个模板同步增加根本需求与参考实现说明，完整性检查清单新增「根本需求」产出项
 - **中性表达**：清洗模板中的行业业务词汇（如价源、报价、定价），改为通用中性表述
 
 ### 交互规则新增嵌套深度上限

@@ -165,8 +165,8 @@ Reviewed by {tool}+{model}
 
 #### 规则验证
 ```bash
-# 验证规则文件格式
-markdownlint lang-spec/spec.*.md
+# 验证规则文件格式（本仓库不使用 markdownlint，改用逻辑成行检查）
+bin/check-md-wrap.sh lang-spec/
 
 # 测试审查执行
 模拟审查示例项目

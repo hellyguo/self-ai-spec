@@ -2,13 +2,11 @@
 
 > Language: [中文](README.md) | [English](README_en.md)
 
-A documentation repository of skills and language specifications for AI coding agents, providing unified skill
-definitions for multiple AI coding tools.
+A documentation repository of skills and language specifications for AI coding agents, providing unified skill definitions for multiple AI coding tools.
 
 ## Important Prerequisite
 
-**The environment variable is mandatory**: before using any script, you must set the `AI_SPEC_ROOT` environment variable
-to the root directory of this repository.
+**The environment variable is mandatory**: before using any script, you must set the `AI_SPEC_ROOT` environment variable to the root directory of this repository.
 
 **Why the environment variable is required**:
 
@@ -136,8 +134,7 @@ Each programming language provides the following related files (`ci` is availabl
 
 - **When coding**: consult `spec.{lang}.md` to keep the code compliant
 - **When reviewing**: consult both `spec.{lang}.md` and `review.{lang}.md` for a complete check
-- **Skill integration**: the `/code-review` skill automatically loads the corresponding language specification and
-  review rules
+- **Skill integration**: the `/code-review` skill automatically loads the corresponding language specification and review rules
 
 ## Agent Template Configuration
 
@@ -165,9 +162,7 @@ Language-specific agent templates live in `agent-templates/` and are used to con
 
 ## Quick-Start Scripts
 
-The `bin/` directory contains quick-start scripts for AI coding tools, supporting session resume and automatic language
-template configuration.
-Session IDs are stored in hidden files at the project root, managed independently per tool.
+The `bin/` directory contains quick-start scripts for AI coding tools, supporting session resume and automatic language template configuration. Session IDs are stored in hidden files at the project root, managed independently per tool.
 
 | Script | Tool | Session ID file | Session resume |
 | :----- | :--- | :-------------- | :------------- |
@@ -246,21 +241,14 @@ Both currently link to the corresponding `memrec` implementations (`pi-extension
 
 Not all skills under `skills/` are version-controlled in this repository; there are four forms:
 
-- **Maintained in this repository**: the directory and `SKILL.md` are tracked directly (for example `code-review`,
-  `java-env`, `vbox-test-env`).
-- **Symbolic links to self-maintained repositories**: the `SKILL.md` files of `memrec` and `multype2txt` are symlinked
-  to repositories maintained independently by the author (see the table below); this repository keeps only the symlink
-  entry and index notes, and the links are ignored in `skills/.gitignore`.
-- **Symbolic links to third-party repositories**: diagram and presentation skills point to independent repositories
-  (`creating-mermaid-diagrams`, `drawio-skill`, `excalidraw-diagram`, `html-ppt`, `plantuml-skill`, `ppt-master`)
-  and are ignored in `skills/.gitignore`.
-- **Maintained locally, not version-controlled**: `semble-search` and similar skills exist only on the local machine and
-  are not published to public repositories.
+- **Maintained in this repository**: the directory and `SKILL.md` are tracked directly (for example `code-review`, `java-env`, `vbox-test-env`).
+- **Symbolic links to self-maintained repositories**: the `SKILL.md` files of `memrec` and `multype2txt` are symlinked to repositories maintained independently by the author (see the table below); this repository keeps only the symlink entry and index notes, and the links are ignored in `skills/.gitignore`.
+- **Symbolic links to third-party repositories**: diagram and presentation skills point to independent repositories (`creating-mermaid-diagrams`, `drawio-skill`, `excalidraw-diagram`, `html-ppt`, `plantuml-skill`, `ppt-master`) and are ignored in `skills/.gitignore`.
+- **Maintained locally, not version-controlled**: `semble-search` and similar skills exist only on the local machine and are not published to public repositories.
 
 ### Self-maintained Skill Repositories
 
-The implementations of the following skills live in independent repositories, and this repository pulls in their
-`SKILL.md` through symbolic links:
+The implementations of the following skills live in independent repositories, and this repository pulls in their `SKILL.md` through symbolic links:
 
 | Skill | GitHub | Gitee |
 | :--- | :--- | :--- |
@@ -280,8 +268,7 @@ The implementations of the following skills live in independent repositories, an
 
 ## Detailed Documents
 
-- Interaction rules and repository conventions: [AGENTS.md](AGENTS.md),
-  [rules/interaction.rules.md](rules/interaction.rules.md)
+- Interaction rules and repository conventions: [AGENTS.md](AGENTS.md), [rules/interaction.rules.md](rules/interaction.rules.md)
 - Code review framework design: [docs/code-review-framework.md](docs/code-review-framework.md)
 - Full change history: [CHANGELOG_en.md](CHANGELOG_en.md)
 - Chinese version: [README.md](README.md) | [CHANGELOG.md](CHANGELOG.md)

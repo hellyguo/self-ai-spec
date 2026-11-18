@@ -162,8 +162,7 @@ self-ai-spec/
 
 ## 快速启动脚本
 
-`bin/` 目录包含 AI 编码工具的快速启动脚本，支持会话恢复和语言模板自动配置：
-会话 ID 保存在项目根目录的隐藏文件中，各工具独立管理。
+`bin/` 目录包含 AI 编码工具的快速启动脚本，支持会话恢复和语言模板自动配置：会话 ID 保存在项目根目录的隐藏文件中，各工具独立管理。
 
 | 启动脚本 | 工具 | 会话 ID 文件 | 会话恢复 |
 | :------- | :--- | :----------- | :------- |
@@ -243,11 +242,8 @@ updocid
 `skills/` 下的技能并非全部纳入本仓库版本管理，存在四种形态：
 
 - **本仓库维护**：目录与 `SKILL.md` 直接跟踪（如 `code-review`、`java-env`、`vbox-test-env`）。
-- **符号链接到自维护仓库**：`memrec`、`multype2txt` 的 `SKILL.md` 软链接到本人独立维护的仓库（地址见下表），
-  本仓库只保留软链接入口与索引说明，软链接已在 `skills/.gitignore` 中忽略。
-- **符号链接到第三方仓库**：图表与演示类技能指向独立仓库
-  （`creating-mermaid-diagrams`、`drawio-skill`、`excalidraw-diagram`、`html-ppt`、`plantuml-skill`、`ppt-master`），
-  已在 `skills/.gitignore` 中忽略。
+- **符号链接到自维护仓库**：`memrec`、`multype2txt` 的 `SKILL.md` 软链接到本人独立维护的仓库（地址见下表），本仓库只保留软链接入口与索引说明，软链接已在 `skills/.gitignore` 中忽略。
+- **符号链接到第三方仓库**：图表与演示类技能指向独立仓库（`creating-mermaid-diagrams`、`drawio-skill`、`excalidraw-diagram`、`html-ppt`、`plantuml-skill`、`ppt-master`），已在 `skills/.gitignore` 中忽略。
 - **本地维护、不纳入版本控制**：`semble-search` 等，仅存在于本机，不发布到公共仓库。
 
 ### 自维护技能仓库

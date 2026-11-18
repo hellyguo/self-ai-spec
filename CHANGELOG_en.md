@@ -2,90 +2,61 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-18
+
+### Stricter Markdown Layout Rule: One Logical Block Per Line
+
+- **Rule rewrite**: `rules/interaction.rules.md` replaces the former no-column-wrapping bullet with "one paragraph, one list item, one blockquote occupies one logical line", explicitly making one-sentence-per-line a violation, and adds parity for Chinese and English, no reflowing of code blocks and tables, a blank line before tables, and explicit breaks limited to signature/metadata areas
+- **Criterion change**: detection now keys on "a second consecutive text line inside the same logical block" instead of "the previous line lacks closing punctuation". The punctuation test was decidable but bypassable: splitting one sentence per line passed it, so the criterion must sit on the logical block. The author still owns the grouping decision; the script only enforces one block per line
+- **New checker**: `bin/check-md-wrap.sh` reports WRAP (in-block line break) and TABLE (missing blank line before a table), checks the change set by default, supports `--all`, skips symlinks so external skill repositories are never rewritten, and exits 0/1/2
+- **markdownlint disabled**: `.markdownlint.json` is removed and the repository no longer validates against width-based checks such as MD013; the rule verification command in `docs/code-review-framework.md` now calls the new script
+- **Legacy normalization**: 160 wrapped continuation lines across `CHANGELOG.md`, `CHANGELOG_en.md`, `README.md`, and `README_en.md` are merged into logical lines with identical non-whitespace character counts; the remaining ~187 spots live in skill documents and converge on a fix-as-you-touch basis
+
 ## 2026-11-17
 
 ### MR-JAR Chapter Added to AGENTS.java.md
 
-- Documents the multi-release jar source layout: `src/main/java` holds only JDK-version-neutral code, `java8`
-  compiles into the jar root, and `java{N}` compiles into `META-INF/versions/{N}`; MR-JAR has no `versions/8`
-- Fixes the Maven wiring: `build-helper-maven-plugin:add-source` for `src/main/java8`, a dedicated compiler
-  execution with `compileSourceRoots` override for versioned sources, a JDK-range activated profile, and
-  `Multi-Release: true`
-- Distills seven hard constraints: base classes cannot be built with `--release 8` when using Unsafe, versioned
-  classes only apply when loaded from the jar, same name and signature plus no old-JDK API in versioned code,
-  a single backend switch shared by access and bridge layers, restricted methods need native-access, bridge hot
-  paths rely on constant folding and must avoid `layout.varHandle()`, and codegen must not emit version-specific
-  instructions
-- Adds an acceptance checklist: JDK8 clean test, jar structure verification, probes on both JDKs, benchmark
-  comparison, and complete source jars
+- Documents the multi-release jar source layout: `src/main/java` holds only JDK-version-neutral code, `java8` compiles into the jar root, and `java{N}` compiles into `META-INF/versions/{N}`; MR-JAR has no `versions/8`
+- Fixes the Maven wiring: `build-helper-maven-plugin:add-source` for `src/main/java8`, a dedicated compiler execution with `compileSourceRoots` override for versioned sources, a JDK-range activated profile, and `Multi-Release: true`
+- Distills seven hard constraints: base classes cannot be built with `--release 8` when using Unsafe, versioned classes only apply when loaded from the jar, same name and signature plus no old-JDK API in versioned code, a single backend switch shared by access and bridge layers, restricted methods need native-access, bridge hot paths rely on constant folding and must avoid `layout.varHandle()`, and codegen must not emit version-specific instructions
+- Adds an acceptance checklist: JDK8 clean test, jar structure verification, probes on both JDKs, benchmark comparison, and complete source jars
 
 ### Static Analysis Skills Merged by Capability (5 → 2)
 
-- **Merge criterion**: skills are split along *capability*, not language prefix. Same-language, same-capability
-  analyzers that differ only by engine are true duplicates, so they become router-style skills (`SKILL.md` selection
-  plus on-demand `references/`); any skill beyond 300 lines must be layered
-- **`java-static-analysis`**: merges `java-check-pmd` and `java-check-spotbugs`, adds
-  `references/combined-workflow.md` for chained runs and de-duplication, unifies three-level severity
-  (PMD priority 1-2 / SpotBugs high → P0), and prefixes templates with `pmd-` / `spotbugs-`
-- **`cpp-static-analysis`**: merges `cpp-check`, `cpp-clang-tidy`, and `cpp-tscancode`, adds an engine comparison
-  table and a triage-then-refine strategy, and requires reports to flag the missing-`compile_commands.json` false
-  positive risk
-- **Not merged**: `rust-clippy` (static analysis) vs `rust-flamegraph` (CPU sampling) are unrelated capabilities;
-  `java-asprof` and `jmh-bench` cover runtime sampling versus microbenchmarks. Merging by language prefix would blur
-  descriptions and degrade triggering
-- **Index sync**: the skill tables in `AGENTS.md`, `README.md`, and `README_en.md` shrink from 5 rows to 2, taking
-  the skill entry count from 42 to 39
+- **Merge criterion**: skills are split along *capability*, not language prefix. Same-language, same-capability analyzers that differ only by engine are true duplicates, so they become router-style skills (`SKILL.md` selection plus on-demand `references/`); any skill beyond 300 lines must be layered
+- **`java-static-analysis`**: merges `java-check-pmd` and `java-check-spotbugs`, adds `references/combined-workflow.md` for chained runs and de-duplication, unifies three-level severity (PMD priority 1-2 / SpotBugs high → P0), and prefixes templates with `pmd-` / `spotbugs-`
+- **`cpp-static-analysis`**: merges `cpp-check`, `cpp-clang-tidy`, and `cpp-tscancode`, adds an engine comparison table and a triage-then-refine strategy, and requires reports to flag the missing-`compile_commands.json` false positive risk
+- **Not merged**: `rust-clippy` (static analysis) vs `rust-flamegraph` (CPU sampling) are unrelated capabilities; `java-asprof` and `jmh-bench` cover runtime sampling versus microbenchmarks. Merging by language prefix would blur descriptions and degrade triggering
+- **Index sync**: the skill tables in `AGENTS.md`, `README.md`, and `README_en.md` shrink from 5 rows to 2, taking the skill entry count from 42 to 39
 
 ## 2026-11-13
 
 ### sync-repo-docs Chains into merge-agents-md
 
-- **New chained step in the workflow**: `skills/sync-repo-docs/SKILL.md` now runs `merge-agents-md` as step 5 after
-  cross-links are completed, synchronizing `AGENTS.md`; the former "output change list" step moves to step 6 and the
-  list must include the AGENTS.md merge result
-- **New "Chaining into AGENTS.md" section**: defines the template reference anchor, language resolution order
-  (user-specified > extension inference > ask the user), inherits the merge hard gate of the called skill (project
-  facts first, incremental merge without full overwrite), and specifies skip conditions plus recording requirements
-- **Conflict handling and checklist**: adds rules for asking the user and skipping when `AGENTS.md` is missing and the
-  language cannot be determined; the checklist gains an item confirming the AGENTS.md merge or the skip reason
+- **New chained step in the workflow**: `skills/sync-repo-docs/SKILL.md` now runs `merge-agents-md` as step 5 after cross-links are completed, synchronizing `AGENTS.md`; the former "output change list" step moves to step 6 and the list must include the AGENTS.md merge result
+- **New "Chaining into AGENTS.md" section**: defines the template reference anchor, language resolution order (user-specified > extension inference > ask the user), inherits the merge hard gate of the called skill (project facts first, incremental merge without full overwrite), and specifies skip conditions plus recording requirements
+- **Conflict handling and checklist**: adds rules for asking the user and skipping when `AGENTS.md` is missing and the language cannot be determined; the checklist gains an item confirming the AGENTS.md merge or the skip reason
 - **Index sync**: the skill tables in `README.md` and `README_en.md` update the `sync-repo-docs` description
 
 ## 2026-11-11
 
 ### gdb-heap-analysis: Large-Core Forensics and Mmap Accounting
 
-- **Mmap accounting (Step 4.5)**: `IS_MMAPPED` allocations sit outside the arena chain and are not counted in
-  `system_mem`, so they were previously a blind spot. New `scripts/mmap_scan.c` parses `PT_LOAD` and `NT_FILE` and
-  reports file/anonymous mapping counts, anonymous size buckets, suspected `IS_MMAPPED` chunks, and large non-chunk
-  ANON mappings; `min_size` defaults to 128KB
-- **Large-core direct scanning (Step 6)**: `references/large-core-chunk-scan.md` documents file-level scanning for
-  cores over 4GB or with millions of chunks, covering the `p_offset` vs `p_vaddr` mismatch, chunk-chain traversal,
-  size-fingerprint bucketing, content clustering, reachability judgement, and zero-page/RSS comparison
-- **New scripts**: `heap_scan.c` (arena chain statistics with last-chunk bounds protection, `bad>0` warnings, and
-  `memcpy` unaligned reads), `scan_zero_pages.c` (zero-page statistics), `arena_walk.py` (arena traversal by glibc
-  version)
-- **Cross-architecture page size fix**: page size is now read from the core's `NT_AUXV` (`AT_PAGESZ`) instead of the
-  host `sysconf`; this fixes wrong page counts and MiB totals when an x86 host analyses an aarch64 core with 64KB pages
-- **Portability and scope**: corrected glibc 2.28 aarch64 offsets (`top=0x60`, `next=0x870`, `system_mem=0x888`);
-  added `references/scope-and-limits.md` defining visibility across glibc ptmalloc, non-glibc allocators, JVM
-  heap/Metaspace, and Netty allocation paths; added `templates/leak-profile-output.md`
-- **Sanitization**: removed project-specific traits from the skill (product names, core file names, concrete
-  addresses, business fields, measured numbers) in favour of placeholders; deleted the unused `agents/openai.yaml`
+- **Mmap accounting (Step 4.5)**: `IS_MMAPPED` allocations sit outside the arena chain and are not counted in `system_mem`, so they were previously a blind spot. New `scripts/mmap_scan.c` parses `PT_LOAD` and `NT_FILE` and reports file/anonymous mapping counts, anonymous size buckets, suspected `IS_MMAPPED` chunks, and large non-chunk ANON mappings; `min_size` defaults to 128KB
+- **Large-core direct scanning (Step 6)**: `references/large-core-chunk-scan.md` documents file-level scanning for cores over 4GB or with millions of chunks, covering the `p_offset` vs `p_vaddr` mismatch, chunk-chain traversal, size-fingerprint bucketing, content clustering, reachability judgement, and zero-page/RSS comparison
+- **New scripts**: `heap_scan.c` (arena chain statistics with last-chunk bounds protection, `bad>0` warnings, and `memcpy` unaligned reads), `scan_zero_pages.c` (zero-page statistics), `arena_walk.py` (arena traversal by glibc version)
+- **Cross-architecture page size fix**: page size is now read from the core's `NT_AUXV` (`AT_PAGESZ`) instead of the host `sysconf`; this fixes wrong page counts and MiB totals when an x86 host analyses an aarch64 core with 64KB pages
+- **Portability and scope**: corrected glibc 2.28 aarch64 offsets (`top=0x60`, `next=0x870`, `system_mem=0x888`); added `references/scope-and-limits.md` defining visibility across glibc ptmalloc, non-glibc allocators, JVM heap/Metaspace, and Netty allocation paths; added `templates/leak-profile-output.md`
+- **Sanitization**: removed project-specific traits from the skill (product names, core file names, concrete addresses, business fields, measured numbers) in favour of placeholders; deleted the unused `agents/openai.yaml`
 
 ### Skill Origin Correction and Documentation Sync
 
-- **Self-maintained skill labeling**: the `SKILL.md` files of `memrec` and `multype2txt` are symbolic links to
-  repositories maintained independently by the author; `AGENTS.md` previously labeled them as "local"
+- **Self-maintained skill labeling**: the `SKILL.md` files of `memrec` and `multype2txt` are symbolic links to repositories maintained independently by the author; `AGENTS.md` previously labeled them as "local"
   - `AGENTS.md` adds an `External (self-maintained)` origin category and lists the GitHub / Gitee URLs of both skills
-  - The "Origins of Skills" sections of `README.md` and `README_en.md` are split into four forms: maintained in this
-    repository, symlinked to self-maintained repositories, symlinked to third-party repositories, and local-only; a
-    "Self-maintained Skill Repositories" table is added
+  - The "Origins of Skills" sections of `README.md` and `README_en.md` are split into four forms: maintained in this repository, symlinked to self-maintained repositories, symlinked to third-party repositories, and local-only; a "Self-maintained Skill Repositories" table is added
   - `semble-search` is still classified as locally maintained and unpublished
-- **Index completion**: `AGENTS.md`, `README.md`, and `README_en.md` now list `java-quality-loop`, and the
-  `gdb-heap-analysis` description now covers IS_MMAPPED/mmap accounting and large-core scanning
-- **Documentation sync**: reviewed the naming and cross-links of the three document types per the `sync-repo-docs`
-  plan; the existing decision to omit MANUAL stands; changes between 2026-11-05 and 2026-11-11 that were missing from
-  the changelog are recorded here
+- **Index completion**: `AGENTS.md`, `README.md`, and `README_en.md` now list `java-quality-loop`, and the `gdb-heap-analysis` description now covers IS_MMAPPED/mmap accounting and large-core scanning
+- **Documentation sync**: reviewed the naming and cross-links of the three document types per the `sync-repo-docs` plan; the existing decision to omit MANUAL stands; changes between 2026-11-05 and 2026-11-11 that were missing from the changelog are recorded here
 
 ## 2026-11-10
 
@@ -97,135 +68,89 @@
 
 ### New java-quality-loop Skill
 
-- **New `java-quality-loop`**: an execution-oriented loop SOP for multi-module Maven/Gradle Java projects; each round
-  runs `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`, with rollback and
-  verification as hard requirements
-- **Governance boundary**: states explicitly that the skill is a continuous pressure-relief stage and cannot replace
-  testing, CI gates, architecture governance, observability, or security governance; success means continuously
-  reducing decay increment, not driving duplication or complexity to zero
-- **Refactoring references and scripts**: adds duplication, complexity, and structural-dispatch refactoring guides plus
-  three scanners (`dup_clusters.py`, `pattern_scan.py`, `complexity_scan.py`), with backlog, round-report, metrics,
-  decision-record, cycle-summary, state.json, and loop-config.yaml templates
-- **`code-review` structure lens**: adds `templates/structure-lens.md` so structural dispatch, similar paradigms, and
-  complexity signals become review viewpoints
+- **New `java-quality-loop`**: an execution-oriented loop SOP for multi-module Maven/Gradle Java projects; each round runs `Scan → Rank → Select → Baseline → Refactor → Verify → Review → Commit → Record`, with rollback and verification as hard requirements
+- **Governance boundary**: states explicitly that the skill is a continuous pressure-relief stage and cannot replace testing, CI gates, architecture governance, observability, or security governance; success means continuously reducing decay increment, not driving duplication or complexity to zero
+- **Refactoring references and scripts**: adds duplication, complexity, and structural-dispatch refactoring guides plus three scanners (`dup_clusters.py`, `pattern_scan.py`, `complexity_scan.py`), with backlog, round-report, metrics, decision-record, cycle-summary, state.json, and loop-config.yaml templates
+- **`code-review` structure lens**: adds `templates/structure-lens.md` so structural dispatch, similar paradigms, and complexity signals become review viewpoints
 
 ## 2026-11-06
 
 ### Interaction Language Rules Scoped by Output Type
 
-- **Rules scoped per output type**: LLM interaction and output use Simplified Chinese without Emoji; formal documents
-  use Chinese unless English is explicitly requested; git commits use English with Chinese when necessary
-- **Thinking-language clause removed**: the language of hidden reasoning cannot be enforced or verified, so the clause
-  only added noise
-- **Synchronized locations**: the inline copy in `AGENTS.md` and the commit examples of `code-detect-problem`,
-  `long-term-task`, and `merge-agents-md` now follow the clarified rule
+- **Rules scoped per output type**: LLM interaction and output use Simplified Chinese without Emoji; formal documents use Chinese unless English is explicitly requested; git commits use English with Chinese when necessary
+- **Thinking-language clause removed**: the language of hidden reasoning cannot be enforced or verified, so the clause only added noise
+- **Synchronized locations**: the inline copy in `AGENTS.md` and the commit examples of `code-detect-problem`, `long-term-task`, and `merge-agents-md` now follow the clarified rule
 
 ## 2026-11-05
 
 ### requirement-collect: Root Requirements First
 
-- **Root requirements first (mandatory)**: technical implementation is a reference implementation, not the
-  requirement itself; each requirement states the root requirement, then the reference implementation, then the code
-  evidence, and "the system does X" may not replace "the system must guarantee Y"
-- **Templates and checklist**: the module, business-rule, and global-requirement templates now explain root
-  requirements and reference implementations, and the completeness checklist gains a "root requirement" output
-- **Neutral wording**: industry-specific terms in templates (such as price source, quote, pricing) were replaced with
-  neutral wording
+- **Root requirements first (mandatory)**: technical implementation is a reference implementation, not the requirement itself; each requirement states the root requirement, then the reference implementation, then the code evidence, and "the system does X" may not replace "the system must guarantee Y"
+- **Templates and checklist**: the module, business-rule, and global-requirement templates now explain root requirements and reference implementations, and the completeness checklist gains a "root requirement" output
+- **Neutral wording**: industry-specific terms in templates (such as price source, quote, pricing) were replaced with neutral wording
 
 ### Interaction Rule: Maximum Nesting Depth
 
-- **Maximum nesting depth**: from the start of a line, code reaching the equivalent of 6 tabs must be optimized or
-  refactored, and nesting may not deepen further
+- **Maximum nesting depth**: from the start of a line, code reaching the equivalent of 6 tabs must be optimized or refactored, and nesting may not deepen further
 
 ## 2026-11-04
 
 ### Skill Boundary Alignment
 
-- **Clear division between `lets-loop` and `long-term-task`**: the former designs loop systems (L1-L4 model, loop
-  patterns, configuration templates), while the latter defines the execution protocol for a single long task
-  (clarification, plan confirmation, continuous execution, completion summary)
-  - `lets-loop` gained a "Scope: framework design vs task execution" section with a scenario routing table, and
-    designates patterns 4 (Reflexion) and 7 (plan → execute → replan) for use during execution
-  - `long-term-task` gained a "Relationship with lets-loop" section defining the boundary and how patterns are borrowed,
-    without changing the HARD-GATE, plan confirmation gate, or TODO recording requirements
+- **Clear division between `lets-loop` and `long-term-task`**: the former designs loop systems (L1-L4 model, loop patterns, configuration templates), while the latter defines the execution protocol for a single long task (clarification, plan confirmation, continuous execution, completion summary)
+  - `lets-loop` gained a "Scope: framework design vs task execution" section with a scenario routing table, and designates patterns 4 (Reflexion) and 7 (plan → execute → replan) for use during execution
+  - `long-term-task` gained a "Relationship with lets-loop" section defining the boundary and how patterns are borrowed, without changing the HARD-GATE, plan confirmation gate, or TODO recording requirements
   - Both skill `description` fields now cross-reference each other so skill routing can distinguish their triggers
-- **Index synchronization**: skill table descriptions in `AGENTS.md`, `README.md`, and `README_en.md` updated to the
-  boundary-aware wording
-- **Wrong reference fixes**: removed the incorrect `lets-loop` row from the "Integration with other skills" table in
-  `skills/code-review/SKILL.md`; the AI-generated-code performance pitfall in `lang-spec/review.java.md` no longer
-  points to `lets-loop` and now states the review requirement inline
+- **Index synchronization**: skill table descriptions in `AGENTS.md`, `README.md`, and `README_en.md` updated to the boundary-aware wording
+- **Wrong reference fixes**: removed the incorrect `lets-loop` row from the "Integration with other skills" table in `skills/code-review/SKILL.md`; the AI-generated-code performance pitfall in `lang-spec/review.java.md` no longer points to `lets-loop` and now states the review requirement inline
 
 ## 2026-10-26
 
 ### Documentation Bilingualization
 
 - **New English documents**: `README_en.md` and `CHANGELOG_en.md`, semantically consistent with the Chinese versions
-- **Cross-links completed**: `README.md` / `README_en.md` link to each other, `CHANGELOG.md` / `CHANGELOG_en.md` link to
-  each other, and each bilingual README references the CHANGELOG in its own language
-- **MANUAL decision**: this repository does not provide `MANUAL.md`; usage guidance is carried by `README.md` and the
-  skill documents under `skills/`
+- **Cross-links completed**: `README.md` / `README_en.md` link to each other, `CHANGELOG.md` / `CHANGELOG_en.md` link to each other, and each bilingual README references the CHANGELOG in its own language
+- **MANUAL decision**: this repository does not provide `MANUAL.md`; usage guidance is carried by `README.md` and the skill documents under `skills/`
 
 ### Skill and Specification Consolidation
 
 - **Skill merges**: removed `java-compile` and `java-gen-unittest`
-  - The compile commands of `java-compile` moved into `lang-spec/ci.java.md`; environment verification remains the
-    responsibility of `java-env`
-  - The test-writing workflow of `java-gen-unittest` moved into the "Test Writing Workflow" of `java-coverage`, so the
-    coverage skill now covers both generation and measurement
+  - The compile commands of `java-compile` moved into `lang-spec/ci.java.md`; environment verification remains the responsibility of `java-env`
+  - The test-writing workflow of `java-gen-unittest` moved into the "Test Writing Workflow" of `java-coverage`, so the coverage skill now covers both generation and measurement
   - `README.md`, `AGENTS.md`, `skills/code-part-modification`, and `skills/lets-loop/templates` updated accordingly
-- **java-coverage fixes**: removed delegation to the non-existent `131-java-testing-unit-testing` and
-  `spring-boot-test`, inlining the test guidance instead; added a "Scope" section clarifying its role in the fixed-file
-  workflow; unified `mvn test` as `mvnd test`
-- **AST rule deduplication**: `code-review` no longer maintains concrete rules and now points to `ast-grep-block` and
-  `sql-extract`; five commonly used rules moved to section 11 of `ast-grep-block/templates/recipes.md`
-- **Skill origin labels**: the skill table in `AGENTS.md` gained a "Source" column distinguishing this repository,
-  locally untracked, and external symlinked skills
-- **Template deduplication**: the local Java tool table moved from `AGENTS.java.md` into `java-env`, leaving only a
-  pointer in the template; the rarely used `jitwatch-ui` was removed from `java-env`
-- **Python review rules**: merged the overlapping "Code Quality Review Rules" and "Code Quality and Bad Smells" in
-  `review.python.md`, with the bad smells table kept as section 3 (1.3.0 -> 1.3.1)
+- **java-coverage fixes**: removed delegation to the non-existent `131-java-testing-unit-testing` and `spring-boot-test`, inlining the test guidance instead; added a "Scope" section clarifying its role in the fixed-file workflow; unified `mvn test` as `mvnd test`
+- **AST rule deduplication**: `code-review` no longer maintains concrete rules and now points to `ast-grep-block` and `sql-extract`; five commonly used rules moved to section 11 of `ast-grep-block/templates/recipes.md`
+- **Skill origin labels**: the skill table in `AGENTS.md` gained a "Source" column distinguishing this repository, locally untracked, and external symlinked skills
+- **Template deduplication**: the local Java tool table moved from `AGENTS.java.md` into `java-env`, leaving only a pointer in the template; the rarely used `jitwatch-ui` was removed from `java-env`
+- **Python review rules**: merged the overlapping "Code Quality Review Rules" and "Code Quality and Bad Smells" in `review.python.md`, with the bad smells table kept as section 3 (1.3.0 -> 1.3.1)
 - **README correction**: `sync-repo-doc` corrected to `sync-repo-docs`
-- **spec.java.md split assessment**: not splitting for now. Although the concurrency chapter is long, splitting would
-  require synchronizing `review.java.md`, `AGENTS.java.md`, and all referenced anchors; the benefit is lower than the
-  risk of broken links. Reassess when on-demand loading becomes a requirement
+- **spec.java.md split assessment**: not splitting for now. Although the concurrency chapter is long, splitting would require synchronizing `review.java.md`, `AGENTS.java.md`, and all referenced anchors; the benefit is lower than the risk of broken links. Reassess when on-demand loading becomes a requirement
 
 ## 2026-10-23
 
 ### Prohibit Multiple Variable Declarations on a Single Line Across All Languages
 
-- **Eight language coding standards**: added a high-priority "Variable Declarations" rule prohibiting multiple
-  declarations on one line
+- **Eight language coding standards**: added a high-priority "Variable Declarations" rule prohibiting multiple declarations on one line
   - Declaring several variables with commas in one statement is forbidden; each variable must occupy its own line
   - Mixed pointer and plain variable declarations (`int* p, q;`) must be split to avoid misreading
   - Multiple loop variables in a `for` loop must be split or initialized in advance
-  - Pattern destructuring (Rust tuple destructuring, Kotlin destructuring declarations, Python tuple unpacking) is a
-    single-assignment pattern match and is not treated as a multi-variable declaration
-  - Affected files: `lang-spec/spec.js.md`, `spec.cpp.md`, `spec.ansi_c.md`, `spec.rust.md`, `spec.java.md`,
-    `spec.shell.md`, `spec.kotlin.md`, `spec.python.md`
-- **Code review framework**: the code quality rules in `skills/code-review/SKILL.md` gained a variable declaration check
-  marked as high priority and applicable to all languages
-- **Review rules**: the "Must Fix (High Priority)" lists in `review.java.md`, `review.cpp.md`, `review.ansi_c.md`, and
-  `review.kotlin.md` gained the same single-line declaration check
+  - Pattern destructuring (Rust tuple destructuring, Kotlin destructuring declarations, Python tuple unpacking) is a single-assignment pattern match and is not treated as a multi-variable declaration
+  - Affected files: `lang-spec/spec.js.md`, `spec.cpp.md`, `spec.ansi_c.md`, `spec.rust.md`, `spec.java.md`, `spec.shell.md`, `spec.kotlin.md`, `spec.python.md`
+- **Code review framework**: the code quality rules in `skills/code-review/SKILL.md` gained a variable declaration check marked as high priority and applicable to all languages
+- **Review rules**: the "Must Fix (High Priority)" lists in `review.java.md`, `review.cpp.md`, `review.ansi_c.md`, and `review.kotlin.md` gained the same single-line declaration check
 
 ## 2026-10-21
 
 ### Fan-in and Fan-out Design Rules Added to the Java Coding Standard
 
 - **Java coding standard**: added a "Fan-in and Fan-out" subsection under "Design Patterns" (version 1.3.0 -> 1.4.0)
-  - Core principle: abstraction follows fan-in, constraints follow fan-out; abstraction benefit is approximately `fan-in
-    × change frequency`
+  - Core principle: abstraction follows fan-in, constraints follow fan-out; abstraction benefit is approximately `fan-in × change frequency`
   - Modules are split by reason for change, not by functional relatedness or technical layering
-  - Business data must not directly control flow; split into a decision-rule interface, a rule-parameter data interface,
-    and a route strategy
-  - Behavioral interfaces return immutable decision objects and distinguish success/business rejection/system
-    failure/unknown result; data interfaces are typed and distinguish missing/empty/zero states
-  - Unit test boundaries equal interface boundaries; "at which stage does a change explode" is the inverse indicator for
-    design trade-offs; hot paths eliminate hard branching on business data
-- **Interface design correction**: "interface fan-out should not be limited" corrected to "interface fan-in should not
-  be limited, while an interface's own fan-out must be controlled", removing the contradiction with the fan-in/fan-out
-  principle
-- **File size limit alignment**: the Java single-file line limit changed from "recommended not to exceed 2000 lines" to
-  "split above 500 lines, must split above 1000 lines", consistent with `skills/code-review/SKILL.md`
+  - Business data must not directly control flow; split into a decision-rule interface, a rule-parameter data interface, and a route strategy
+  - Behavioral interfaces return immutable decision objects and distinguish success/business rejection/system failure/unknown result; data interfaces are typed and distinguish missing/empty/zero states
+  - Unit test boundaries equal interface boundaries; "at which stage does a change explode" is the inverse indicator for design trade-offs; hot paths eliminate hard branching on business data
+- **Interface design correction**: "interface fan-out should not be limited" corrected to "interface fan-in should not be limited, while an interface's own fan-out must be controlled", removing the contradiction with the fan-in/fan-out principle
+- **File size limit alignment**: the Java single-file line limit changed from "recommended not to exceed 2000 lines" to "split above 500 lines, must split above 1000 lines", consistent with `skills/code-review/SKILL.md`
 - Source: memrec design preference record (2026-10-21, module design principles / fan-in and fan-out)
 
 ## 2026-10-16
@@ -233,14 +158,10 @@
 ### Computation and Branching Rules Added to Language Specifications
 
 - **Java / C++ / ANSI C / Rust coding standards**: added a "Computation and Branching" chapter
-  - Precompute where possible: perform computations that can be determined in advance at program, class, or module
-    initialization to reduce runtime work
-  - Loop-invariant expressions: expressions whose result is unchanged across iterations should be hoisted out of the
-    loop and computed once
-  - Whole-loop invariants: values that stay constant throughout the loop should be moved outside the loop rather than
-    computed inside
-  - Branches should read positively (affirmatively) rather than negatively; negated conditions increase reading
-    difficulty
+  - Precompute where possible: perform computations that can be determined in advance at program, class, or module initialization to reduce runtime work
+  - Loop-invariant expressions: expressions whose result is unchanged across iterations should be hoisted out of the loop and computed once
+  - Whole-loop invariants: values that stay constant throughout the loop should be moved outside the loop rather than computed inside
+  - Branches should read positively (affirmatively) rather than negatively; negated conditions increase reading difficulty
   - Affected files: `lang-spec/spec.java.md`, `spec.cpp.md`, `spec.ansi_c.md`, `spec.rust.md` (version 1.2.0 -> 1.3.0)
 
 ## 2026-10-12
@@ -248,18 +169,14 @@
 ### New Design Specification Skill
 
 - **sync-dev-spec skill**: distills the descriptive output of code-deconstruct into normative development specifications
-  - Checks the completeness of deconstruction artifacts first; runs code-deconstruct when artifacts are missing or
-    shallow
+  - Checks the completeness of deconstruction artifacts first; runs code-deconstruct when artifacts are missing or shallow
   - Each rule has five fields: identifier (DS-{seq}), constraint, rationale, evidence, and scope
-  - Inconsistencies, open questions, and gaps are escalated to the user for a decision rather than applying generic best
-    practices absent from the code
-  - The complete specification is written to `docs/dev-spec/design-charter.md`; constraint entries go into the `## 设计规约`
-    section of the project's `AGENTS.md`; can be rerun for incremental synchronization
+  - Inconsistencies, open questions, and gaps are escalated to the user for a decision rather than applying generic best practices absent from the code
+  - The complete specification is written to `docs/dev-spec/design-charter.md`; constraint entries go into the `## 设计规约` section of the project's `AGENTS.md`; can be rerun for incremental synchronization
   - Location: `skills/sync-dev-spec/SKILL.md`, templates `templates/design-charter.md`, `templates/agents-section.md`
 - Commits:
   - Commit: `41f7da3` feat: add sync-dev-spec skill turning deconstruct outputs into design charter
-- Background: dev-balance (a seven-dimension questionnaire baseline, tag `20261012_dropped_dev-balance`) was retired
-  because a fixed option menu cannot cover project diversity; replaced by deriving specifications from code facts
+- Background: dev-balance (a seven-dimension questionnaire baseline, tag `20261012_dropped_dev-balance`) was retired because a fixed option menu cannot cover project diversity; replaced by deriving specifications from code facts
 
 ## 2026-10-08
 
@@ -269,8 +186,7 @@
   - File naming: all caps; Chinese versions without a suffix and English versions ending with `_en`
   - Three document pairs: README.md/README_en.md, CHANGELOG.md/CHANGELOG_en.md, MANUAL.md/MANUAL_en.md
   - Each pair cross-links, and each README references the CHANGELOG/MANUAL in its own language
-  - Missing README/CHANGELOG are added automatically; adding MANUAL and expanding to bilingual requires user
-    confirmation
+  - Missing README/CHANGELOG are added automatically; adding MANUAL and expanding to bilingual requires user confirmation
 - Commits:
   - Commit: `b2c16be` doc: new skill sync-repo-docs
   - Commit: `62bc591` doc: update skill sync-repo-docs
@@ -285,13 +201,11 @@
 
 ### Documentation Refresh
 
-- **README.md / AGENTS.md skill tables refreshed**: filled in skill entries missing from the documents and clarified
-  skill directory forms
+- **README.md / AGENTS.md skill tables refreshed**: filled in skill entries missing from the documents and clarified skill directory forms
   - Added `multype2txt` to the Document and Diagram Generation category
   - Added `semble-search` and `vbox-test-env` to the Engineering and Memory category
   - Added the `ci.{lang}.md` row to the language specification file structure in AGENTS.md
-  - Extended the Extensions and Plugins chapter of README.md to describe the three origins of skills under `skills/`
-    (maintained here, symlinked to external repositories, maintained locally without version control)
+  - Extended the Extensions and Plugins chapter of README.md to describe the three origins of skills under `skills/` (maintained here, symlinked to external repositories, maintained locally without version control)
 - **CHANGELOG.md completed**: added changes from 2026-08-12 through 2026-10-03
 
 ### New Test Environment Skill
@@ -344,11 +258,9 @@
 
 ### Ignore Rules and External Extensions
 
-- **Ignore rules split**: `skills/.gitignore`, `pi-extensions/.gitignore`, and `dsh-plugins/.gitignore` maintained
-  separately
+- **Ignore rules split**: `skills/.gitignore`, `pi-extensions/.gitignore`, and `dsh-plugins/.gitignore` maintained separately
   - Commit: `00fd1c0` chore: ignore
-- **memrec externalized**: removed the inline `pi-extensions/memrec.ts` and pulled in the external implementation via
-  symbolic link
+- **memrec externalized**: removed the inline `pi-extensions/memrec.ts` and pulled in the external implementation via symbolic link
   - Commit: `e5edf30` chore: remove
 
 ## 2026-09-01
@@ -376,8 +288,7 @@
 
 ### Paths and Interaction Rules
 
-- **Hard-coded paths removed**: `cpp-tscancode`, `java-asprof`, `java-check-pmd`, `java-check-spotbugs`, `java-env`, and
-  other skills now use environment variables consistently
+- **Hard-coded paths removed**: `cpp-tscancode`, `java-asprof`, `java-check-pmd`, `java-check-spotbugs`, `java-env`, and other skills now use environment variables consistently
   - Commit: `fa828a2` doc: remove hard-code path
 - Updated `agent-template/interaction.rules.md`
   - Commit: `2818386` doc: update interaction
@@ -429,8 +340,7 @@
   - Added the `java-coverage` skill to the Java development tools category
   - Added the `cpp-clang-tidy` skill to the static analysis category
   - Added the `ast-grep-block` skill to the static analysis category
-  - Adjusted the skill category structure: static analysis tools and performance analysis tools became independent
-    categories
+  - Adjusted the skill category structure: static analysis tools and performance analysis tools became independent categories
 
 - **AGENTS.md refreshed**: synchronized the skill list
 
@@ -472,12 +382,10 @@ This refresh added the following skills that existed but were missing from the d
 
 ### New Qualitative Assessment Skill
 
-- **qualitative-assessment skill**: summarizes system properties across design, development, operations, and
-  non-functional dimensions based on full analysis output
+- **qualitative-assessment skill**: summarizes system properties across design, development, operations, and non-functional dimensions based on full analysis output
   - Location: `skills/qualitative-assessment/SKILL.md`
 - **full-analysis skill enhanced**: added a qualitative assessment stage at the end of the full analysis pipeline
-  - Pipeline: design deconstruction -> code review -> duplication detection -> problem detection -> qualitative
-    assessment
+  - Pipeline: design deconstruction -> code review -> duplication detection -> problem detection -> qualitative assessment
 
 ### code-deconstruct Skill Enhanced
 
@@ -487,8 +395,7 @@ This refresh added the following skills that existed but were missing from the d
 
 - **No-argument startup logic improved**: refined how the oc/cdbd/clc scripts start without arguments
   - Shows detailed help when there is neither a session ID nor an AGENTS.md
-- **Financial quote system classification corrected**: clarified the financial quote system classification in
-  qualitative assessment
+- **Financial quote system classification corrected**: clarified the financial quote system classification in qualitative assessment
 
 ### Commits
 
@@ -503,8 +410,7 @@ This refresh added the following skills that existed but were missing from the d
 
 ### code-review Skill Modularization
 
-- **Modular framework**: refactored code-review into a layered architecture of a generic review framework plus
-  language-specific rules
+- **Modular framework**: refactored code-review into a layered architecture of a generic review framework plus language-specific rules
   - Generic framework: `skills/code-review/SKILL.md` + `docs/code-review-framework.md`
   - Language rules: `lang-spec/spec.{lang}.md` loaded on demand
 - **Content deconstruction completed**: finished decomposing code-review skill content into the modular architecture
@@ -523,13 +429,11 @@ This refresh added the following skills that existed but were missing from the d
 
 ### Path Reference Unification
 
-- **Environment variable replaces hard-coded paths**: unified all path references by replacing hard-coded paths with the
-  `${AI_SPEC_ROOT}` environment variable
+- **Environment variable replaces hard-coded paths**: unified all path references by replacing hard-coded paths with the `${AI_SPEC_ROOT}` environment variable
 
 ### New Java Static Analysis Skills
 
-- **java-check-spotbugs skill**: SpotBugs static analysis skill with Find Security Bugs and fb-contrib plugin
-  integration
+- **java-check-spotbugs skill**: SpotBugs static analysis skill with Find Security Bugs and fb-contrib plugin integration
   - Detection scope: code defects, security vulnerabilities, performance issues
   - Tool version: SpotBugs 4.7.3 (supports up to Java 17)
   - Location: `skills/java-check-spotbugs/SKILL.md`
@@ -542,8 +446,7 @@ This refresh added the following skills that existed but were missing from the d
 ### Tool Verification Results
 
 - **PMD verified**: the tool works and correctly detected issues such as empty catch blocks and unused variables
-- **SpotBugs version compatibility**: SpotBugs 4.7.3 does not support Java 25 due to ASM version limits and requires
-  Java 17 or earlier
+- **SpotBugs version compatibility**: SpotBugs 4.7.3 does not support Java 25 due to ASM version limits and requires Java 17 or earlier
 - **Skill documentation updated**: added version compatibility notes and solutions to the SpotBugs skill
 
 ### Skill List Updates
@@ -569,15 +472,12 @@ This refresh added the following skills that existed but were missing from the d
 
 - **Shell support added**: language specifications and agent templates for Shell/Bash projects
 - **Script system refactored**: symbolic link deployment and environment-variable-driven architecture
-- **Architecture optimization**: shared functions centralized in `common.sh`, each script validates the environment
-  variable independently
+- **Architecture optimization**: shared functions centralized in `common.sh`, each script validates the environment variable independently
 
 ### Technical Improvements
 
-- **Path reference unification**: replaced all hard-coded `/disk2/helly_data/code/markdown/self-ai-spec` paths with the
-  `${AI_SPEC_ROOT}` environment variable
-- **Script error handling**: fixed friendly messages in the `oc`/`cdbd`/`clc` scripts when there are no arguments and no
-  session ID
+- **Path reference unification**: replaced all hard-coded `/disk2/helly_data/code/markdown/self-ai-spec` paths with the `${AI_SPEC_ROOT}` environment variable
+- **Script error handling**: fixed friendly messages in the `oc`/`cdbd`/`clc` scripts when there are no arguments and no session ID
 - **Documentation standards**: separated change history from README.md into CHANGELOG.md
 - **Security awareness**: added an AI tool script testing safety reminder to AGENTS.md
 
@@ -590,8 +490,7 @@ This refresh added the following skills that existed but were missing from the d
 
 ### Major code-review Skill Update
 
-- **Sensitive data review generalized**: sensitive data review is explicitly a mandatory item for all languages (not
-  specific to C/C++)
+- **Sensitive data review generalized**: sensitive data review is explicitly a mandatory item for all languages (not specific to C/C++)
 - **Security review expanded**: added the following review points:
   - Sensitive information leakage
   - Sensitive data residue in memory
