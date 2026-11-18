@@ -138,6 +138,7 @@ jq: parse error: Invalid numeric literal at line 1, column 44
 ```
 
 **原因**：未指定 `--json=stream`，ast-grep 默认 `--json=pretty` 输出为数组 `[...]`，
+
 但流式管道中 jq 收到的是「被管道缓冲切断的 JSON 片段」。
 
 **解决**：显式 `--json=stream` 输出 NDJSON（每行一对象）：
@@ -153,6 +154,7 @@ jq: error: syntax error, unexpected INVALID_CHARACTER (Unix shell quoting issues
 ```
 
 **原因**：在 `-o`/命令行内联含 `\\b`、`\\s`、`(?i)` 等的正则时，shell 的双引号
+
 与反斜杠转义相互干扰，传给 jq 的字符串已被破坏。
 
 **解决**：**永远用 `-f 文件`**：
@@ -174,6 +176,7 @@ Error: Broken pipe (os error 32)
 **原因**：jq 提前结束（如 `select(...)` 过滤大量行后），上游管道关闭。
 
 **解决**：**正常现象，不影响结果**。仅在 stderr 输出，stdout 已正确生成 lst。
+
 若需消除噪声：
 ```bash
 ast-grep ... 2>/dev/null | jq ...
@@ -182,6 +185,7 @@ ast-grep ... 2>/dev/null | jq ...
 ### 陷阱 5：build/target/gtest 目录大量噪声
 
 **现象**：结果中包含大量 `build/CMakeFiles/`、`target/generated-sources/`、
+
 `gtest/` 下的文件，与业务无关。
 
 **解决**：必排除：
@@ -199,6 +203,7 @@ ast-grep ... 2>/dev/null | jq ...
 **现象**：XML 兜底检索时，`pom.xml` 命中 `<update.class>`、`<select.org>` 等自定义标签。
 
 **原因**：rg 用 `<select\b|<update\b` 匹配 XML 标签名，但 Maven 的 pom.xml
+
 允许任意自定义标签（如 `update.class`）。
 
 **解决**：
@@ -252,14 +257,17 @@ error: the argument '--kind <KIND>' cannot be used with '--pattern <PATTERN>'
 ```
 
 **解决**：`--pattern` 和 `--kind` 二选一。提取所有字符串字面量用 `--kind`，
+
 精确匹配 AST 模式用 `--pattern`。
 
 **MCP 等价**：`find_code` 使用 pattern，`find_code_by_rule` 使用 rule.pattern，无 kind 选项。
+
 MCP 模式下用 `pattern: '"$SQL"'` 等价于 CLI 的 `--kind string_literal` + jq 过滤。
 
 ### 陷阱 9：拼接 SQL 片段化
 
 **现象**：Java `"SELECT * FROM " + table + " WHERE id=?"` 被 ast-grep 解析为
+
 两个独立 `string_literal`，输出两条记录（同行不同列）。
 
 **原因**：AST 视角下，拼接表达式的每个字面量是独立节点。

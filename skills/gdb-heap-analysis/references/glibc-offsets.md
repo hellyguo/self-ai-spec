@@ -36,8 +36,7 @@ p &((struct malloc_state *)0)->top
 | max_system_mem | 0x890 | 2192 |
 | sizeof(malloc_state) | 0x898 | 2200 |
 
-> 2.28 的 `malloc_state` 与 `heap_info` 偏移在 aarch64 与 x86_64 上一致；
-> 不同发行版/补丁可能有增删字段，务必用符号或“top 反查 + system_mem 校验”现场确认。
+> 2.28 的 `malloc_state` 与 `heap_info` 偏移在 aarch64 与 x86_64 上一致； > 不同发行版/补丁可能有增删字段，务必用符号或“top 反查 + system_mem 校验”现场确认。
 
 ### glibc ≤ 2.25（无 have_fastchunks）
 
@@ -60,8 +59,7 @@ p &((struct malloc_state *)0)->top
 
 ### glibc 2.32+
 
-字段布局在 2.32+ 有调整（`have_fastchunks` 等），**不要直接套用上表**；
-优先用调试符号，或用 “top 反查 + system_mem 校验” 的方式现场确认。
+字段布局在 2.32+ 有调整（`have_fastchunks` 等），**不要直接套用上表**；优先用调试符号，或用 “top 反查 + system_mem 校验” 的方式现场确认。
 
 ## heap_info Offsets
 
@@ -78,8 +76,7 @@ p &((struct malloc_state *)0)->top
 
 ### glibc 2.30+
 
-新增 `pagesize` 字段（`ar_ptr/prev/size/mprotect_size/pagesize`），`sizeof` 变为 40→对齐 48。
-用 `ar_ptr` 读出的地址反推更稳，不要写死 `+0x20`。
+新增 `pagesize` 字段（`ar_ptr/prev/size/mprotect_size/pagesize`），`sizeof` 变为 40→对齐 48。用 `ar_ptr` 读出的地址反推更稳，不要写死 `+0x20`。
 
 ## Notes
 

@@ -49,8 +49,7 @@
 
 ### 编码规范
 
-授权读取：${AI_SPEC_ROOT}/lang-spec/spec.js.md
-授权读取：${AI_SPEC_ROOT}/lang-spec/review.js.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.js.md 授权读取：${AI_SPEC_ROOT}/lang-spec/review.js.md
 
 ### 构建与验证
 

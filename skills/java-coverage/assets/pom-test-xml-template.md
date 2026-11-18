@@ -1,8 +1,6 @@
 # pom-test.xml 模板
 
-> 创建新模块的 pom-test.xml 时，复制模板后只替换 {占位符} 部分。
-> 此文件由 assets/pom-test-xml-template.md 生成到 docs/pom-test-xml-template.md。
-> 首次执行时，将项目特定的父 POM 信息、自定义属性等填充到占位符中。
+> 创建新模块的 pom-test.xml 时，复制模板后只替换 {占位符} 部分。 > 此文件由 assets/pom-test-xml-template.md 生成到 docs/pom-test-xml-template.md。 > 首次执行时，将项目特定的父 POM 信息、自定义属性等填充到占位符中。
 
 ## 差异化字段清单
 

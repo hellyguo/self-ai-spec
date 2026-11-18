@@ -83,6 +83,9 @@ description: "Java 静态分析统一入口：按检查目标在 PMD（源码规
 ---
 
 **技能版本**: 2.0.0
+
 **合并来源**: `java-check-pmd` 1.0.0、`java-check-spotbugs` 1.0.0
+
 **工具版本**: PMD 6.19.0、SpotBugs 4.7.3（含 Find Security Bugs、fb-contrib）
+
 **适用项目**: Java 8+（SpotBugs 分析侧需 JDK 17 及以下）

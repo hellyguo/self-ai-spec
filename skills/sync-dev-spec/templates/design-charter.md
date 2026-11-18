@@ -1,8 +1,11 @@
 # 设计规约（Design Charter）
 
 > 项目：{project-name}
+>
 > 同步日期：{yyyymmdd}
+>
 > 基于：docs/deconstruct/（同步于 {deconstruct-date}）
+>
 > 状态：草稿 / 已确认
 
 ## 1. 规约条目

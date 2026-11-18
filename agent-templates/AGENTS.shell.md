@@ -51,8 +51,7 @@
 
 ### 编码规范
 
-授权读取：${AI_SPEC_ROOT}/lang-spec/spec.shell.md
-授权读取：${AI_SPEC_ROOT}/lang-spec/review.shell.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.shell.md 授权读取：${AI_SPEC_ROOT}/lang-spec/review.shell.md
 
 ### 构建与验证
 

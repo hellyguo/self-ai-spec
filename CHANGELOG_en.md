@@ -10,7 +10,7 @@
 - **Criterion change**: detection now keys on "a second consecutive text line inside the same logical block" instead of "the previous line lacks closing punctuation". The punctuation test was decidable but bypassable: splitting one sentence per line passed it, so the criterion must sit on the logical block. The author still owns the grouping decision; the script only enforces one block per line
 - **New checker**: `bin/check-md-wrap.sh` reports WRAP (in-block line break) and TABLE (missing blank line before a table), checks the change set by default, supports `--all`, skips symlinks so external skill repositories are never rewritten, and exits 0/1/2
 - **markdownlint disabled**: `.markdownlint.json` is removed and the repository no longer validates against width-based checks such as MD013; the rule verification command in `docs/code-review-framework.md` now calls the new script
-- **Legacy normalization**: 160 wrapped continuation lines across `CHANGELOG.md`, `CHANGELOG_en.md`, `README.md`, and `README_en.md` are merged into logical lines with identical non-whitespace character counts; the remaining ~187 spots live in skill documents and converge on a fix-as-you-touch basis
+- **Legacy normalization**: first the 160 wrapped continuation lines in `CHANGELOG.md`, `CHANGELOG_en.md`, `README.md`, and `README_en.md`, then the remaining 179 spots across 51 files in one pass — prose continuations joined into the previous line, label pairs separated by a blank line, parallel items inside blockquotes separated by a bare `>` line — bringing `--all` to zero. Excluding the 13 bare-quote separator lines added, non-whitespace character counts are identical to before, with no Chinese/ASCII gluing
 
 ## 2026-11-17
 

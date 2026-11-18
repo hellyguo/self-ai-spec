@@ -60,5 +60,7 @@
 ---
 
 **审查工具**：{coding util}+{model name}
+
 **规则来源**：${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md
+
 **审查完成时间**：{时间戳}

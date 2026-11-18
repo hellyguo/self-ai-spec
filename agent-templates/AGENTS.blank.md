@@ -38,8 +38,7 @@
 
 ### 编码规范
 
-授权读取：${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md
-授权读取：${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.{lang}.md 授权读取：${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 ### 构建与验证
 

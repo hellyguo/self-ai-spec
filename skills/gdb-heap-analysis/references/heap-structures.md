@@ -27,10 +27,7 @@ Each arena has a `malloc_state` structure containing:
 1. The brk heap of `main_arena`
 2. Memory from subheaps (`heap_info` structures) of non-main arenas
 
-**It does NOT include individual `IS_MMAPPED` chunks.** Large allocations served
-by direct `mmap` are tracked separately (for example `malloc_info` reports them
-under `<total type="mmap">`). This is why an arena walk can miss large native
-allocations entirely.
+**It does NOT include individual `IS_MMAPPED` chunks.** Large allocations served by direct `mmap` are tracked separately (for example `malloc_info` reports them under `<total type="mmap">`). This is why an arena walk can miss large native allocations entirely.
 
 ## malloc_chunk (Chunk Header)
 
@@ -109,8 +106,7 @@ Direct mmap allocation:
 - Chunk header is at the start of the mapping and has the IS_MMAPPED flag
 - Freed via munmap directly
 
-Use `scripts/mmap_scan.c` to enumerate these independently of the arena walk.
-`mmap_threshold` is dynamic: freeing mmapped chunks can raise it up to ~32MB.
+Use `scripts/mmap_scan.c` to enumerate these independently of the arena walk. `mmap_threshold` is dynamic: freeing mmapped chunks can raise it up to ~32MB.
 
 ## Bin Types
 
@@ -163,8 +159,7 @@ The "wilderness" chunk at the end of available memory:
 
 ### HEAP_MAX_SIZE = 64MB
 
-Maximum size of a single subheap. A non-main arena can own multiple subheaps;
-individual requests >= `mmap_threshold` bypass arenas and use direct mmap.
+Maximum size of a single subheap. A non-main arena can own multiple subheaps; individual requests >= `mmap_threshold` bypass arenas and use direct mmap.
 
 ### MMAP_THRESHOLD = 128KB
 

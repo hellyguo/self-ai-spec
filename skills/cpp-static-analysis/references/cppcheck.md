@@ -231,6 +231,9 @@ echo "风格: $(grep -c '(style)' cppcheck.txt)"
 ---
 
 **工具页面版本**: 1.1.0（自 `cpp-check` 1.0.0 迁入）
+
 **工具版本**: Cppcheck 2.17.1
+
 **适用项目**: C/C++项目
+
 **输出位置**: 当前目录下的 `cppcheck-*.txt`

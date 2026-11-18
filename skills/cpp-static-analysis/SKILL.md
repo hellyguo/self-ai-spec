@@ -102,6 +102,9 @@ compiledb make                                      # 非 CMake
 ---
 
 **技能版本**: 2.0.0
+
 **合并来源**: `cpp-check` 1.0.0、`cpp-clang-tidy` 1.0.0、`cpp-tscancode` 1.0.0
+
 **工具版本**: Cppcheck 2.17.1、Clang-Tidy 19.1.7、TscanCode
+
 **适用项目**: C/C++（含 ANSI C）

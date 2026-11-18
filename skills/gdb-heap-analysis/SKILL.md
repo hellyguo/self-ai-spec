@@ -58,8 +58,7 @@ ldd --version
 info sharedlibrary libc
 ```
 
-Read [references/glibc-offsets.md](references/glibc-offsets.md) for known offsets by version.
-（64 位下 aarch64 与 x86_64 的指针/对齐一致，2.26–2.31 的 `top=0x60`、`next=0x870`、`system_mem=0x888` 通用。）
+Read [references/glibc-offsets.md](references/glibc-offsets.md) for known offsets by version. （64 位下 aarch64 与 x86_64 的指针/对齐一致，2.26–2.31 的 `top=0x60`、`next=0x870`、`system_mem=0x888` 通用。）
 
 ## Step 2: Walk All Arenas
 

@@ -8,11 +8,8 @@
 - Top chunk is far from the arena structure address
 
 **Diagnosis**:
-- For `main_arena`: `system_mem` is the brk heap; there is **no `heap_info`** and the
-  arena structure lives in libc, so a far top chunk is normal. This is not mmap mode.
-- For non-main arenas: subheap sum should be close to `system_mem` (modulo page
-  rounding). A large gap means the subheap walk is incomplete (wrong `prev`
-  direction / multiple subheaps / wrong offsets), not direct mmap.
+- For `main_arena`: `system_mem` is the brk heap; there is **no `heap_info`** and the arena structure lives in libc, so a far top chunk is normal. This is not mmap mode.
+- For non-main arenas: subheap sum should be close to `system_mem` (modulo page rounding). A large gap means the subheap walk is incomplete (wrong `prev` direction / multiple subheaps / wrong offsets), not direct mmap.
 - Single `IS_MMAPPED` allocations are **not** part of `system_mem` at all; see Pattern 9.
 
 **Explanation**:
@@ -115,6 +112,7 @@ x/gx $arena+0x888
 - 对象内容高度重复（同一来源/标题/业务键占绝大多数）。
 
 **Diagnosis**: 某条“失败/异常路径”上创建的对象没有被释放；常见于
+
 “克隆/复制消息或记录 → 分发、解析或入库失败 → 只释放了外层容器，未释放克隆体”。
 
 **典型统计形态（数值均为示意）**:
@@ -147,9 +145,8 @@ size bucket <chunk_size>B: <millions> 个，占 in-use 的 95%+
 3. 对“分发失败/异常”路径逐条核对所有权（注意 handler 提前 return、double-free）。
 
 **可达性边界**：`hits==1` 只对“裸指针 + 标准 malloc”成立。自定义分配器（slab/对象池/
-tcmalloc/jemalloc）用 freelist/位图管理空闲对象时，`hits==1` 也可能是在池中待复用；
-TLS/线程缓存持有对象指针时，`hits>1` 仍可能是逻辑已释放、延迟归还。需结合分配器元数据
-与引用者生命周期判断。
+
+tcmalloc/jemalloc）用 freelist/位图管理空闲对象时，`hits==1` 也可能是在池中待复用； TLS/线程缓存持有对象指针时，`hits>1` 仍可能是逻辑已释放、延迟归还。需结合分配器元数据与引用者生命周期判断。
 
 ---
 
@@ -190,6 +187,7 @@ gcc -O2 -o /tmp/scan_zero_pages ../scripts/scan_zero_pages.c
 ```
 
 **Rule**: 判断真实占用用“非零页 × 页大小”，不要用 core 文件大小；泄漏定位看 in-use chunk 统计。
+
 `bad>0` 时统计在首个坏块处截断，只能当下界。
 
 ---
@@ -202,6 +200,7 @@ gcc -O2 -o /tmp/scan_zero_pages ../scripts/scan_zero_pages.c
 - `mmap_scan` 在匿名映射起始处发现 `IS_MMAPPED` chunk，或发现大块非零 ANON 映射。
 
 **Diagnosis**: 请求 >= `mmap_threshold`（默认 128KB，动态可升到约 32MB）时，glibc 直接
+
 `mmap`，chunk 独立于 arena：
 
 - 不在 arena chunk 链里；
@@ -219,9 +218,9 @@ gcc -O2 -o /tmp/mmap_scan ../scripts/mmap_scan.c
 
 **注意**:
 - 不要用 “system_mem - subheap 总和” 去估算 mmap 量，两者没有该等式关系。
-- 非 chunk 的 ANON 映射可能是池化缓冲、JIT 代码或自定义分配器；本工具只给尺寸与头部样本，
-  不下类型结论。
+- 非 chunk 的 ANON 映射可能是池化缓冲、JIT 代码或自定义分配器；本工具只给尺寸与头部样本，不下类型结论。
 - 页大小从 core 的 `AT_PAGESZ` 读；跨架构时宿主 `sysconf` 会给出错误页大小。
 
 **Next step**: 把 `mmap_scan` 的分桶与 arena 链分桶合并，得到全量 native 分配画像；对
+
 ANON 大块结合进程侧统计（NMT、分配器统计、池配置）定位来源。

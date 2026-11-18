@@ -56,11 +56,7 @@ m2h2pdf docs/review/*.md
 
 ````markdown
 ```mermaid
-sequenceDiagram
-  participant C as Client
-  participant S as Server
-  C->>S: Request
-  S-->>C: Response
+sequenceDiagram participant C as Client participant S as Server C->>S: Request S-->>C: Response
 ```
 ````
 
@@ -81,15 +77,11 @@ sequenceDiagram
 
 ````markdown
 ```plantuml
-@startuml
-!theme plain
+@startuml !theme plain
 
-actor User
-component "Web App" as app
-database DB
+actor User component "Web App" as app database DB
 
-User --> app
-app --> DB
+User --> app app --> DB
 
 @enduml
 ```
@@ -134,8 +126,7 @@ app --> DB
 
 ## 安装脚本
 
-脚本位置: `LinuxEnv/bin/md2pdf`
-脚本位置: `LinuxEnv/bin/m2h2pdf`
+脚本位置: `LinuxEnv/bin/md2pdf` 脚本位置: `LinuxEnv/bin/m2h2pdf`
 
 确保脚本有执行权限：
 ```bash

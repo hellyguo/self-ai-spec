@@ -6,16 +6,17 @@
 # 按行宽计算的检查，唯一验收标准是本脚本。
 #
 # 检查项：
-#   1. WRAP  —— 段内换行：同一段落、同一列表项、同一引用块被拆成多行。判据是“同块连续文本”，
-#               与句号无关，因此“一句一换行”同样会被判出；整段写成一行、句号后继续写则不判。
+#   1. WRAP  —— 段内换行：同一段落、同一列表项、同一引用段落被拆成多行。判据是“同块连续文本”，
+#               与句号无关，因此“一句一换行”同样会被判出；整段一行、句号后继续写则不判。
 #   2. TABLE —— 表格块紧贴上一段落，缺空行（GFM 下会被并入段落）。
 #
 # 注意：
 #   1. 本脚本只认结构信号，不判断“逻辑归类”是否合理；归类由作者决定，脚本只保证“一个逻辑块占一行”。
 #   2. code fence、YAML 前置数据、HTML 注释、缩进代码块内的内容一律跳过；缩进代码块以空行起始识别。
-#   3. 行尾两个空格或反斜杠视为显式硬换行（签名/元数据区用法），不判违规。
-#   4. 符号链接文件默认跳过，避免改写外部仓库。
-#   5. 退出码：0 无违规，1 存在违规，2 参数或环境错误。
+#   3. 引用块按去掉 `>` 后的内容判定：引用内的列表项、空 `>` 行都算块边界，不判段内换行。
+#   4. 行尾两个空格或反斜杠视为显式硬换行（签名/元数据区用法），不判违规。
+#   5. 符号链接文件默认跳过，避免改写外部仓库。
+#   6. 退出码：0 无违规，1 存在违规，2 参数或环境错误。
 #
 # 用法：bin/check-md-wrap.sh [选项] [路径...]
 #   默认只检查变更集（与 HEAD 的差异 + 未跟踪文件），无 git 时退化为全仓
@@ -29,7 +30,7 @@ QUIET=0
 SCOPE=changed
 
 usage() {
-    sed -n '3,26p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '3,27p' "$0" | sed 's/^# \{0,1\}//'
     exit 0
 }
 
@@ -100,7 +101,8 @@ function is_list(s)     { return s ~ /^[ \t]*([-*+]|[0-9]+[.)])[ \t]+/ }
 function is_html(s)     { return s ~ /^[ \t]*</ }
 function is_linkdef(s)  { return s ~ /^[ \t]*\[[^]]+\]:[ \t]/ }
 function is_indented(s) { return s ~ /^(\t|  )/ }
-function is_blank(s)    { return s ~ /^[ \t]*$/ }
+function body(s)        { sub(/^[ \t]*>[ \t]?/, "", s); return s }
+function is_blank(s)    { return s ~ /^[ \t]*$/ || (is_quote(s) && body(s) ~ /^[ \t]*$/) }
 
 function starts_block(s) {
     return is_fence(s) || is_heading(s) || is_hr(s) || is_table(s) || is_quote(s) ||
@@ -111,15 +113,18 @@ function explicit_break(s) {
     return (s ~ /[ \t][ \t]$/ || s ~ /\\$/)
 }
 function same_block(p, c) {
-    # 段落续段落、列表项续正文、引用续引用属于同一逻辑块；跨块不判
-    if (is_quote(p) && is_quote(c))      return 1
-    if (is_quote(p) || is_quote(c))      return 0
+    # 段落续段落、列表项续正文属于同一逻辑块；跨块不判
     if (is_table(p) || is_table(c))      return 0
     if (is_heading(p) || is_heading(c))  return 0
     if (is_hr(p) || is_hr(c))            return 0
     if (is_linkdef(p) || is_linkdef(c))  return 0
     if (is_html(p) || is_html(c))        return 0
     if (is_fence(p) || is_fence(c))      return 0
+    if (is_quote(p) != is_quote(c))      return 0
+    if (is_quote(p) && is_quote(c)) {
+        # 引用内以列表项开始的行各成一块
+        if (starts_block(body(p)) || starts_block(body(c))) return 0
+    }
     return 1
 }
 function trim(s) { sub(/[ \t]+$/, "", s); return s }
@@ -196,13 +201,13 @@ FNR == 1 {
     }
 
     if (prev_no > 0 && !prev_blank && prev_no == no - 1) {
-        # 新块起始行（标题/列表/表格/围栏等）与上一行不同块，不判段内换行
         if (!starts_block(line)) {
             if (same_block(prev, line) && !explicit_break(prev)) {
                 printf "%s:%d: WRAP 段内换行：本行与上一行同属一个逻辑块，应并入上一行或以空行分隔 -> %s\n", FILENAME, no, preview(line)
             }
-        } else if (is_quote(line) && is_quote(prev) && !explicit_break(prev)) {
-            printf "%s:%d: WRAP 段内换行：引用块被拆成多行，应写成一个逻辑行 -> %s\n", FILENAME, no, preview(line)
+        } else if (is_quote(line) && is_quote(prev) && !explicit_break(prev) &&
+                   !starts_block(body(line)) && !starts_block(body(prev))) {
+            printf "%s:%d: WRAP 段内换行：引用段落被拆成多行，应写成一个逻辑行 -> %s\n", FILENAME, no, preview(line)
         }
     }
 

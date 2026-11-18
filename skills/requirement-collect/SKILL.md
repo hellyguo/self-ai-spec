@@ -191,9 +191,7 @@ find_code(pattern: 'throw new $EXCEPTION($$$ARGS)', language: java, project_fold
 
 ### 直接源码
 
-Java(`*.java`)、Python(`*.py`)、C++(`*.cpp/*.hpp`)、ANSI C(`*.c/*.h`)、
-JavaScript(`*.js/*.mjs`)、TypeScript(`*.ts/*.tsx`)、Rust(`*.rs`)、
-Go(`*.go`)、Kotlin(`*.kt`)、Scala(`*.scala`)、Shell(`*.sh`)、Batch(`*.bat/*.ps1`)
+Java(`*.java`)、Python(`*.py`)、C++(`*.cpp/*.hpp`)、ANSI C(`*.c/*.h`)、 JavaScript(`*.js/*.mjs`)、TypeScript(`*.ts/*.tsx`)、Rust(`*.rs`)、 Go(`*.go`)、Kotlin(`*.kt`)、Scala(`*.scala`)、Shell(`*.sh`)、Batch(`*.bat/*.ps1`)
 
 ### SQL 来源
 

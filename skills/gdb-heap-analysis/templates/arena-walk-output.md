@@ -31,8 +31,7 @@ Total subheap: {total} MB
 Gap (system_mem - subheap): {gap} MB → {normal|walk incomplete|n/a (main_arena)}
 ```
 
-> main_arena 使用 brk，没有 `heap_info`；gap 大时先怀疑 subheap 链未走全或偏移错误，
-> 不要据此推断 mmap 分配。
+> main_arena 使用 brk，没有 `heap_info`；gap 大时先怀疑 subheap 链未走全或偏移错误， > 不要据此推断 mmap 分配。
 
 ## Mmap Allocations（arena 链盲区）
 

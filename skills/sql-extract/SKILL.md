@@ -155,6 +155,7 @@ find_code_by_rule(
 | Scala | `scala` |
 
 > **注意**：Go 的 raw string literal（`` `SELECT * FROM t` ``）不会被 `'"$SQL"'` 匹配，
+>
 > 需额外用 pattern `` `$$$SQL` `` 匹配。参见 `templates/recipes.md`。
 
 #### 3d. SQL 拼接点识别
@@ -431,6 +432,9 @@ src/Svc.java:108:25  String sql = "SELECT * FROM user WHERE id=" + id;
 ---
 
 **技能版本**: 2.0.0
+
 **核心工具**: ast-grep-mcp（首选）/ ast-grep 0.45+ + jq 1.6+（兜底）/ ripgrep 13+（XML）
+
 **输出位置**: MCP JSON / `/tmp/sql_<lang>.lst`（CLI）
+
 **典型耗时**: MCP 即时返回 / CLI: C++ 5k 文件 ≈ 1-2 分钟；Java 12k 文件 ≈ 3-5 分钟

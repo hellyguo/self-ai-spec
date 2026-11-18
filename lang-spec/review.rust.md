@@ -1,7 +1,6 @@
 # Rust 代码审查规则
 
-> 本文件面向代码审查，聚焦 Rust 特有的缺陷模式与审查动作。
-> 编码约束以 `${AI_SPEC_ROOT}/lang-spec/spec.rust.md` 为准，通用审查框架以 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 为准。
+> 本文件面向代码审查，聚焦 Rust 特有的缺陷模式与审查动作。 > 编码约束以 `${AI_SPEC_ROOT}/lang-spec/spec.rust.md` 为准，通用审查框架以 `${AI_SPEC_ROOT}/skills/code-review/SKILL.md` 为准。
 
 ## 严重度口径
 

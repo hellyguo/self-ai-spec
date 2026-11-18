@@ -52,8 +52,7 @@
 
 ### 编码规范
 
-授权读取：${AI_SPEC_ROOT}/lang-spec/spec.kotlin.md
-授权读取：${AI_SPEC_ROOT}/lang-spec/review.kotlin.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.kotlin.md 授权读取：${AI_SPEC_ROOT}/lang-spec/review.kotlin.md
 
 ### 构建与验证
 

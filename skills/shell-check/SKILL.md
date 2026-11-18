@@ -134,5 +134,7 @@ enable=require-variable-braces
 
 ---
 **技能版本**: 1.0.0
+
 **工具版本**: ShellCheck 0.10.0
+
 **适用项目**: Shell脚本（bash/sh/dash/ksh）

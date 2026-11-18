@@ -66,8 +66,7 @@ relax 可显著提升开发内环效率：跳过完整 cargo 构建，按需 JIT
 
 ### 编码规范
 
-授权读取：${AI_SPEC_ROOT}/lang-spec/spec.rust.md
-授权读取：${AI_SPEC_ROOT}/lang-spec/review.rust.md
+授权读取：${AI_SPEC_ROOT}/lang-spec/spec.rust.md 授权读取：${AI_SPEC_ROOT}/lang-spec/review.rust.md
 
 ### 构建与验证
 

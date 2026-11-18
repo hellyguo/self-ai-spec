@@ -112,5 +112,7 @@ grep -E '(error|warning):' tscancode.txt
 ---
 
 **工具页面版本**: 1.1.0（自 `cpp-tscancode` 1.0.0 迁入）
+
 **适用项目**: C/C++
+
 **输出位置**: 当前目录下的 `tscancode-*.txt`

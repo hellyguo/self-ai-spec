@@ -1,7 +1,6 @@
 # Java 构建工具
 
-相关工具路径，见 skill /java-env
-首选 mvnd，次选 mvn；下列命令以 `mvnd` 为例，`mvnd` 不可用时替换为 `mvn`。
+相关工具路径，见 skill /java-env 首选 mvnd，次选 mvn；下列命令以 `mvnd` 为例，`mvnd` 不可用时替换为 `mvn`。
 
 ## 构建/测试命令
 

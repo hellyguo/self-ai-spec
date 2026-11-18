@@ -120,6 +120,9 @@ $PMD_CLI pmd -d $SRC_DIR -R rulesets/java/quickstart.xml -f text -debug    # 调
 ---
 
 **工具页面版本**: 1.1.0（自 `java-check-pmd` 1.0.0 迁入）
+
 **工具版本**: PMD 6.19.0
+
 **适用项目**: Java 8+ 企业级项目
+
 **输出位置**: 当前目录下的 `pmd-*.txt`

@@ -118,6 +118,9 @@ clang-tidy src/main.cpp -- -Iinclude 2>&1 | grep -E '(error|warning):'
 ---
 
 **工具页面版本**: 1.1.0（自 `cpp-clang-tidy` 1.0.0 迁入）
+
 **工具版本**: Clang-Tidy 19.1.7
+
 **适用项目**: C/C++（需 compile_commands.json）
+
 **输出位置**: 当前目录下的诊断输出 / `tidy-fixes.yaml`

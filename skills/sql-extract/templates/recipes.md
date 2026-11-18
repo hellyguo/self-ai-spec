@@ -103,10 +103,10 @@ rg -n -i '(String\.format|sprintf|snprintf|f".*SELECT)' <dirs>
 CHANGED=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep -E '\.(cpp|java)$')
 ```
 
-对每个改动文件调用 `find_code_by_rule`（限定 `project_folder` 为文件所在目录），
-或对改动文件所在目录批量搜索。
+对每个改动文件调用 `find_code_by_rule`（限定 `project_folder` 为文件所在目录），或对改动文件所在目录批量搜索。
 
 > **注意**：`find_code_by_rule` 的 `project_folder` 是目录级搜索，无法精确到单文件。
+>
 > 如需单文件精确搜索，用 `find_code` + pattern。
 
 ### CLI 模式
@@ -233,8 +233,7 @@ done
 
 ### MCP 模式
 
-`find_code_by_rule` 返回 JSON 时，同一文件多行 SQL 拼接会分别输出。
-Agent 可在内存中按文件聚合、相邻行合并。
+`find_code_by_rule` 返回 JSON 时，同一文件多行 SQL 拼接会分别输出。 Agent 可在内存中按文件聚合、相邻行合并。
 
 ### CLI 模式
 
