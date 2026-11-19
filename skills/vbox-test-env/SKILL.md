@@ -1,13 +1,17 @@
 ---
 name: vbox-test-env
-description: "提供 VirtualBox 三机测试环境（含互信与 sudo），用于集群、分布式与主备类系统测试。适用于需要多节点环境的联调与验证。"
+description: "提供 VirtualBox 测试环境：三台 Debian 虚拟机（互信与 sudo）用于集群/分布式测试，以及一台 Windows Server 2019 构建虚拟机用于 MSVC 编译；包含启动停止、guestcontrol、文件传输与工具链路径。"
 ---
 
-# VirtualBox 三机测试环境
+# VirtualBox 测试环境
+
+本技能覆盖两类虚拟机：三台 Debian 组成的集群测试环境，以及一台 Windows Server 2019 的 MSVC 构建环境。两者共用宿主机的 VirtualBox 与 host-only 网络（`vboxnet0`，宿主 `172.22.133.1`）。
+
+## 一、Linux 三机集群
 
 提供三台已配置互信与 sudo 的 VirtualBox 虚拟机，用于集群、分布式、主备等需要多节点的测试场景。
 
-## 机器清单
+### 机器清单
 
 | 主机名    | 登录用户 | SSH 别名   |
 | --------- | -------- | ---------- |
@@ -15,11 +19,11 @@ description: "提供 VirtualBox 三机测试环境（含互信与 sudo），用�
 | debian002 | vboxuser | vboxdeb002 |
 | debian003 | vboxuser | vboxdeb003 |
 
-## 网络拓扑
+### 网络拓扑
 
 每台虚拟机配置三种网络视图，使用时按通信方向选择地址：
 
-### 虚拟机到宿主机
+#### 虚拟机到宿主机
 
 三台机器均通过 NAT 访问宿主机，虚拟机侧看到的默认地址相同：
 
@@ -31,7 +35,7 @@ description: "提供 VirtualBox 三机测试环境（含互信与 sudo），用�
 
 说明：`10.0.2.15` 是 VirtualBox NAT 为每台虚拟机分配的独立地址，互相不冲突；宿主机侧地址均为 `10.0.2.2`。
 
-### 宿主机到虚拟机
+#### 宿主机到虚拟机
 
 宿主机通过宿主网络访问各虚拟机：
 
@@ -41,7 +45,7 @@ description: "提供 VirtualBox 三机测试环境（含互信与 sudo），用�
 | debian002 | 172.22.133.252 | 172.22.133.1 |
 | debian003 | 172.22.133.253 | 172.22.133.1 |
 
-### 虚拟机之间
+#### 虚拟机之间
 
 虚拟机之间通过内部网络通信：
 
@@ -51,14 +55,14 @@ description: "提供 VirtualBox 三机测试环境（含互信与 sudo），用�
 | debian002 | 192.168.77.102 |
 | debian003 | 192.168.77.103 |
 
-## 已安装环境
+### 已安装环境
 
 - 编译工具：gcc、g++、make、cmake
 - 内核开发：libbpf、libxdp
 - Java 8：位于 `~/lang`
 - Node.js
 
-## 启动
+### 启动
 
 ```bash
 vboxmanage startvm --type=headless debian001 &
@@ -68,7 +72,7 @@ vboxmanage startvm --type=headless debian003 &
 
 启动后等待约 30 秒，使用 `ssh vboxdeb001 true` 验证连通性。
 
-## 停止
+### 停止
 
 ```bash
 ssh vboxuser@vboxdeb001 sudo poweroff
@@ -76,8 +80,155 @@ ssh vboxuser@vboxdeb002 sudo poweroff
 ssh vboxuser@vboxdeb003 sudo poweroff
 ```
 
+## 二、Windows 构建虚拟机
+
+### 机器与网络
+
+| 项目 | 值 |
+|------|-----|
+| 虚拟机名 | `WinServer2019` |
+| 系统 | Windows Server 2019（10.0.17763） |
+| Guest Additions | 7.1.4 |
+| 登录用户 | `vboxuser`（密码不入库，见“Guest 控制”） |
+| host-only 地址 | 当前 `172.22.133.114`，以查询结果为准 |
+| NAT 地址 | Guest `10.0.2.15`，宿主机侧 `10.0.2.2` |
+| 宿主机服务访问 | Guest 内使用 `ws://10.0.2.2:<port>/...` |
+
+查询当前 host-only 地址：
+
+```bash
+VBoxManage guestproperty get WinServer2019 "/VirtualBox/GuestInfo/Net/1/V4/IP"
+```
+
+### 启动与关闭
+
+```bash
+enable-vboxnet0
+vboxmanage startvm --type=headless WinServer2019
+```
+
+关闭：
+
+```bash
+vboxmanage controlvm WinServer2019 poweroff
+```
+
+`poweroff` 为强制断电；正常关机可在 Guest 内执行 `shutdown /s /t 0`。`enable-vboxnet0` 通常位于 `~/LinuxEnv/bin/`，确认已加入 `PATH`。
+
+虚拟机以 GUI 运行时，前端会持有写锁，`VBoxManage sharedfolder add` 会失败；需要共享目录时先关机配置，或使用 `guestcontrol` 与 `scp`。
+
+### Guest 控制
+
+密码不要写入仓库、公开 dotfiles 或本技能。推荐放在权限为 `600` 的密码文件中：
+
+```bash
+printf '%s' '<password>' > "$HOME/.vbox-win.pass"
+chmod 600 "$HOME/.vbox-win.pass"
+```
+
+以下函数放入私有 shell 配置（不要提交）：
+
+```bash
+WIN_VM=WinServer2019
+WIN_USER=vboxuser
+WIN_PASSFILE=$HOME/.vbox-win.pass
+
+wincmd() {
+    VBoxManage guestcontrol "$WIN_VM" run --exe 'C:\Windows\System32\cmd.exe' \
+        --username "$WIN_USER" --passwordfile "$WIN_PASSFILE" \
+        --wait-stdout --wait-stderr -- /c "$1"
+}
+
+winpsh() {
+    VBoxManage guestcontrol "$WIN_VM" run --exe 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' \
+        --username "$WIN_USER" --passwordfile "$WIN_PASSFILE" \
+        --wait-stdout --wait-stderr -- -Command "$1"
+}
+
+winpsex() {
+    VBoxManage guestcontrol "$WIN_VM" run --exe 'C:\App\SysinternalsSuite\psexec.exe' \
+        --username "$WIN_USER" --passwordfile "$WIN_PASSFILE" \
+        --wait-stdout --wait-stderr -- "$@"
+}
+```
+
+用法：
+
+```bash
+wincmd "ver"
+wincmd "dir C:\work"
+winpsh "Get-ChildItem C:\work"
+winpsex "whoami"
+```
+
+`winpsex` 以管理员权限运行，适合需要提权的命令。若宿主机上没有 `--passwordfile` 支持，可临时使用 `--password`，但不要写入脚本或历史记录。
+
+### 工具链位置
+
+| 工具 | 路径/版本 |
+|------|-----------|
+| Visual Studio 2015 | `C:\Program Files (x86)\Microsoft Visual Studio 14.0` |
+| vcvarsall | `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat` |
+| cl.exe（x64） | `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\cl.exe` |
+| MSVC 版本 | 19.00.24247.2（VS2015，C++14） |
+| CMake / Ninja | `C:\App\strawberryperl\c\bin\`（CMake 3.29.2） |
+| OpenSSL | `C:\OpenSSL-Win64`（4.0.0，库在 `lib\VC\x64\{MD,MDd,MT,MTd}`） |
+| Git | `C:\git4win\bin\git.exe` |
+| 7-Zip | `C:\Program Files\7-Zip\7z.exe`（已在 PATH） |
+| OpenSSH scp | `C:\Windows\System32\OpenSSH\scp.exe` |
+| 源码工作目录示例 | `C:\work\<project>` |
+
+VS2015 的 MSBuild/VS 生成器不完整，`cmake -G "Visual Studio 14 2015"` 会报 `VCTargetsPath` 错误；统一使用 `Ninja` + `vcvarsall`。
+
+### 文件传输
+
+Guest 已安装 OpenSSH 客户端与 7-Zip，并已配置到宿主机当前用户的免密登录。Guest 访问宿主机使用 NAT 地址 `10.0.2.2`。
+
+Linux 侧打包优先使用 `git archive`，参数可以是任意 git 引用（分支、tag、commit、`HEAD~N`），只包含已提交内容：
+
+```bash
+cd <repo>
+REF=HEAD
+git archive --format=zip -o /tmp/"$REF".zip "$REF"
+```
+
+需要包含未提交改动时打包工作区：
+
+```bash
+7z a -t7z -mx=3 /tmp/worktree.7z . -x'!build/*' -x'!.git/*' -x'!dist/*'
+```
+
+Windows 侧取包并解压（7z 可直接解 zip）：
+
+```bash
+wincmd "scp <host-user>@10.0.2.2:/tmp/HEAD.zip C:\Temp\src.zip"
+wincmd "7z x C:\Temp\src.zip -aoa -oC:\work\<project>"
+```
+
+上传产物回宿主：
+
+```bash
+wincmd "scp C:\work\<project>\build-win\webnet2\webnet2.dll <host-user>@10.0.2.2:<repo>/dist/win-x64/webnet2.dll"
+```
+
+说明：
+
+- `<host-user>` 为宿主机当前登录用户；免密登录已配置，host key 变化时检查宿主 `sshd` 或清理 Guest 的 `known_hosts`。
+- `scp -r` 可传目录，但大量小文件建议先打包。
+- 备用方式：`guestcontrol copyto/copyfrom`。`copyto` 的 `--target-directory` 需以反斜杠结尾；直接复制宿主机 `/disk2/...` 可能报 `NS_ERROR_FAILURE`，先放 `/tmp` 再传。`copyfrom` 必须带 VM 名，目标是宿主机文件路径。
+
+### Windows 构建要点
+
+- 使用 `vcvarsall amd64` 或 `vcvarsall x86` + `cmake -G Ninja`。
+- VS2015 只支持到 C++14；CMake 在 `MSVC_VERSION < 1910` 时应回退到 C++14。
+- Windows 构建默认关闭 zlib 与 permessage-deflate 时，产物不支持 gzip；需要压缩时准备与 MSVC 匹配的 zlib，并打开 `LWS_WITH_ZLIB` 与扩展。
+- 32 位最小包可用静态 CRT（`CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded`）并关闭 SSL，运行依赖只剩 `WS2_32.dll`、`KERNEL32.dll`，但不支持 wss。
+- 导出符号验证需在 `vcvarsall` 环境运行 `dumpbin`；建议在 Guest 内写一个 `.bat` 调用 `vcvarsall` 后再执行 `dumpbin`。
+
 ## 使用约束
 
 - 仅用于测试，不得存放生产数据。
-- 三台机器共享同一宿主资源，压测时注意宿主机 CPU、内存与磁盘上限。
+- 三台 Debian 虚拟机共享同一宿主资源，压测时注意宿主机 CPU、内存与磁盘上限。
 - 修改网络配置前先确认虚拟机间与宿主机到虚拟机的连通性，避免失联。
+- Windows 虚拟机密码、宿主机账号等敏感信息不得写入仓库或本技能；使用密码文件并限制权限。
+- 远程传输前先确认 Guest 地址（host-only 或 NAT），避免使用过期 IP。
