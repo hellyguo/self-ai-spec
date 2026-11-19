@@ -65,9 +65,9 @@ description: "提供 VirtualBox 测试环境：三台 Debian 虚拟机（互信�
 ### 启动
 
 ```bash
-vboxmanage startvm --type=headless debian001 &
-vboxmanage startvm --type=headless debian002 &
-vboxmanage startvm --type=headless debian003 &
+vboxmanage startvm --type=headless debian001
+vboxmanage startvm --type=headless debian002
+vboxmanage startvm --type=headless debian003
 ```
 
 启动后等待约 30 秒，使用 `ssh vboxdeb001 true` 验证连通性。
@@ -113,9 +113,9 @@ vboxmanage startvm --type=headless WinServer2019
 vboxmanage controlvm WinServer2019 poweroff
 ```
 
-`poweroff` 为强制断电；正常关机可在 Guest 内执行 `shutdown /s /t 0`。`enable-vboxnet0` 通常位于 `~/LinuxEnv/bin/`，确认已加入 `PATH`。
+`poweroff` 为强制断电；正常关机无法在 Guest 内提权执行 `shutdown /s /t 0`。`enable-vboxnet0` 通常位于 `~/LinuxEnv/bin/`，确认已加入 `PATH`。
 
-虚拟机以 GUI 运行时，前端会持有写锁，`VBoxManage sharedfolder add` 会失败；需要共享目录时先关机配置，或使用 `guestcontrol` 与 `scp`。
+虚拟机以 GUI 运行时，前端会持有写锁，`VBoxManage sharedfolder add` 会失败；需要共享目录时先关机配置，或使用 `guestcontrol` 与 `scp`(首选)。
 
 ### Guest 控制
 
@@ -161,7 +161,7 @@ winpsh "Get-ChildItem C:\work"
 winpsex "whoami"
 ```
 
-`winpsex` 以管理员权限运行，适合需要提权的命令。若宿主机上没有 `--passwordfile` 支持，可临时使用 `--password`，但不要写入脚本或历史记录。
+`wincmd`/`winpsh`/`winpsex` 都无法在控制台下以管理员权限运行，因为无法通过 console 命令提权。若宿主机上没有 `--passwordfile` 支持，可临时使用 `--password`，但不要写入脚本或历史记录。
 
 ### 工具链位置
 
