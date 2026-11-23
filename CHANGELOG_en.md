@@ -2,6 +2,12 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-23
+
+### code-detect-dup: Corrected Simian Path
+
+- The Simian command in `skills/code-detect-dup/SKILL.md` referenced `~/app/simian/simian-4.2.1.jar`, which does not exist on this machine, so the command could never succeed; the working jar is `~/app/simian/simian.jar` (Simian 4.2.1, verified with `-version` and a `-language=java` run), and the path is corrected
+
 ## 2026-11-18
 
 ### Stricter Markdown Layout Rule: One Logical Block Per Line

@@ -2,6 +2,12 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-23
+
+### code-detect-dup 的 Simian 路径修正
+
+- `skills/code-detect-dup/SKILL.md` 的 Simian 命令引用 `~/app/simian/simian-4.2.1.jar`，该文件在本机不存在，命令必然失败；实际可用的是 `~/app/simian/simian.jar`（Simian 4.2.1，`-version` 与 `-language=java` 实测通过），已改为该路径
+
 ## 2026-11-18
 
 ### markdown 排版规则收紧：逻辑成行 + 唯一检查脚本

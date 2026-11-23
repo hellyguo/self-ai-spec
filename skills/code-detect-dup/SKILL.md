@@ -25,7 +25,7 @@ description: "使用 Simian 与 JSCPD 检测项目中的重复代码，统计重
 ## 工具一：Simian
 
 ```bash
-java -jar ~/app/simian/simian-4.2.1.jar \
+java -jar ~/app/simian/simian.jar \
   -language=java -threshold=20 \
   $(fd -H -I -s -c never -t f -e java | grep --color=never -v "\/test\/" | xargs) \
   > docs/dup/dup-{yyyymmdd}-{seq}.txt 2>&1
