@@ -4,6 +4,11 @@
 
 ## 2026-11-23
 
+### Markdown Tilde Escaping Rule
+
+- A new bullet in the Constraints section of `rules/interaction.rules.md`: `~` is allowed in Markdown body text but must be escaped as `\~` or placed in an inline code span, otherwise a pair of them renders as strikethrough
+- A scan of tracked documents found no accidental `~~` pairs, so no legacy fixes were needed; the rule is not enforced by `bin/check-md-wrap.sh`, which only covers logical-line layout and blank lines before tables
+
 ### code-detect-dup: Corrected Simian Path
 
 - The Simian command in `skills/code-detect-dup/SKILL.md` referenced `~/app/simian/simian-4.2.1.jar`, which does not exist on this machine, so the command could never succeed; the working jar is `~/app/simian/simian.jar` (Simian 4.2.1, verified with `-version` and a `-language=java` run), and the path is corrected

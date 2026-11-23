@@ -4,6 +4,11 @@
 
 ## 2026-11-23
 
+### markdown 波浪号转义约束
+
+- `rules/interaction.rules.md` 的“约束”新增一条：markdown 正文中的 `~` 允许使用，但须转义为 `\~` 或放入行内代码，否则成对出现会按删除符渲染成删除线
+- 现有受控文档扫描无成对 `~~` 误用，故无存量修正；该条不纳入 `bin/check-md-wrap.sh`（该脚本只判逻辑成行与表格空行）
+
 ### code-detect-dup 的 Simian 路径修正
 
 - `skills/code-detect-dup/SKILL.md` 的 Simian 命令引用 `~/app/simian/simian-4.2.1.jar`，该文件在本机不存在，命令必然失败；实际可用的是 `~/app/simian/simian.jar`（Simian 4.2.1，`-version` 与 `-language=java` 实测通过），已改为该路径
