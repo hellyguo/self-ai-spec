@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # ast-grep-block 便捷调用脚本
-# 用法: ./run-cli.sh <lang> <level|all> <path> [--json] [--out <file>]
+# 用法: ./run-cli.sh <lang> <level|all> <path> [--json] [--out <file>] [--extract-sfc] [--keep-temp]
 # 示例:
 #   ./run-cli.sh java high .                # 仅扫 high，文本输出
 #   ./run-cli.sh cpp all . --json --out r.json  # 全级别 JSON 报告
 #   ./run-cli.sh ansi_c high src/           # 只扫 src/ 子目录
+#   ./run-cli.sh js all . --extract-sfc     # 连 .vue/.html 内联脚本一起扫
 #
 # 设计原则:
 #   - 不重新实现 run.sh，仅做参数包装 + 报告归档
@@ -25,17 +26,20 @@ fi
 # ---- 参数解析 ----
 if [[ $# -lt 3 ]]; then
     cat <<EOF
-用法: $0 <lang> <level|all> <path> [--json] [--out <file>]
+用法: $0 <lang> <level|all> <path> [--json] [--out <file>] [--extract-sfc] [--keep-temp]
 参数:
   lang    java | cpp | ansi_c | rust | js | ts
   level   high | medium | low | all
   path    被扫描的项目根（绝对或相对路径）
 选项:
-  --json            输出 SARIF 风格 JSON（默认文本）
-  --out <file>      将输出保存到文件（默认 stdout）
-  --help, -h        显示帮助
+  --json          输出 SARIF 风格 JSON（默认文本）
+  --out <file>    将输出保存到文件（默认 stdout）
+  --extract-sfc   抽取 .vue/.html/.htm 内联脚本（仅 js|ts）
+  --keep-temp     保留 SFC 抽取临时目录
+  --help, -h      显示帮助
 环境变量:
   CODE_CHECKLIST_ROOT  规则库根（默认 $CODE_CHECKLIST_ROOT）
+  CODE_CHECKLIST_TMP_DIR  SFC 抽取临时目录（默认 /tmp/opencode/code-checklist-sfc）
 EOF
     exit 2
 fi
@@ -47,11 +51,15 @@ shift 3
 
 JSON_OUTPUT=0
 OUT_FILE=""
+EXTRACT_SFC=0
+KEEP_TEMP=0
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --json) JSON_OUTPUT=1; shift ;;
         --out)  OUT_FILE="$2"; shift 2 ;;
-        -h|--help) sed -n '5,25p' "$0"; exit 0 ;;
+        --extract-sfc) EXTRACT_SFC=1; shift ;;
+        --keep-temp) KEEP_TEMP=1; shift ;;
+        -h|--help) sed -n '1,15p' "$0"; exit 0 ;;
         *) echo "[run-cli] 未知参数: $1" >&2; exit 2 ;;
     esac
 done
@@ -61,6 +69,11 @@ case "$LANG_ARG" in
     java|cpp|ansi_c|rust|js|ts) ;;
     *) echo "[run-cli] 不支持的语言: $LANG_ARG（java/cpp/ansi_c/rust/js/ts）" >&2; exit 2 ;;
 esac
+
+# --extract-sfc 只对 js/ts 有意义
+if [[ "$EXTRACT_SFC" -eq 1 && "$LANG_ARG" != "js" && "$LANG_ARG" != "ts" ]]; then
+    echo "[run-cli] --extract-sfc 仅支持 lang=js|ts（当前: $LANG_ARG）" >&2; exit 2
+fi
 
 # 校验 level
 case "$LEVEL_ARG" in
@@ -82,6 +95,8 @@ else
     RUN_ARGS+=(--level "$LEVEL_ARG")
 fi
 [[ "$JSON_OUTPUT" -eq 1 ]] && RUN_ARGS+=(--json)
+[[ "$EXTRACT_SFC" -eq 1 ]] && RUN_ARGS+=(--extract-sfc)
+[[ "$KEEP_TEMP" -eq 1 ]] && RUN_ARGS+=(--keep-temp)
 
 # ---- 执行 + 输出归档 ----
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)

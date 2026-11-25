@@ -71,6 +71,27 @@ mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD 
 # 后续同 1b，--lang 改为 ts（ts 规则不覆盖 .js/.jsx）
 ```
 
+### 1g. Vue / HTML 内联脚本变更扫描
+
+`.vue` / `.html` 必须启用 `--extract-sfc`，否则 ast-grep 的 js/ts 解析器不会命中：
+
+```bash
+# 只看变更是否涉及前端文件
+mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM origin/main...HEAD -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.vue' '*.html' '*.htm')
+
+if [[ ${#CHANGED[@]} -eq 0 ]]; then
+    echo "无前端变更，跳过扫描"
+    exit 0
+fi
+
+# 仍按项目根整体扫描（抽取需要源码树结构），由 SFC 抽取统一处理 .vue/.html
+"$CODE_CHECKLIST_ROOT/scripts/run.sh" \
+    --lang js --level high --path . --extract-sfc --json > fe-report.json
+echo $?  # js 与 ts 是两套规则集，ts 项目需另跑一次 --lang ts --extract-sfc
+```
+
+> 抽取只覆盖内联 `<script>`，`<template>` 与普通 HTML 内容不参与扫描。
+
 ## 2. 多语言批量扫描
 
 ### 2a. 单项目多语言
@@ -86,16 +107,23 @@ for lang in java cpp ansi_c rust js ts; do
         cpp)    fd --no-ignore -e cpp -e h -e hpp -t f "$PROJECT" | head -1 ;;
         ansi_c) fd --no-ignore -e c -t f "$PROJECT" | head -1 ;;
         rust)   fd --no-ignore -e rs -t f "$PROJECT" | head -1 ;;
-        js)     fd --no-ignore -e js -e jsx -t f "$PROJECT" | head -1 ;;
-        ts)     fd --no-ignore -e ts -e tsx -t f "$PROJECT" | head -1 ;;
+        js)     fd --no-ignore -e js -e jsx -e vue -e html -e htm -t f "$PROJECT" | head -1 ;;
+        ts)     fd --no-ignore -e ts -e tsx -e vue -e html -e htm -t f "$PROJECT" | head -1 ;;
     esac | grep -q . || { echo "$lang: 无源文件，跳过"; continue; }
+
+    # 前端项目含 .vue/.html 时加 --extract-sfc（仅 js/ts 合法）
+    EXTRA_ARGS=()
+    if [[ ( "$lang" == "js" || "$lang" == "ts" ) ]] \
+        && fd --no-ignore -e vue -e html -e htm -t f "$PROJECT" | head -1 | grep -q .; then
+        EXTRA_ARGS+=(--extract-sfc)
+    fi
 
     # 退出码 1（有 high 命中）与 3（规则解析失败）都是正常业务返回值，
     # 必须 set +e 包裹后再取 rc，否则 set -e 会中断且拿不到 3。
     set +e
     "$CODE_CHECKLIST_ROOT/scripts/run.sh" \
         --lang "$lang" --level high \
-        --path "$PROJECT" --json > "reports/$lang-high.json"
+        --path "$PROJECT" "${EXTRA_ARGS[@]}" --json > "reports/$lang-high.json"
     rc=$?
     set -e
     echo "$lang high 退出码: $rc"
@@ -420,3 +448,39 @@ find_code_by_rule(
 ### 11.6 SQL 注入风险
 
 复用 `sql-extract` 的规则，见 `${AI_SPEC_ROOT}/skills/sql-extract/templates/recipes.md`。
+
+## 12. Vue / HTML 内联脚本排查
+
+### 12.1 确认抽取是否生效
+
+```bash
+# 先看抽取目录里生成了多少文件（manifest 记录原始路径映射）
+"$CODE_CHECKLIST_ROOT/scripts/run.sh" \
+    --lang js --all --path . --extract-sfc --keep-temp --json > /tmp/sfc-report.json
+# 从 stderr 拿到 "已保留 SFC 抽取目录: ..."，检查其中的 manifest.json
+```
+
+### 12.2 按 sfcBlock 定位块
+
+```bash
+# 只看某个 .vue 文件第 2 个 <script> 的命中
+jq -r '.[] | select(.file | endswith(".vue")) | select(.sfcBlock == 2) | "\(.file):\(.range.start.line + 1):\(.ruleId)"' \
+    /tmp/sfc-report.json
+```
+
+### 12.3 抽取能力自检
+
+```bash
+"$CODE_CHECKLIST_ROOT/scripts/validate-sfc-extract.sh"
+echo $?  # 0=通过；1=断言失败；2=环境/工具缺失
+```
+
+### 12.4 常见误判
+
+| 现象 | 原因 | 处理 |
+|------|------|------|
+| `.vue` 0 命中 | 未加 `--extract-sfc` | 追加参数后重扫 |
+| 命中重复 | 抽取与原生扫描同时生效（老版本 run.sh） | 升级规则库，原生扫描已自动排除 `.vue/.html/.htm` |
+| ts 块不命中 | 用 `--lang js` 扫 ts 块 | 改用 `--lang ts --extract-sfc` |
+| 行号对不上 | 改动过抽取脚本或手工改了临时文件 | 用 `validate-sfc-extract.sh` 回归，勿手改临时产物 |
+| `src` 引入的脚本 0 命中 | 外部脚本不抽取 | 确认对应 `.js`/`.ts` 在源码树内，由原生扫描覆盖 |

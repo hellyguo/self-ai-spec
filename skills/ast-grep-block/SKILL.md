@@ -1,6 +1,6 @@
 ---
 name: ast-grep-block
-description: "基于 ast-grep 与 code-checklist 规则库，对 Java/C++/ANSI C 项目执行分级（high/medium/low）AST 静态审查，输出命中清单与 CI 退出码。适用于提交/合并前质量门禁、CI 流水线静态检查、审查前自动化预检、存量问题盘点。"
+description: "基于 ast-grep 与 code-checklist 规则库，对 Java/C++/ANSI C/Rust/JavaScript/TypeScript 项目执行分级（high/medium/low）AST 静态审查，并支持抽取 .vue/.html 内联脚本按 js/ts 扫描，输出命中清单与 CI 退出码。适用于提交/合并前质量门禁、CI 流水线静态检查、审查前自动化预检、存量问题盘点。"
 ---
 
 # ast-grep-block 代码审查门禁技能
@@ -18,7 +18,7 @@ description: "基于 ast-grep 与 code-checklist 规则库，对 Java/C++/ANSI C
 
 ## 核心思路
 
-**单一 CLI 模式**：直接调用 code-checklist 仓库的 `scripts/run.sh`，该脚本封装了规则遍历、`.astgrepignore` 过滤、分级统计、CI 退出码输出。
+**单一 CLI 模式**：直接调用 code-checklist 仓库的 `scripts/run.sh`，该脚本封装了规则遍历、`.astgrepignore` 过滤、分级统计、CI 退出码输出；对 `.vue` / `.html` 项目可加 `--extract-sfc` 抽取内联脚本后按 `js` / `ts` 一并扫描。
 
 不使用 ast-grep-mcp，因为：
 - 审查语义需要"全规则批量 + ignore 过滤 + 退出码"，这些是 CLI 模式的优势
@@ -118,6 +118,7 @@ fd --no-ignore -e c -e h -t f <project_root> | wc -l  # ANSI C
 fd --no-ignore -e rs -t f <project_root> | wc -l  # Rust
 fd --no-ignore -e js -e jsx -t f <project_root> | wc -l  # JavaScript
 fd --no-ignore -e ts -e tsx -t f <project_root> | wc -l  # TypeScript
+fd --no-ignore -e vue -e html -e htm -t f <project_root> | wc -l  # SFC/HTML 内联脚本（配合 --extract-sfc）
 ```
 
 ### 步骤 2：选语言与级别
@@ -127,6 +128,11 @@ fd --no-ignore -e ts -e tsx -t f <project_root> | wc -l  # TypeScript
 | `--lang` | `java` / `cpp` / `ansi_c` / `rust` / `js` / `ts` | 必填 |
 | `--level` | `high` / `medium` / `low` | 任选其一 |
 | `--all` | 扫描所有级别 | 替代 `--level` |
+| `--path` | 被扫描项目根 | `.` |
+| `--json` | 输出 JSON 数组 | 文本报告 |
+| `--extract-sfc` | 抽取 `.vue` / `.html` / `.htm` 内联 `<script>`，仅 `--lang js|ts` 可用 | 关闭 |
+| `--tmp-dir` | SFC 抽取临时目录 | `${CODE_CHECKLIST_TMP_DIR:-/tmp/opencode/code-checklist-sfc}` |
+| `--keep-temp` | 保留 SFC 抽取目录便于排查 | 关闭（默认成功/失败都清理） |
 
 **推荐顺序**：先跑 `high` 修阻断项，再跑 `--all` 盘点全量。
 
@@ -149,7 +155,32 @@ echo "退出码: $?  # 0 通过 / 1 high 命中 / 2 参数错误 / 3 规则解�
     --lang java --level high \
     --path <project_root> --json > report.json
 echo $?  # 退出码仍正确返回
+
+# 3d. Vue / HTML 项目：抽取内联脚本后按 js/ts 扫描
+"$CODE_CHECKLIST_ROOT/scripts/run.sh" \
+    --lang js --all \
+    --path <project_root> --extract-sfc --json > report.json
+
+# 3e. 保留抽取现场排查（默认扫描结束即清理临时目录）
+"$CODE_CHECKLIST_ROOT/scripts/run.sh" \
+    --lang ts --all --path <project_root> --extract-sfc --keep-temp
 ```
+
+> `--extract-sfc` 仅支持 `--lang js|ts`，其他语言会以退出码 2 拒绝。
+
+### 步骤 3 补充：SFC / HTML 内联脚本
+
+ast-grep 的 `javascript` 解析器不处理 `.vue`，因此需要抽取：
+
+1. **行号对齐**：抽取文件在脚本内容前补等量空行，命中行号与原始 `.vue` / `.html` 一致；`file` 还原为原始路径，并附带 `sfcBlock`（第几个 `<script>`）。
+2. **语言分流**：`lang="ts"` / `type="text/typescript"` 归 `ts`；无 `lang`、`lang="js|javascript|babel|ecmascript"`、`type="module"` / `text/javascript` 归 `js`。扫 `js` 跳过 `ts` 块，反之亦然。
+3. **不重复上报**：启用抽取后原生扫描会用 `--globs` 排除 `.vue/.html/.htm`，由抽取结果统一提供。
+4. **跳过外部脚本**：带 `src` 的 `<script>` 不抽取，其目标 `.js` 仍被原生扫描。
+5. **跳过第三方目录**：`.git`、`.svn`、`node_modules`、`dist`、`coverage`、`libs`、`ueditor`、`kindeditor`、`jsoneditor` / `json-editor`、`echarts`。
+6. **临时目录**：`/tmp/opencode/code-checklist-sfc/run.XXXXXXXX`，可用 `--tmp-dir` 或 `CODE_CHECKLIST_TMP_DIR` 覆盖。
+7. **忽略规则**：`.astgrepignore` 按还原后的原始路径匹配，可直接写 `src/views/**/*.vue`。
+
+抽取能力本身可用 `"$CODE_CHECKLIST_ROOT/scripts/validate-sfc-extract.sh"` 验证（行号对齐、js/ts 分流、临时目录清理）。
 
 > 便捷封装见 `templates/run-cli.sh`，可复制到目标项目 `scripts/` 直接 `./scripts/run-cli.sh java high .`。
 
@@ -180,11 +211,14 @@ src/util/Crypto.java:108:25:hardcoded-secret: private String key = "sk-12345";
     "lines": "catch (Exception e) {}",
     "text": "...AST 节点文本...",
     "ruleId": "empty-catch-block",
-    "level": "high"
+    "level": "high",
+    "sfcBlock": 2
   },
   ...
 ]
 ```
+
+> `sfcBlock` 仅在 `--extract-sfc` 命中 `.vue/.html` 时出现，表示命中的是文件内第几个 `<script>`（1-based）。
 
 详细字段说明与统计命令见 `templates/report-summary.md`。
 
@@ -263,16 +297,20 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 | Rust 全级别盘点 | `run.sh --lang rust --all --path .` |
 | JavaScript 仅缺陷 | `run.sh --lang js --level high --path .` |
 | TypeScript 全级别 | `run.sh --lang ts --all --path .` |
+| Vue/HTML 内联脚本（js） | `run.sh --lang js --all --path . --extract-sfc` |
+| Vue/HTML 内联脚本（ts） | `run.sh --lang ts --all --path . --extract-sfc` |
 | JSON 报告 | `run.sh --lang java --all --path . --json > r.json` |
 | 仅看 high 命中文件 | `jq -r 'select(.level=="high")\|.file' r.json \| sort -u` |
 | 规则分布 Top N | `jq -r '.ruleId' r.json \| sort \| uniq -c \| sort -rn \| head` |
 | 校验规则库 | `"$CODE_CHECKLIST_ROOT/scripts/validate-meta.sh" && "$CODE_CHECKLIST_ROOT/scripts/validate-examples.sh"` |
+| 校验 SFC 抽取 | `"$CODE_CHECKLIST_ROOT/scripts/validate-sfc-extract.sh"` |
 
 ## 输出位置
 
 - 文本报告：默认 stderr + stdout（按 `run.sh` 实现）
 - JSON 报告：通过 `--json` 参数，需重定向到文件
-- 临时输出：本 skill 不创建临时文件，由调用方决定保存路径
+- SFC 抽取临时文件：`${CODE_CHECKLIST_TMP_DIR:-/tmp/opencode/code-checklist-sfc}/run.XXXXXXXX`，默认自动清理，`--keep-temp` 保留
+- 其他临时输出：本 skill 不创建，由调用方决定保存路径
 
 ## 陷阱与故障排除
 
@@ -284,6 +322,10 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 | high 退出码总是 1 | 有 high 命中（正常） | 按步骤 5 修复或登记 `.astgrepignore` |
 | 退出码 3 / `规则解析失败` | 规则 YAML 顶层含 ast-grep 不接受的字段（如 `level`），或 ast-grep 版本与规则格式不匹配 | 修规则（扩展字段放 `metadata:`）或对齐 ast-grep 版本，**此时 0 命中不算通过** |
 | `.astgrepignore` 不生效 | 放错位置 | 必须放在被扫描项目根，不是规则库根 |
+| `.vue` / `.html` 内联脚本 0 命中 | 未启用 `--extract-sfc`，或 `--lang` 与 `<script lang>` 不匹配 | js 项目用 `--lang js --extract-sfc`；ts 块用 `--lang ts --extract-sfc` |
+| `.vue` 命中重复上报 | 未启用抽取，ast-grep 自身又解析了 HTML 内联脚本 | 统一用 `--extract-sfc`，原生扫描会自动排除 `.vue/.html/.htm` |
+| `--extract-sfc 仅支持 --lang js\|ts` | 语言参数不是 js/ts | 改为 `--lang js` 或 `--lang ts`，其他语言不需要抽取 |
+| SFC 抽取失败（退出码 3） | 内联脚本抽取或命中路径还原异常 | 加 `--keep-temp` 保留现场检查，再跑 `validate-sfc-extract.sh` 确认抽取能力正常 |
 | 误报泛滥 | 规则太宽 | 优先优化 constraints，次选 ignore |
 | 极慢（万级文件） | ast-grep 串行扫描 | 按目录分批跑（见 `templates/recipes.md`） |
 | 找不到 `id` 字段 | YAML 损坏 | `validate-meta.sh` 校验 |
@@ -298,19 +340,23 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 6. **结果归档**：JSON 报告归档到 CI artifact，便于跨构建对比
 7. **增量扫描**：PR/commit 场景只扫变更文件，避免全量噪音（见 recipes）
 8. **环境变量固化**：`CODE_CHECKLIST_ROOT` 配置到 shell rc 或 CI 变量，避免硬编码
+9. **前端项目必开抽取**：含 `.vue` / `.html` 内联脚本的项目，`js`/`ts` 扫描统一加 `--extract-sfc`，避免漏报与重复上报
+10. **临时目录固定**：SFC 抽取目录放在 `/tmp/opencode` 下，不要污染 `/tmp` 根或仓库工作区
 
 ## 适用与限制
 
 **适用**：
-- Java / C++ / ANSI C 三语言（规则库覆盖范围）
+- Java / C++ / ANSI C / Rust / JavaScript / TypeScript 六种语言（规则库覆盖范围）
+- `.vue` / `.html` / `.htm` 内联 `<script>` 的 JS/TS 片段（需 `--extract-sfc`）
 - 字符串字面量、AST 结构可表达的代码模式
 - CI/CD 质量门禁、提交前预检、审查前盘点
 
 **不适用**：
-- 规则库未覆盖的语言（Python/Go/Rust 等需扩展规则）
+- 规则库未覆盖的语言（如 Python/Go/Kotlin）需先扩展规则
 - 跨文件数据流分析（需 SonarQube / Infer 等）
 - 运行时缺陷（需动态分析）
 - 复杂类型推断（ast-grep 是语法层，无类型信息）
+- 模板表达式（`.vue` 的 `<template>`、`.html` 的非 `<script>` 内容）不参与扫描
 
 ## 模板引用
 
@@ -322,12 +368,12 @@ rg -n -A 3 -B 3 'catch \(' src/dao/UserDao.java
 
 ---
 
-**技能版本**: 1.0.0
+**技能版本**: 1.1.0
 
-**核心工具**: code-checklist/scripts/run.sh（CLI 模式）
+**核心工具**: code-checklist/scripts/run.sh（CLI 模式，含 `--extract-sfc`）
 
 **依赖外部**: `$CODE_CHECKLIST_ROOT` 规则库
 
-**典型耗时**: Java 5k 文件 high 扫描 ≈ 30s-2min；C++ 5k 文件 ≈ 1-3min
+**典型耗时**: Java 5k 文件 high 扫描 ≈ 30s-2min；C++ 5k 文件 ≈ 1-3min；SFC 抽取在 JS/TS 扫描基础上增加一次文件遍历与临时文件写入，通常 < 10s
 
 **输出位置**: stdout/stderr 或重定向 JSON 文件

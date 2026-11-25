@@ -55,13 +55,27 @@ src/util/Util.java:15:5:unnecessary-import: import java.util.*;
     "language": "Java",
     "ruleId": "empty-catch-block",
     "level": "high"
+  },
+  {
+    "file": "/abs/src/views/Order.vue",
+    "lines": "this.$bus.$off();",
+    "text": "this.$bus.$off()",
+    "range": {
+      "byteOffset": 88,
+      "start": { "line": 41, "column": 4 },
+      "end":   { "line": 41, "column": 20 }
+    },
+    "language": "JavaScript",
+    "ruleId": "event-bus-off-all",
+    "level": "medium",
+    "sfcBlock": 1
   }
 ]
 ```
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `file` | string | 命中文件**绝对路径** |
+| `file` | string | 命中文件**绝对路径**；SFC 抽取命中会还原为原始 `.vue` / `.html` 路径 |
 | `lines` | string | 命中代码原文（首行） |
 | `text` | string | AST 节点完整文本（可能多行） |
 | `range.byteOffset` | int | 文件内字节偏移 |
@@ -72,6 +86,7 @@ src/util/Util.java:15:5:unnecessary-import: import java.util.*;
 | `language` | string | ast-grep 语言名（Java/CPP/C/Rust/JavaScript/TypeScript） |
 | `ruleId` | string | 规则 ID |
 | `level` | string | 级别（high/medium/low），由 run.sh 注入 |
+| `sfcBlock` | int | 仅 `--extract-sfc` 命中 `.vue`/`.html` 时出现，表示第几个 `<script>`（1-based） |
 
 > ⚠️ **行号偏移陷阱**：JSON 中 `range.start.line` 是 **0-based**，文本输出与 IDE 跳转是 **1-based**，转换：`line + 1`。
 
