@@ -2,6 +2,13 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-25
+
+### java-env: Decompiler Tools
+
+- The diagnostics table in `skills/java-env/SKILL.md` gains `cfr` (`${HOME}/bin/cfr`, wrapping `~/app/cfr/cfr-0.152.jar`, arguments passed through) and `fernflower` (`${HOME}/bin/fernflower`, wrapping `~/bin/fernflower.jar`)
+- Call constraints added below the table: `cfr` writes to stdout when no output directory is given; `fernflower` accepts exactly two arguments (input, output directory) and only prints Usage otherwise, with fixed flags `-hes=0 -hdc=0 -rbr=0 -rsy=0 -rer=0`; both use the `java` on PATH, so switch JDKs when the bytecode version is too new
+
 ## 2026-11-23
 
 ### Markdown Tilde Escaping Rule

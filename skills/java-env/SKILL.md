@@ -72,6 +72,14 @@ java25='JAVA_HOME=$JAVA_HOME25 PATH=$JAVA_HOME25/bin:$NOJAVA_HOME_PATH java'
 | jitwatch | `${HOME}/app/jitwatch` | JIT 编译分析 |
 | jarScanMax325 | `${HOME}/bin/jarScanMax325` | 扫描超过 325 字节、无法被 JIT 内联的方法 |
 | hprof-slurp / jhh | `${HOME}/.cargo/bin/` | 堆转储解析，命令行方式，速度快于 GUI |
+| CFR | `${HOME}/bin/cfr` | 字节码反编译为 Java 源码，包装 `~/app/cfr/cfr-0.152.jar`，参数原样透传 |
+| Fernflower | `${HOME}/bin/fernflower` | 字节码反编译为源码目录，包装 `~/bin/fernflower.jar`（Idea 自带引擎） |
+
+反编译工具的调用约束：
+
+- `cfr` 是包装脚本，参数直接透传给 CFR（当前 0.152），不带输出目录参数时结果打到标准输出。
+- `fernflower` 只接受恰好两个参数（输入、输出目录），缺参时仅打印 Usage；脚本固定加了 `-hes=0 -hdc=0 -rbr=0 -rsy=0 -rer=0`。
+- 两者都使用当前 PATH 中的 `java`；若目标字节码版本过高导致失败，先切换到匹配的 JDK（脚本内已给出 `JAVA_HOME` 切换的注释示例）。
 
 ## 验证
 

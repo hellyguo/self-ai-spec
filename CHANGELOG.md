@@ -2,6 +2,13 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-25
+
+### java-env 补充反编译工具
+
+- `skills/java-env/SKILL.md` 的「诊断与分析工具路径」表新增 `cfr`（`${HOME}/bin/cfr`，包装 `~/app/cfr/cfr-0.152.jar`，参数透传）与 `fernflower`（`${HOME}/bin/fernflower`，包装 `~/bin/fernflower.jar`）
+- 表后补调用约束：`cfr` 无输出目录参数时结果打到标准输出；`fernflower` 仅接受两个参数（输入、输出目录），缺参只打印 Usage，且脚本固定带 `-hes=0 -hdc=0 -rbr=0 -rsy=0 -rer=0`；两者均使用当前 PATH 中的 `java`，字节码版本过高时需切 JDK
+
 ## 2026-11-23
 
 ### markdown 波浪号转义约束
