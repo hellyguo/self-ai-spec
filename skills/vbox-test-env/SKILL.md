@@ -1,6 +1,6 @@
 ---
 name: vbox-test-env
-description: "提供 VirtualBox 测试环境：三台 Debian 虚拟机（互信与 sudo）用于集群/分布式测试，以及一台 Windows Server 2019 构建虚拟机用于 MSVC 编译；包含启动停止、guestcontrol、文件传输与工具链路径。"
+description: "提供 VirtualBox 测试环境：三台 Debian 虚拟机（互信与 sudo）用于集群/分布式测试，以及一台 Windows Server 2019 构建虚拟机（VS2022 + Rust）用于 MSVC 编译；包含启动停止、guestcontrol、scp 文件传输与工具链路径。"
 ---
 
 # VirtualBox 测试环境
@@ -90,6 +90,9 @@ ssh vboxuser@vboxdeb003 sudo poweroff
 | 系统 | Windows Server 2019（10.0.17763） |
 | Guest Additions | 7.1.4 |
 | 登录用户 | `vboxuser`（密码不入库，见“Guest 控制”） |
+| Visual Studio | VS2022 Community，`C:\vs\VS22Comm`（主用）；VS2015 仍在但仅作遗留 |
+| Rust | 1.100.0，`C:\Users\vboxuser\.cargo\bin`（rustc/cargo/rustup） |
+| CPU / 磁盘 | 4 逻辑核；构建前约 13.5GB 可用（以实际为准） |
 | host-only 地址 | 当前 `172.22.133.114`，以查询结果为准 |
 | NAT 地址 | Guest `10.0.2.15`，宿主机侧 `10.0.2.2` |
 | 宿主机服务访问 | Guest 内使用 `ws://10.0.2.2:<port>/...` |
@@ -163,22 +166,39 @@ winpsex "whoami"
 
 `wincmd`/`winpsh`/`winpsex` 都无法在控制台下以管理员权限运行，因为无法通过 console 命令提权。若宿主机上没有 `--passwordfile` 支持，可临时使用 `--password`，但不要写入脚本或历史记录。
 
+注意：通过 `guestcontrol ... /c "<command>"` 传含引号、花括号或 `&` 的复杂命令时，容易发生二次转义，导致参数被截断。复杂命令建议写成 `.bat` 文件上传到 `C:\Temp` 后执行，例如：
+
+```bat
+@echo off
+cd /d C:\work\project
+cargo build --release
+```
+
+```bash
+VBoxManage guestcontrol WinServer2019 copyto --username vboxuser --passwordfile "$HOME/.vbox-win.pass" /tmp/build.bat 'C:\Temp\build.bat'
+wincmd "C:\Temp\build.bat"
+```
+
 ### 工具链位置
+
+以下为 2026-11-25 实测值：
 
 | 工具 | 路径/版本 |
 |------|-----------|
-| Visual Studio 2015 | `C:\Program Files (x86)\Microsoft Visual Studio 14.0` |
-| vcvarsall | `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat` |
-| cl.exe（x64） | `C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\cl.exe` |
-| MSVC 版本 | 19.00.24247.2（VS2015，C++14） |
-| CMake / Ninja | `C:\App\strawberryperl\c\bin\`（CMake 3.29.2） |
+| Visual Studio（主用） | VS2022 Community，`C:\vs\VS22Comm` |
+| vcvars（主用） | `C:\vs\VS22Comm\VC\Auxiliary\Build\vcvars64.bat` |
+| cl.exe（x64） | `C:\vs\VS22Comm\VC\Tools\MSVC\14.43.34808\bin\Hostx64\x64\cl.exe` |
+| MSVC 版本 | 19.43.34810（C++20/23） |
+| Visual Studio 2015（遗留） | `C:\Program Files (x86)\Microsoft Visual Studio 14.0`，仅 C++14，不用于新项目 |
+| Rust | 1.100.0（`rustc`/`cargo`/`rustup` 位于 `C:\Users\vboxuser\.cargo\bin`） |
+| CMake / Ninja | `C:\App\strawberryperl\c\bin\`（CMake 3.29.2 / Ninja 1.12.0） |
 | OpenSSL | `C:\OpenSSL-Win64`（4.0.0，库在 `lib\VC\x64\{MD,MDd,MT,MTd}`） |
 | Git | `C:\git4win\bin\git.exe` |
 | 7-Zip | `C:\Program Files\7-Zip\7z.exe`（已在 PATH） |
 | OpenSSH scp | `C:\Windows\System32\OpenSSH\scp.exe` |
 | 源码工作目录示例 | `C:\work\<project>` |
 
-VS2015 的 MSBuild/VS 生成器不完整，`cmake -G "Visual Studio 14 2015"` 会报 `VCTargetsPath` 错误；统一使用 `Ninja` + `vcvarsall`。
+VS2022 已支持 C++20/23；优先使用 `vcvars64.bat`。VS2015 的 MSBuild/VS 生成器不完整，`cmake -G "Visual Studio 14 2015"` 会报 `VCTargetsPath` 错误，新项目不要走 VS2015。
 
 ### 文件传输
 
@@ -198,32 +218,44 @@ git archive --format=zip -o /tmp/"$REF".zip "$REF"
 7z a -t7z -mx=3 /tmp/worktree.7z . -x'!build/*' -x'!.git/*' -x'!dist/*'
 ```
 
-Windows 侧取包并解压（7z 可直接解 zip）：
+Windows 侧取包（在 Guest 内主动 `scp` 拉取，免密已配置）：
 
 ```bash
-wincmd "scp <host-user>@10.0.2.2:/tmp/HEAD.zip C:\Temp\src.zip"
+wincmd "scp -o StrictHostKeyChecking=no <host-user>@10.0.2.2:/tmp/HEAD.zip C:\Temp\src.zip"
 wincmd "7z x C:\Temp\src.zip -aoa -oC:\work\<project>"
 ```
 
-上传产物回宿主：
+上传产物回宿主（同样由 Guest 侧 `scp` 推送）：
 
 ```bash
-wincmd "scp C:\work\<project>\build-win\webnet2\webnet2.dll <host-user>@10.0.2.2:<repo>/dist/win-x64/webnet2.dll"
+wincmd "scp -o StrictHostKeyChecking=no C:\work\<project>\target\release\app.exe <host-user>@10.0.2.2:/tmp/app.exe"
 ```
 
 说明：
 
-- `<host-user>` 为宿主机当前登录用户；免密登录已配置，host key 变化时检查宿主 `sshd` 或清理 Guest 的 `known_hosts`。
+- `scp` 方向是 Guest 主动连接宿主机 `10.0.2.2`，宿主无需运行 SSH 服务端；已实测可双向传输。
+- `<host-user>` 为宿主机当前登录用户；免密登录已配置，host key 变化时检查宿主机 `sshd` 或清理 Guest 的 `known_hosts`。
 - `scp -r` 可传目录，但大量小文件建议先打包。
 - 备用方式：`guestcontrol copyto/copyfrom`。`copyto` 的 `--target-directory` 需以反斜杠结尾；直接复制宿主机 `/disk2/...` 可能报 `NS_ERROR_FAILURE`，先放 `/tmp` 再传。`copyfrom` 必须带 VM 名，目标是宿主机文件路径。
 
 ### Windows 构建要点
 
-- 使用 `vcvarsall amd64` 或 `vcvarsall x86` + `cmake -G Ninja`。
-- VS2015 只支持到 C++14；CMake 在 `MSVC_VERSION < 1910` 时应回退到 C++14。
+- 优先使用 VS2022：`call C:\vs\VS22Comm\VC\Auxiliary\Build\vcvars64.bat`；`vcvarsall amd64` 也可用。
+- VS2022 支持 C++20/23；需要 C++20 的项目（如 qpdf 12 vendored）可直接构建。VS2015 仅 C++14，只用于遗留项目。
+- Rust 项目的 MSRV 需注意：flpdf 0.10 要求 rustc ≥1.89；若 cargo 报 MSRV 错误，先 `rustup update stable`（当前为 1.100.0）。
+- 需要免 VC++ Redistributable 的 Rust 产物，设置静态 CRT：
+
+```bat
+set RUSTFLAGS=-C target-feature=+crt-static
+cargo build --release
+```
+
+  构建后用 `dumpbin /dependents` 检查，理想情况下只剩 `kernel32.dll`、`ADVAPI32.dll`、`ntdll.dll` 等系统 DLL，不应出现 `MSVCP140.dll` / `VCRUNTIME140.dll`。
+- 某些 `-sys` crate 的 vendored C/C++ 构建使用 `cc` crate 而不是 CMake（例如 `qpdf-sys` 直接以 `/std:c++20` 编译），不要假设必须提供 CMake。
+- 使用 CMake 的项目，在 vcvars 环境后统一用 `cmake -G Ninja`；不要用 VS2015 生成器。
 - Windows 构建默认关闭 zlib 与 permessage-deflate 时，产物不支持 gzip；需要压缩时准备与 MSVC 匹配的 zlib，并打开 `LWS_WITH_ZLIB` 与扩展。
 - 32 位最小包可用静态 CRT（`CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded`）并关闭 SSL，运行依赖只剩 `WS2_32.dll`、`KERNEL32.dll`，但不支持 wss。
-- 导出符号验证需在 `vcvarsall` 环境运行 `dumpbin`；建议在 Guest 内写一个 `.bat` 调用 `vcvarsall` 后再执行 `dumpbin`。
+- 导出符号验证需在 vcvars 环境运行 `dumpbin`；建议在 Guest 内写一个 `.bat` 调用 `vcvars64.bat` 后再执行 `dumpbin`。
 
 ## 使用约束
 
