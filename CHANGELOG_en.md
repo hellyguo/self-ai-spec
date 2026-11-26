@@ -4,6 +4,11 @@
 
 ## 2026-11-26
 
+### code-review: Bounded-Query P0 Rule
+
+- The database review section of `skills/code-review/SKILL.md` gains a hard gate: every query must bound its output (via `LIMIT`, a paging cap, or bounded streaming batches) or bound its conditions (equality/range that hits an index); failing both is a P0, and "the table is small" or "we call it rarely" is not an excuse
+- `templates/database-review.md` gains a "Bounded Query Review (P0)" section: two criteria, seven violation patterns with detection methods (unconditional full scan, unbounded ORM `findAll`, unbounded `pageSize`, one-shot export loading, unbounded user-supplied `in` lists, N+1 lazy loading, pagination that skips rows), three memory-side checks (full retention, batch cap, in-memory filter/sort that belongs in SQL), and four exemptions; the SQL performance table gains "unbounded result set" and "full load" rows
+
 ### rust-crossing-compile: Layered Restructure
 
 - `SKILL.md` shrinks from 243 to 155 lines: the three overlapping decision tables (use cases, worth-it check, option comparison) merge into one "Applicability and Selection" section, the main path keeps only the macOS verification chain, and "Outputs", "Done Criteria" and "Reference Index" are added to match the body structure required by `AGENTS.md`

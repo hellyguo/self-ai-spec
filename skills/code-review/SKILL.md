@@ -145,7 +145,9 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 ### 数据库审查规则
 
-详见 [templates/database-review.md](templates/database-review.md)：SQL安全性、SQL性能、表结构设计、数据库架构。
+**查询必须有界（P0 判定项）**：任何查询要么约束总输出条数（`LIMIT`/`TOP`/分页/流式分批），要么约束查询条件（等值或范围条件且能命中索引），二者至少满足其一；两者都不满足即判 P0，不允许以“表小”“调用少”为由放行。
+
+详见 [templates/database-review.md](templates/database-review.md)：SQL安全性、SQL性能、表结构设计、数据库架构、查询有界性。
 
 ## 审查输出
 
