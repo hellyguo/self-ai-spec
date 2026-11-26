@@ -4,10 +4,12 @@
 
 ## 2026-11-26
 
-### code-review: Bounded-Query P0 Rule
+### code-review: Bounded Entry Points and Bounded Queries (P0)
 
-- The database review section of `skills/code-review/SKILL.md` gains a hard gate: every query must bound its output (via `LIMIT`, a paging cap, or bounded streaming batches) or bound its conditions (equality/range that hits an index); failing both is a P0, and "the table is small" or "we call it rarely" is not an excuse
-- `templates/database-review.md` gains a "Bounded Query Review (P0)" section: two criteria, seven violation patterns with detection methods (unconditional full scan, unbounded ORM `findAll`, unbounded `pageSize`, one-shot export loading, unbounded user-supplied `in` lists, N+1 lazy loading, pagination that skips rows), three memory-side checks (full retention, batch cap, in-memory filter/sort that belongs in SQL), and four exemptions; the SQL performance table gains "unbounded result set" and "full load" rows
+- `skills/code-review/SKILL.md` gains an "Entry-Point Boundedness (P0)" section: HTTP controller/action, RPC/TCP handlers, MQ listeners, CLI commands and scheduled jobs must explicitly bound counts, collection lengths, payload size and time windows, and concurrency/depth
+- The database review section adds its own gate: every query must bound its output (via `LIMIT`, a paging cap, or bounded streaming batches) or its conditions (equality/range that hits an index); failing both is a P0, and "the table is small" or "we call it rarely" is not an excuse
+- New `templates/endpoint-bounds.md`: five dimensions that must be bounded, per-endpoint checklists for four entry types, review actions, exemptions, and a four-quadrant table pairing entry-point and query boundedness (the entry point is the gate, the query is the backstop)
+- `templates/database-review.md` gains a "Bounded Query Review (P0)" section: two criteria, seven violation patterns with detection methods (unconditional full scan, unbounded ORM `findAll`, unbounded `pageSize`, one-shot export loading, unbounded user-supplied `in` lists, N+1 lazy loading, pagination that skips rows), three memory-side checks (full retention, batch cap, in-memory filter/sort that belongs in SQL), and four exemptions; a missing upstream bound is recorded as an entry-point P0
 
 ### rust-crossing-compile: Layered Restructure
 
