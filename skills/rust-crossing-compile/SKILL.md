@@ -97,7 +97,7 @@ codesign --verify --verbose=2 target/${TARGET}/release/<binary>
 
 硬性要求：依赖列表里不允许出现构建机绝对路径；随包分发的 dylib 应以 `@loader_path` 或 `@rpath` 引用。
 
-Linux/Windows 产物的校验命令与 11 项验收清单见 `references/verification.md`。
+Linux/Windows 产物的校验命令与 11 项验收清单见 `references/verification.md`；Windows MSVC 构建若要免 VC++ Redistributable，使用目标专属 `+crt-static`，详见该页。
 
 ### 步骤4：组装 .app
 
