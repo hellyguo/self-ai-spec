@@ -98,6 +98,12 @@ self-ai-spec/
 | `gdb-heap-analysis` | GDB heap analysis: glibc ptmalloc memory leak/arena analysis in core dumps, including mmap accounting and large-core scanning |
 | `rust-flamegraph` | Rust flame graphs: CPU hotspot analysis and bottleneck localization (cargo flamegraph) |
 
+### Build and Cross-Compilation
+
+| Skill | Purpose |
+| :--- | :--- |
+| `rust-crossing-compile` | Rust macOS cross-compilation: emit arm64/x86_64 Mach-O binaries and `.app` bundles from Linux/Windows via zig, covering SDK and framework linking, ad-hoc signing, Mach-O verification, packaging and troubleshooting |
+
 ### Document and Diagram Generation
 
 | Skill | Purpose |

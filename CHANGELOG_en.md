@@ -2,6 +2,14 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-26
+
+### rust-crossing-compile: Layered Restructure
+
+- `SKILL.md` shrinks from 243 to 155 lines: the three overlapping decision tables (use cases, worth-it check, option comparison) merge into one "Applicability and Selection" section, the main path keeps only the macOS verification chain, and "Outputs", "Done Criteria" and "Reference Index" are added to match the body structure required by `AGENTS.md`
+- Content moves into `references/troubleshooting.md` (13 common symptoms, 6 Rust heavy-dependency cross notes, triage order), `references/verification.md` (three-platform verification commands plus an 11-item acceptance checklist), and `references/ci-release.md` (CI advice, universal binaries and other Apple platforms, security and compliance); nothing is dropped, only reorganized
+- Skill tables: `AGENTS.md`, `README.md`, and `README_en.md` gain a "Build and Cross-Compilation" category with the `rust-crossing-compile` entry, which had been committed earlier without an index row
+
 ## 2026-11-25
 
 ### java-env: Decompiler Tools

@@ -2,6 +2,14 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-26
+
+### rust-crossing-compile 分层重构
+
+- `SKILL.md` 由 243 行压到 155 行：合并「适用场景 / 先决策 / 方案选型」三张重叠决策表为「适用场景与选型」，主线只保留 macOS 校验链，补齐「输出物」「完成标准」「参考索引」，对齐 `AGENTS.md` 的正文结构约定
+- 下沉出 `references/troubleshooting.md`（13 条常见问题、6 条 Rust 重依赖交叉要点、排查顺序）、`references/verification.md`（三平台校验命令与 11 项验收清单）、`references/ci-release.md`（CI 建议、通用二进制与其他 Apple 平台、安全与合规）；内容只重组不删减
+- 技能表同步：`AGENTS.md`、`README.md`、`README_en.md` 新增「构建与交叉编译」分类与 `rust-crossing-compile` 条目（该技能此前已入库但未进索引）
+
 ## 2026-11-25
 
 ### java-env 补充反编译工具

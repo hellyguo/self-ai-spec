@@ -139,6 +139,12 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 | `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析，含 mmap 统计与大 core 扫描 | 仓库 |
 | `rust-flamegraph` | Rust 火焰图：CPU 热点分析、性能瓶颈定位（cargo flamegraph） | 仓库 |
 
+### 构建与交叉编译
+
+| 技能 | 用途 | 来源 |
+| :--- | :--- | :--- |
+| `rust-crossing-compile` | Rust macOS 交叉编译：用 zig 在 Linux/Windows 产出 arm64/x86_64 的 Mach-O 与 `.app`，含 SDK 与框架链接、ad-hoc 签名、Mach-O 校验、打包与排错 | 仓库 |
+
 ### 文档与图表生成
 
 | 技能 | 用途 | 来源 |

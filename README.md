@@ -98,6 +98,12 @@ self-ai-spec/
 | `gdb-heap-analysis` | GDB 堆内存分析：core dump 中的 glibc ptmalloc 内存泄漏/arena 分析，含 mmap 统计与大 core 扫描 |
 | `rust-flamegraph` | Rust 火焰图：CPU 热点分析、性能瓶颈定位（cargo flamegraph） |
 
+### 构建与交叉编译
+
+| 技能 | 用途 |
+| :--- | :--- |
+| `rust-crossing-compile` | Rust macOS 交叉编译：用 zig 在 Linux/Windows 产出 arm64/x86_64 的 Mach-O 与 `.app`，含 SDK 与框架链接、ad-hoc 签名、Mach-O 校验、打包与排错 |
+
 ### 文档与图表生成
 
 | 技能 | 用途 |
