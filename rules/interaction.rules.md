@@ -38,6 +38,12 @@
     - ntimes[重复执行，ntimes n -- cmd(串行执行) / ntimes n -p -- cmd(并行执行)]
     - codegraph/semble/zg[特化的代码检索]
 
+## dev-balance 门禁
+
+1. 开发类任务（编码、重构、架构落地、局部修改）开始前，检查当前项目 `AGENTS.md` 中是否存在 `## dev-balance 执行结论` 章节
+2. 如果不存在，必须先调用 skill `dev-balance` 完成七维度问询，形成执行结论并写入 `AGENTS.md`，方可开始开发
+3. 后续开发、审查、重构以该结论为标尺，偏离结论即为问题；变更预期须回到 `dev-balance` 修订结论
+
 ## CodeGraph
 
 1. 如果不存在，`.codegraph/`，主动创建 `.codegraph/`

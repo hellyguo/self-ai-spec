@@ -172,6 +172,7 @@ description: "能力说明。适用于触发场景一、触发场景二。"
 | :--- | :--- | :--- |
 | `merge-agents-md` | 合并语言模板到项目 AGENTS.md | 仓库 |
 | `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 | 仓库 |
+| `dev-balance` | 开发平衡基线：七维度询问项目预期，生成基线并将执行结论写入 AGENTS.md，约束后续编码与架构决策 |
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） | 外部（自维护） |
 | `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） | 本地 |
 | `vbox-test-env` | VirtualBox 测试环境：三台 Debian 虚拟机（互信与 sudo）用于集群/分布式测试，另有一台 Windows Server 2019 构建机（VS2022 + Rust）用于 MSVC 编译 | 仓库 |
