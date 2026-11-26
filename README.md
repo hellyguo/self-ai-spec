@@ -78,7 +78,7 @@ self-ai-spec/
 | `shell-check` | ShellCheck 静态分析：Shell 脚本代码质量检测（语法错误、潜在缺陷、代码风格） |
 | `rust-clippy` | Clippy 静态分析：Rust 代码质量检测（错误、风格、性能、安全），支持 cargo fix 自动修复 |
 | `java-static-analysis` | Java 静态分析统一入口：PMD 源码规范与坏味道 / SpotBugs 字节码缺陷与安全，可串联归并，输出分级问题清单 |
-| `ast-grep-block` | 基于 ast-grep 的代码审查门禁：code-checklist 规则集分级扫描 Java/C++/ANSI C |
+| `ast-grep-block` | 基于 ast-grep 与 code-checklist 的审查门禁：六语言（Java/C++/ANSI C/Rust/JS/TS）分级扫描，支持 `.vue`/`.html` 内联脚本抽取，输出 CI 退出码 |
 
 ### Java 开发工具
 
@@ -125,7 +125,7 @@ self-ai-spec/
 | `sql-extract` | SQL 抽取：从 C++/Java/XML 源代码中抽取内嵌 SQL 语句，识别 SQL 拼接点 |
 | `memrec` | AI 记忆持久化：跨会话记忆存储、检索、项目隔离、混合检索（KNN+BM25） |
 | `semble-search` | 代码检索子代理：按意图查找实现、理解代码、发现相关代码（语义检索） |
-| `vbox-test-env` | VirtualBox 三机测试环境：已配置互信与 sudo，适用于集群/分布式系统测试 |
+| `vbox-test-env` | VirtualBox 测试环境：三台 Debian 虚拟机（互信与 sudo）用于集群/分布式测试，另有一台 Windows Server 2019 构建机（VS2022 + Rust）用于 MSVC 编译 |
 | `sync-repo-docs` | 仓库文档同步：基于 git 提交记录同步 README/CHANGELOG/MANUAL，规范双语命名与互链，并联动 `merge-agents-md` 同步 AGENTS.md |
 
 ## 语言规范（lang-spec）

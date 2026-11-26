@@ -10,6 +10,18 @@
 - 下沉出 `references/troubleshooting.md`（13 条常见问题、6 条 Rust 重依赖交叉要点、排查顺序）、`references/verification.md`（三平台校验命令与 11 项验收清单）、`references/ci-release.md`（CI 建议、通用二进制与其他 Apple 平台、安全与合规）；内容只重组不删减
 - 技能表同步：`AGENTS.md`、`README.md`、`README_en.md` 新增「构建与交叉编译」分类与 `rust-crossing-compile` 条目（该技能此前已入库但未进索引）
 
+### ast-grep-block 扩展到六语言并支持 SFC 抽取
+
+- 语言范围由 Java/C++/ANSI C 扩至 Java/C++/ANSI C/Rust/JavaScript/TypeScript，分级口径统一为 high/medium/low
+- 新增 `--extract-sfc`：抽取 `.vue`/`.html`/`.htm` 的内联 `<script>` 后按 `js`/`ts` 扫描，仅这两个 `--lang` 可用
+- `templates/recipes.md`、`templates/report-summary.md`、`templates/run-cli.sh` 同步补齐命令样例与报告格式
+
+### vbox-test-env 纳入 Windows 构建虚拟机
+
+- 技能结构拆为「Linux 三机集群」与「Windows 构建虚拟机」两部分，前者行为不变
+- 新增 Windows Server 2019 构建机（VS2022 + Rust），覆盖 headless 启停、`guestcontrol` 以密码文件认证、工具链路径、`scp`/7z 传输与 Windows 构建注意事项
+- 明确 UAC 约束：guest 侧无法以管理员身份执行；密码与宿主账号机密不写入技能
+
 ## 2026-11-25
 
 ### java-env 补充反编译工具

@@ -78,7 +78,7 @@ self-ai-spec/
 | `shell-check` | ShellCheck static analysis: Shell script quality checks (syntax errors, potential defects, code style) |
 | `rust-clippy` | Clippy static analysis: Rust code quality checks (errors, style, performance, security), supports `cargo fix` auto-fix |
 | `java-static-analysis` | Unified Java static analysis entry: PMD source-level standards and code smells / SpotBugs bytecode defects and security, chainable with merged grading |
-| `ast-grep-block` | ast-grep based review gate: graded scanning of Java/C++/ANSI C with the code-checklist rule set |
+| `ast-grep-block` | ast-grep and code-checklist review gate: graded scanning across six languages (Java/C++/ANSI C/Rust/JS/TS), optional `.vue`/`.html` inline-script extraction, and CI exit codes |
 
 ### Java Development Tools
 
@@ -125,7 +125,7 @@ self-ai-spec/
 | `sql-extract` | SQL extraction: extract embedded SQL from C++/Java/XML sources and identify SQL concatenation points |
 | `memrec` | AI memory persistence: cross-session memory storage and retrieval, project isolation, hybrid retrieval (KNN+BM25) |
 | `semble-search` | Code search sub-agent: find implementations by intent, understand code, discover related code (semantic search) |
-| `vbox-test-env` | VirtualBox three-machine test environment with mutual trust and sudo configured, suitable for cluster/distributed system testing |
+| `vbox-test-env` | VirtualBox test environment: three Debian VMs with mutual trust and sudo for cluster/distributed testing, plus a Windows Server 2019 build VM (VS2022 + Rust) for MSVC compilation |
 | `sync-repo-docs` | Repository document synchronization: sync README/CHANGELOG/MANUAL based on git commits, standardize bilingual naming and cross-links, and chain into `merge-agents-md` to synchronize AGENTS.md |
 
 ## Language Specifications (lang-spec)

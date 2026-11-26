@@ -10,6 +10,18 @@
 - Content moves into `references/troubleshooting.md` (13 common symptoms, 6 Rust heavy-dependency cross notes, triage order), `references/verification.md` (three-platform verification commands plus an 11-item acceptance checklist), and `references/ci-release.md` (CI advice, universal binaries and other Apple platforms, security and compliance); nothing is dropped, only reorganized
 - Skill tables: `AGENTS.md`, `README.md`, and `README_en.md` gain a "Build and Cross-Compilation" category with the `rust-crossing-compile` entry, which had been committed earlier without an index row
 
+### ast-grep-block: Six Languages and SFC Extraction
+
+- Language coverage grows from Java/C++/ANSI C to Java/C++/ANSI C/Rust/JavaScript/TypeScript with a uniform high/medium/low grading scale
+- New `--extract-sfc` flag: extracts inline `<script>` blocks from `.vue`/`.html`/`.htm` and scans them as `js`/`ts`; available only for those two `--lang` values
+- `templates/recipes.md`, `templates/report-summary.md`, and `templates/run-cli.sh` gain the matching commands and report format
+
+### vbox-test-env: Windows Build VM
+
+- The skill splits into "Linux three-machine cluster" and "Windows build VM" sections; the Linux behaviour is unchanged
+- Adds a Windows Server 2019 build VM (VS2022 + Rust) covering headless start/stop, `guestcontrol` authentication via password files, toolchain paths, `scp`/7z transfer, and Windows build notes
+- Documents the UAC constraint that guests cannot run as administrator, and stores no passwords or host account secrets in the skill
+
 ## 2026-11-25
 
 ### java-env: Decompiler Tools
