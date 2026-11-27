@@ -160,6 +160,34 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 详见 [templates/database-review.md](templates/database-review.md)：SQL安全性、SQL性能、表结构设计、数据库架构、查询有界性。
 
+### 依赖版本规则（Java/Maven）
+
+**同名包多版本（P0）**：同一 `groupId:artifactId` 在 pom 或依赖树中出现两个及以上不同版本，即判 P0。典型来源：pom 内重复声明、同一模块不同 profile 各写一个版本、`dependencyManagement` 与显式声明版本不一致、多模块各自声明同一依赖的不同版本。运行时表现为 classpath 不确定，常见故障是 `NoSuchMethodError`、`ClassCastException` 或旧版本漏洞被解析进来。
+
+检测：
+
+```bash
+# 依赖树中的冲突与重复节点
+mvnd dependency:tree -Dverbose | grep -E "omitted for conflict|omitted for duplicate"
+
+# 同名依赖是否在多处声明了不同版本
+mvnd dependency:list -Dverbose | sort | uniq -c | sort -rn | head
+```
+
+**传递依赖隐式覆盖（P1）**：仅由传递依赖引入、被 Maven 就近原则静默覆盖的版本差异，判 P1。特征是依赖树里出现 `omitted for conflict with`、`managed from`、`version managed from`，但 pom 中没有对应声明——版本由上游决定，上游升级即可能被动变更。
+
+检测：
+
+```bash
+# 指定坐标的完整来源链
+mvnd dependency:tree -Dverbose -Dincludes=<groupId>:<artifactId>
+
+# 实际生效的版本（含 dependencyManagement 覆盖结果）
+mvnd help:effective-pom | grep -B2 -A4 "<artifactId>your-artifact</artifactId>"
+```
+
+分级口径：**能直接在 pom 中看到同名不同版本 → P0**；**只能从 `-Dverbose` 树中看出被覆盖或冲突 → P1**。两者的修复手段一致：在 `dependencyManagement` 中收敛为唯一版本，并开启 `maven-enforcer-plugin` 的 `DependencyConvergence` 规则防止回退。
+
 ## 审查输出
 
 > 本文件中的 `templates/...` 均指本技能目录下的 `templates/` 子目录。

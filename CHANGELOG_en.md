@@ -2,6 +2,14 @@
 
 > Back to index: [README_en.md](README_en.md) | 中文：[CHANGELOG.md](CHANGELOG.md)
 
+## 2026-11-27
+
+### code-review: Java/Maven Dependency Version Rules
+
+- `skills/code-review/SKILL.md` gains a "Dependency Versions (Java/Maven)" section: the same `groupId:artifactId` resolving to two or more versions is a P0 (non-deterministic classpath; typical failures are `NoSuchMethodError`, `ClassCastException`, or an old vulnerable version being resolved), while version drift introduced only through transitive dependencies and silently overridden by Maven's nearest-wins rule is a P1
+- Detection commands are included: `mvnd dependency:tree -Dverbose` filtered for `omitted for conflict`/`omitted for duplicate`, `dependency:list -Dverbose` to find duplicate declarations, and `help:effective-pom` for the effective version; the shared fix is collapsing versions in `dependencyManagement` and enabling the enforcer `DependencyConvergence` rule
+- Grading rule: duplicates visible in the pom are P0; overrides only visible in the verbose tree are P1
+
 ## 2026-11-26
 
 ### code-review: Bounded Entry Points and Bounded Queries (P0)

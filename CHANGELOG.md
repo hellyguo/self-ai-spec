@@ -2,6 +2,14 @@
 
 > 返回目录：[README.md](README.md) | English：[CHANGELOG_en.md](CHANGELOG_en.md)
 
+## 2026-11-27
+
+### code-review 新增 Java/Maven 依赖版本规则
+
+- `skills/code-review/SKILL.md` 新增「依赖版本规则（Java/Maven）」：同一 `groupId:artifactId` 出现两个及以上不同版本判 P0（classpath 不确定，常见 `NoSuchMethodError`、`ClassCastException`、旧版本漏洞被解析）；仅由传递依赖引入、被就近原则静默覆盖的版本差异判 P1
+- 给出检测命令：`mvnd dependency:tree -Dverbose` 过滤 `omitted for conflict`/`omitted for duplicate`、`dependency:list -Dverbose` 查重复声明来源、`help:effective-pom` 查实际生效版本；修复统一走 `dependencyManagement` 收敛并开启 enforcer `DependencyConvergence`
+- 分级口径明确为：pom 中可见的同名不同版本为 P0，只能在 verbose 依赖树中看出被覆盖为 P1
+
 ## 2026-11-26
 
 ### code-review 新增入口与查询有界性 P0 规则
