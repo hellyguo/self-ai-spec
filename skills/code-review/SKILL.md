@@ -162,7 +162,7 @@ Read ${AI_SPEC_ROOT}/lang-spec/review.{lang}.md
 
 ### 依赖版本规则（Java/Maven）
 
-**同名包多版本（P0）**：同一 `groupId:artifactId` 在 pom 或依赖树中出现两个及以上不同版本，即判 P0。典型来源：pom 内重复声明、同一模块不同 profile 各写一个版本、`dependencyManagement` 与显式声明版本不一致、多模块各自声明同一依赖的不同版本。运行时表现为 classpath 不确定，常见故障是 `NoSuchMethodError`、`ClassCastException` 或旧版本漏洞被解析进来。
+**同名包多版本（P0）**：同一 `groupId:artifactId` 在 pom 或依赖树中出现两个及以上不同版本，即判 P0。典型来源：pom 内重复声明、同一模块不同 profile 给同一依赖写了不同版本、`dependencyManagement` 与显式声明版本不一致、多模块各自声明同一依赖的不同版本。运行时表现为 classpath 不确定，常见故障是 `NoSuchMethodError`、`ClassCastException` 或旧版本漏洞被解析进来。
 
 检测：
 
@@ -173,6 +173,10 @@ mvnd dependency:tree -Dverbose | grep -E "omitted for conflict|omitted for dupli
 # 同名依赖是否在多处声明了不同版本
 mvnd dependency:list -Dverbose | sort | uniq -c | sort -rn | head
 ```
+
+**与 MR-JAR 的区分（不计入 P0）**：MR-JAR 的多 JDK 支持靠 profile 切换的是**编译源目录、compiler execution 与 Manifest 的 `Multi-Release: true`**，依赖坐标与版本仍然唯一，版本化类通过 `META-INF/versions/{N}` 生效，不会切换依赖树。判别方法：看 profile 内的差异落在 `<dependency><version>`（依赖版本分叉）还是 `<sourceDirectory>`/`maven-compiler-plugin`/`maven-jar-plugin`（构建配置差异）；后者不属本条。
+
+若某依赖确实必须在不同 JDK 上使用不同版本（例如 MVEL2 这类对内嵌引擎版本敏感、且新旧 JDK 兼容区间不重叠的依赖），属于受控取舍：单次构建内版本仍唯一，判 P1 并要求在 pom 与决策记录中写明触发条件，由 CI 对每个 JDK 矩阵分别验证，不得默认按 P0 处理。
 
 **传递依赖隐式覆盖（P1）**：仅由传递依赖引入、被 Maven 就近原则静默覆盖的版本差异，判 P1。特征是依赖树里出现 `omitted for conflict with`、`managed from`、`version managed from`，但 pom 中没有对应声明——版本由上游决定，上游升级即可能被动变更。
 
@@ -186,7 +190,7 @@ mvnd dependency:tree -Dverbose -Dincludes=<groupId>:<artifactId>
 mvnd help:effective-pom | grep -B2 -A4 "<artifactId>your-artifact</artifactId>"
 ```
 
-分级口径：**能直接在 pom 中看到同名不同版本 → P0**；**只能从 `-Dverbose` 树中看出被覆盖或冲突 → P1**。两者的修复手段一致：在 `dependencyManagement` 中收敛为唯一版本，并开启 `maven-enforcer-plugin` 的 `DependencyConvergence` 规则防止回退。
+分级口径：**能直接在 pom 中看到同名不同版本 → P0**；**只能从 `-Dverbose` 树中看出被覆盖或冲突 → P1**；**MR-JAR 这类只切编译源与工具链、依赖版本唯一的构建 profile → 不计入**。修复手段一致：在 `dependencyManagement` 中收敛为唯一版本，并开启 `maven-enforcer-plugin` 的 `DependencyConvergence` 规则防止回退。
 
 ## 审查输出
 

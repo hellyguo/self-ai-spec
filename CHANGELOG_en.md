@@ -8,7 +8,9 @@
 
 - `skills/code-review/SKILL.md` gains a "Dependency Versions (Java/Maven)" section: the same `groupId:artifactId` resolving to two or more versions is a P0 (non-deterministic classpath; typical failures are `NoSuchMethodError`, `ClassCastException`, or an old vulnerable version being resolved), while version drift introduced only through transitive dependencies and silently overridden by Maven's nearest-wins rule is a P1
 - Detection commands are included: `mvnd dependency:tree -Dverbose` filtered for `omitted for conflict`/`omitted for duplicate`, `dependency:list -Dverbose` to find duplicate declarations, and `help:effective-pom` for the effective version; the shared fix is collapsing versions in `dependencyManagement` and enabling the enforcer `DependencyConvergence` rule
-- Grading rule: duplicates visible in the pom are P0; overrides only visible in the verbose tree are P1
+- The rule is explicitly separated from MR-JAR: MR-JAR profiles switch the source directory, compiler execution and `Multi-Release: true` while the dependency version stays single, so they are not a P0; the distinguishing check is whether the profile diff lands on `<dependency><version>` or on `<sourceDirectory>`/`maven-compiler-plugin`/`maven-jar-plugin`
+- When a dependency genuinely must differ per JDK (for example MVEL2), it is a controlled trade-off: graded P1, with the trigger documented in the pom and decision records and verified by a per-JDK CI matrix, never defaulted to P0
+- Grading rule: duplicates visible in the pom are P0, overrides only visible in the verbose tree are P1, and MR-JAR-style build profiles are excluded
 
 ## 2026-11-26
 
